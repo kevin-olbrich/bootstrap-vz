@@ -15,6 +15,7 @@ class SetGrubConsolOutputDeviceToVirtual(Task):
     @classmethod
     def run(cls, info):
         info.grub_config['GRUB_CMDLINE_LINUX'].append('console=tty0')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('elevator=noop')
 
 
 class SetGrubSystemdShowStatus(Task):
