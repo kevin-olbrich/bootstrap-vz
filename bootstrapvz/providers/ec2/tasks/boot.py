@@ -70,6 +70,16 @@ class ConfigurePVGrub(Task):
         info.grub_config['GRUB_CMDLINE_LINUX'].extend([
             'consoleblank=0',
             'elevator=noop',
+            'noibrs',
+            'noibpb',
+            'nopti',
+            'nospectre_v2',
+            'nospectre_v1',
+            'l1tf=off',
+            'nospec_store_bypass_disable',
+            'no_stf_barrier',
+            'mds=off',
+            'mitigations=off',
         ])
 
 
