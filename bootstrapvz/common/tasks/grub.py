@@ -234,6 +234,45 @@ class DisablePNIN(Task):
         info.grub_config['GRUB_CMDLINE_LINUX'].append('biosdevname=0')
 
 
+class DisableConsoleBlanking(Task):
+    description = 'Disabling Console blanking'
+    phase = phases.system_modification
+    successors = [WriteGrubConfig]
+
+    @classmethod
+    def run(cls, info):
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('consoleblank=0')
+
+
+class SetIoScheduler(Task):
+    description = 'Set VM optimized IO scheduler'
+    phase = phases.system_modification
+    successors = [WriteGrubConfig]
+
+    @classmethod
+    def run(cls, info):
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('elevator=noop')
+
+
+class MakeLinuxFastAgain(Task):
+    description = 'make-linux-fast-again.com'
+    phase = phases.system_modification
+    successors = [WriteGrubConfig]
+
+    @classmethod
+    def run(cls, info):
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('noibrs')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('noibpb')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('nopti')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('nospectre_v2')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('nospectre_v1')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('l1tf=off')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('nospec_store_bypass_disable')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('no_stf_barrier')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('mds=off')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('mitigations=off')
+
+
 class SetGrubTerminalToConsole(Task):
     description = 'Setting the grub terminal to `console\''
     phase = phases.system_modification
