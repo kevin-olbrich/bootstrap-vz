@@ -166,6 +166,7 @@ def get_bootloader_group(manifest):
                       grub.InitGrubConfig,
                       grub.SetGrubTerminalToConsole,
                       grub.DisableConsoleBlanking,
+                      grub.DisableAppArmor,
                       grub.SetIoScheduler,
                       grub.MakeLinuxFastAgain,
                       grub.SetGrubConsolOutputDeviceToSerial,

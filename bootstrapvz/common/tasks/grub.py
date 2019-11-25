@@ -254,6 +254,16 @@ class SetIoScheduler(Task):
         info.grub_config['GRUB_CMDLINE_LINUX'].append('elevator=noop')
 
 
+class DisableAppArmor(Task):
+    description = 'Disable AppArmor'
+    phase = phases.system_modification
+    successors = [WriteGrubConfig]
+
+    @classmethod
+    def run(cls, info):
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('apparmor=0')
+
+
 class MakeLinuxFastAgain(Task):
     description = 'make-linux-fast-again.com'
     phase = phases.system_modification
