@@ -280,6 +280,8 @@ class MakeLinuxFastAgain(Task):
         info.grub_config['GRUB_CMDLINE_LINUX'].append('nospec_store_bypass_disable')
         info.grub_config['GRUB_CMDLINE_LINUX'].append('no_stf_barrier')
         info.grub_config['GRUB_CMDLINE_LINUX'].append('mds=off')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('tsx=on')
+        info.grub_config['GRUB_CMDLINE_LINUX'].append('tsx_async_abort=off')
         info.grub_config['GRUB_CMDLINE_LINUX'].append('mitigations=off')
 
 
