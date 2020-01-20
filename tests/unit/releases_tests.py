@@ -35,9 +35,9 @@ def test_not_identity():
 
 
 def test_alias():
-    assert releases.oldstable == releases.jessie
-    assert releases.stable == releases.stretch
-    assert releases.testing == releases.buster
+    assert releases.oldstable == releases.stretch
+    assert releases.stable == releases.buster
+    assert releases.testing == releases.bullseye
     assert releases.unstable == releases.sid
 
 

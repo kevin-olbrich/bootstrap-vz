@@ -15,6 +15,7 @@ properties:
         - stable
         - stretch
         - buster
+        - bullseye
         - testing
         - sid
         - unstable

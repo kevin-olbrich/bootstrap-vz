@@ -3,10 +3,11 @@ from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import apt
 from bootstrapvz.common.exceptions import TaskError
-from bootstrapvz.common.releases import jessie, wheezy, stretch, buster
+from bootstrapvz.common.releases import jessie, wheezy, stretch, buster, bullseye
 from bootstrapvz.common.tools import sed_i, log_check_call, rel_path
 
 
+ASSETS_DIR_BULLSEYE = rel_path(__file__, 'assets/gpg-keyrings-PC1/bullseye')
 ASSETS_DIR_BUSTER = rel_path(__file__, 'assets/gpg-keyrings-PC1/buster')
 ASSETS_DIR_STRETCH = rel_path(__file__, 'assets/gpg-keyrings-PC1/stretch')
 ASSETS_DIR_JESSIE = rel_path(__file__, 'assets/gpg-keyrings-PC1/jessie')
@@ -19,7 +20,7 @@ class CheckRequestedDebianRelease(Task):
 
     @classmethod
     def run(cls, info):
-        if info.manifest.release not in (jessie, wheezy, stretch, buster):
+        if info.manifest.release not in (jessie, wheezy, stretch, buster, bullseye):
             msg = 'Debian {info.manifest.release} is not (yet) available in the Puppetlabs.com APT repository.'
             raise TaskError(msg)
 
@@ -64,6 +65,8 @@ class InstallPuppetlabsPC1ReleaseKey(Task):
     @classmethod
     def run(cls, info):
         from shutil import copy
+        if (info.manifest.release == bullseye):
+            key_path = os.path.join(ASSETS_DIR_BULLSEYE, 'puppetlabs-pc1-keyring.gpg')
         if (info.manifest.release == buster):
             key_path = os.path.join(ASSETS_DIR_BUSTER, 'puppetlabs-pc1-keyring.gpg')
         if (info.manifest.release == stretch):
@@ -82,6 +85,8 @@ class AddPuppetlabsPC1SourcesList(Task):
 
     @classmethod
     def run(cls, info):
+        if (info.manifest.release == bullseye):
+            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com bullseye PC1')
         if (info.manifest.release == buster):
             info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com buster PC1')
         if (info.manifest.release == stretch):
