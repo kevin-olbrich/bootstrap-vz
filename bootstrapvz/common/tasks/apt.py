@@ -68,16 +68,14 @@ class AddDefaultSources(Task):
                 info.source_lists.add('main', 'deb     {apt_security} {system.release}/updates ' + components)
                 if include_src:
                     info.source_lists.add('main', 'deb-src {apt_security} {system.release}/updates ' + components)
-                info.source_lists.add('main', 'deb     {apt_mirror} {system.release}-updates ' + components)
-                if include_src:
-                    info.source_lists.add('main', 'deb-src {apt_mirror} {system.release}-updates ' + components)
             else:
                 info.source_lists.add('main', 'deb     {apt_security}debian-security {system.release}-security ' + components)
                 if include_src:
                     info.source_lists.add('main', 'deb-src {apt_security}debian-security {system.release}-security ' + components)
-                info.source_lists.add('main', 'deb     {apt_mirror}debian-security {system.release}-security ' + components)
-                if include_src:
-                    info.source_lists.add('main', 'deb-src {apt_mirror}debian-security {system.release}-security ' + components)
+
+            info.source_lists.add('main', 'deb     {apt_mirror} {system.release}-updates ' + components)
+            if include_src:
+                info.source_lists.add('main', 'deb-src {apt_mirror} {system.release}-updates ' + components)
 
 
 class AddBackports(Task):
