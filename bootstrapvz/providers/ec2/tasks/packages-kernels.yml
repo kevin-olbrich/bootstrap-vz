@@ -15,6 +15,15 @@ buster:
 bullseye:
   amd64: linux-image-amd64
   i386: linux-image-686-pae
+bookworm:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+trixie:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+forky:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
 sid:
   amd64: linux-image-amd64
   i386: linux-image-686-pae

@@ -1,9 +1,27 @@
 ---
 # This is a mapping of Debian release codenames to processor architectures to kernel packages
+wheezy:
+  amd64: linux-image-amd64
+  i386: linux-image-686
 jessie:
   amd64: linux-image-amd64
   i386: linux-image-686-pae
 stretch:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+buster:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+bullseye:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+bookworm:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+trixie:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+forky:
   amd64: linux-image-amd64
   i386: linux-image-686-pae
 sid:

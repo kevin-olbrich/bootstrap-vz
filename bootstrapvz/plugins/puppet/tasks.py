@@ -3,10 +3,13 @@ from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import apt
 from bootstrapvz.common.exceptions import TaskError
-from bootstrapvz.common.releases import jessie, wheezy, stretch, buster, bullseye
+from bootstrapvz.common.releases import jessie, wheezy, stretch, buster, bullseye, bookworm, trixie, forky
 from bootstrapvz.common.tools import sed_i, log_check_call, rel_path
 
 
+ASSETS_DIR_FORKY = rel_path(__file__, 'assets/gpg-keyrings-PC1/forky')
+ASSETS_DIR_TRIXIE = rel_path(__file__, 'assets/gpg-keyrings-PC1/trixie')
+ASSETS_DIR_BOOKWORM = rel_path(__file__, 'assets/gpg-keyrings-PC1/bookworm')
 ASSETS_DIR_BULLSEYE = rel_path(__file__, 'assets/gpg-keyrings-PC1/bullseye')
 ASSETS_DIR_BUSTER = rel_path(__file__, 'assets/gpg-keyrings-PC1/buster')
 ASSETS_DIR_STRETCH = rel_path(__file__, 'assets/gpg-keyrings-PC1/stretch')
@@ -20,7 +23,7 @@ class CheckRequestedDebianRelease(Task):
 
     @classmethod
     def run(cls, info):
-        if info.manifest.release not in (jessie, wheezy, stretch, buster, bullseye):
+        if info.manifest.release not in (jessie, wheezy, stretch, buster, bullseye, bookworm, trixie, forky):
             msg = 'Debian {info.manifest.release} is not (yet) available in the Puppetlabs.com APT repository.'
             raise TaskError(msg)
 
@@ -65,6 +68,12 @@ class InstallPuppetlabsPC1ReleaseKey(Task):
     @classmethod
     def run(cls, info):
         from shutil import copy
+        if (info.manifest.release == forky):
+            key_path = os.path.join(ASSETS_DIR_FORKY, 'puppetlabs-pc1-keyring.gpg')
+        if (info.manifest.release == trixie):
+            key_path = os.path.join(ASSETS_DIR_TRIXIE, 'puppetlabs-pc1-keyring.gpg')
+        if (info.manifest.release == bookworm):
+            key_path = os.path.join(ASSETS_DIR_BOOKWORM, 'puppetlabs-pc1-keyring.gpg')
         if (info.manifest.release == bullseye):
             key_path = os.path.join(ASSETS_DIR_BULLSEYE, 'puppetlabs-pc1-keyring.gpg')
         if (info.manifest.release == buster):
@@ -85,6 +94,12 @@ class AddPuppetlabsPC1SourcesList(Task):
 
     @classmethod
     def run(cls, info):
+        if (info.manifest.release == forky):
+            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com forky PC1')
+        if (info.manifest.release == trixie):
+            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com trixie PC1')
+        if (info.manifest.release == bookworm):
+            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com bookworm PC1')
         if (info.manifest.release == bullseye):
             info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com bullseye PC1')
         if (info.manifest.release == buster):
