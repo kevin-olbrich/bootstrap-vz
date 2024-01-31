@@ -1,5 +1,5 @@
 from bootstrapvz.common import task_groups
-from bootstrapvz.common.tasks import image, loopback, initd, ssh, logicalvolume
+from bootstrapvz.common.tasks import image, loopback, initd, ssh, logicalvolume, filesystem
 from .tasks import packages, boot
 
 
@@ -35,11 +35,16 @@ def resolve_tasks(taskset, manifest):
         if manifest.provider['console'] == 'virtual':
             taskset.update([boot.SetGrubConsolOutputDeviceToVirtual])
 
-            from bootstrapvz.common.releases import jessie
+            from bootstrapvz.common.releases import jessie, bookworm
             if manifest.release >= jessie:
                 taskset.update([boot.SetGrubConsolOutputDeviceToVirtual,
                                 boot.SetSystemdTTYVTDisallocate,
                                 ])
+            if manifest.release >= bookworm:
+                if filesystem.CopyMountTable in taskset:
+                    taskset.remove(filesystem.CopyMountTable)
+                if filesystem.RemoveMountTable in taskset:
+                    taskset.remove(filesystem.RemoveMountTable)
 
 
 def resolve_rollback_tasks(taskset, manifest, completed, counter_task):
