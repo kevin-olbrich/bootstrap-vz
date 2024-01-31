@@ -40,11 +40,12 @@ def resolve_tasks(taskset, manifest):
                 taskset.update([boot.SetGrubConsolOutputDeviceToVirtual,
                                 boot.SetSystemdTTYVTDisallocate,
                                 ])
-            if manifest.release >= bookworm:
-                if filesystem.CopyMountTable in taskset:
-                    taskset.remove(filesystem.CopyMountTable)
-                if filesystem.RemoveMountTable in taskset:
-                    taskset.remove(filesystem.RemoveMountTable)
+
+    if manifest.release >= bookworm:
+        if filesystem.CopyMountTable in taskset:
+            taskset.remove(filesystem.CopyMountTable)
+        if filesystem.RemoveMountTable in taskset:
+            taskset.remove(filesystem.RemoveMountTable)
 
 
 def resolve_rollback_tasks(taskset, manifest, completed, counter_task):
