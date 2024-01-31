@@ -35,12 +35,13 @@ def resolve_tasks(taskset, manifest):
         if manifest.provider['console'] == 'virtual':
             taskset.update([boot.SetGrubConsolOutputDeviceToVirtual])
 
-            from bootstrapvz.common.releases import jessie, bookworm
+            from bootstrapvz.common.releases import jessie
             if manifest.release >= jessie:
                 taskset.update([boot.SetGrubConsolOutputDeviceToVirtual,
                                 boot.SetSystemdTTYVTDisallocate,
                                 ])
 
+    from bootstrapvz.common.releases import bookworm
     if manifest.release >= bookworm:
         if filesystem.CopyMountTable in taskset:
             taskset.remove(filesystem.CopyMountTable)
