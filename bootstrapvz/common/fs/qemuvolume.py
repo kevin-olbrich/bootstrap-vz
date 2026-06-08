@@ -77,7 +77,7 @@ class QEMUVolume(LoopbackVolume):
 
     def _find_free_nbd_device(self):
         import os.path
-        for i in xrange(0, 15):
+        for i in range(0, 15):
             device_name = 'nbd' + str(i)
             if not self._is_nbd_used(device_name):
                 return os.path.join('/dev', device_name)

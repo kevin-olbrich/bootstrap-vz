@@ -23,7 +23,7 @@ class Sectors(object):
         if isinstance(quantity, Bytes):
             self.bytes = quantity
         else:
-            if isinstance(quantity, (int, long)):
+            if isinstance(quantity, int):
                 self.bytes = self.sector_size * quantity
             else:
                 self.bytes = Bytes(quantity)
@@ -68,7 +68,7 @@ class Sectors(object):
         return self.bytes > other.bytes
 
     def __add__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             return Sectors(self.bytes + self.sector_size * other, self.sector_size)
         if isinstance(other, Bytes):
             return Sectors(self.bytes + other, self.sector_size)
@@ -79,7 +79,7 @@ class Sectors(object):
         raise UnitError('Can only add sectors, bytes or integers to sectors')
 
     def __iadd__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             self.bytes += self.sector_size * other
             return self
         if isinstance(other, Bytes):
@@ -93,7 +93,7 @@ class Sectors(object):
         raise UnitError('Can only add sectors, bytes or integers to sectors')
 
     def __sub__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             return Sectors(self.bytes - self.sector_size * other, self.sector_size)
         if isinstance(other, Bytes):
             return Sectors(self.bytes - other, self.sector_size)
@@ -104,7 +104,7 @@ class Sectors(object):
         raise UnitError('Can only subtract sectors, bytes or integers from sectors')
 
     def __isub__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             self.bytes -= self.sector_size * other
             return self
         if isinstance(other, Bytes):
@@ -118,20 +118,20 @@ class Sectors(object):
         raise UnitError('Can only subtract sectors, bytes or integers from sectors')
 
     def __mul__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             return Sectors(self.bytes * other, self.sector_size)
         else:
             raise UnitError('Can only multiply sectors with integers')
 
     def __imul__(self, other):
-        if isinstance(other, (int, long)):
+        if isinstance(other, int):
             self.bytes *= other
             return self
         else:
             raise UnitError('Can only multiply sectors with integers')
 
-    def __div__(self, other):
-        if isinstance(other, (int, long)):
+    def __truediv__(self, other):
+        if isinstance(other, int):
             return Sectors(self.bytes / other, self.sector_size)
         if isinstance(other, Sectors):
             if self.sector_size == other.sector_size:
@@ -140,8 +140,8 @@ class Sectors(object):
                 raise UnitError('Cannot divide sectors with different sector sizes')
         raise UnitError('Can only divide sectors with integers or sectors')
 
-    def __idiv__(self, other):
-        if isinstance(other, (int, long)):
+    def __itruediv__(self, other):
+        if isinstance(other, int):
             self.bytes /= other
             return self
         if isinstance(other, Sectors):

@@ -31,7 +31,8 @@ def log_call(command, stdin=None, env=None, shell=False, cwd=None):
     process = subprocess.Popen(args=command, env=env, shell=shell, cwd=cwd,
                                stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+                               stderr=subprocess.PIPE,
+                               universal_newlines=True)
 
     if stdin is not None:
         log.debug('  stdin: ' + stdin)

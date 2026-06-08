@@ -5,12 +5,10 @@ from bootstrapvz.common.tools import log_check_call
 from bootstrapvz.common.fsm_proxy import FSMProxy
 
 
-class AbstractPartition(FSMProxy):
+class AbstractPartition(FSMProxy, metaclass=ABCMeta):
     """Abstract representation of a partiton
     This class is a finite state machine and represents the state of the real partition
     """
-
-    __metaclass__ = ABCMeta
 
     # Our states
     events = [{'name': 'create', 'src': 'nonexistent', 'dst': 'created'},
@@ -75,7 +73,7 @@ class AbstractPartition(FSMProxy):
                      'device_path': self.device_path,
                      'size': self.size,
                      }
-        command = map(lambda part: part.format(**variables), format_command)
+        command = list(map(lambda part: part.format(**variables), format_command))
         # Format the partition
         log_check_call(command)
 
@@ -95,7 +93,7 @@ class AbstractPartition(FSMProxy):
         """
         # Make sure we mount in ascending order of mountpoint path length
         # This ensures that we don't mount /dev/pts before we mount /dev
-        for destination in sorted(self.mounts.iterkeys(), key=len):
+        for destination in sorted(self.mounts.keys(), key=len):
             self.mounts[destination].mount(self.mount_dir)
 
     def _before_unmount(self, e):
@@ -103,7 +101,7 @@ class AbstractPartition(FSMProxy):
         """
         # Unmount the mounts in descending order of mounpoint path length
         # You cannot unmount /dev before you have unmounted /dev/pts
-        for destination in sorted(self.mounts.iterkeys(), key=len, reverse=True):
+        for destination in sorted(self.mounts.keys(), key=len, reverse=True):
             self.mounts[destination].unmount()
         log_check_call(['umount', self.mount_dir])
         del self.mount_dir

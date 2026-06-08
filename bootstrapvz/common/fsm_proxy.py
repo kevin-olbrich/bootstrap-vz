@@ -45,7 +45,7 @@ class FSMProxy(object):
 
     def __getstate__(self):
         state = {}
-        for key, value in self.__dict__.iteritems():
+        for key, value in self.__dict__.items():
             if callable(value) or key == 'fsm':
                 continue
             state[key] = value

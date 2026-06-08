@@ -5,12 +5,10 @@ from bootstrapvz.common.fsm_proxy import FSMProxy
 from ..exceptions import PartitionError
 
 
-class AbstractPartitionMap(FSMProxy):
+class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
     """Abstract representation of a partiton map
     This class is a finite state machine and represents the state of the real partition map
     """
-
-    __metaclass__ = ABCMeta
 
     # States the partition map can be in
     events = [{'name': 'create', 'src': 'nonexistent', 'dst': 'unmapped'},

@@ -316,10 +316,10 @@ baseurl = 'https://github.com/andsens/bootstrap-vz'
 
 import subprocess
 try:
-    git_head = subprocess.check_output('git describe --tags 2>/dev/null', shell=True)
+    git_head = subprocess.check_output('git describe --tags 2>/dev/null', shell=True, universal_newlines=True)
 except subprocess.CalledProcessError:
     try:
-        git_head = subprocess.check_output('git rev-parse HEAD', shell=True).strip()[:10]
+        git_head = subprocess.check_output('git rev-parse HEAD', shell=True, universal_newlines=True).strip()[:10]
     except subprocess.CalledProcessError:
         pass
 

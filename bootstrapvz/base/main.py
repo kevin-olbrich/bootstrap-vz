@@ -116,7 +116,7 @@ def run(manifest, debug=False, pause_on_error=False, dry_run=False):
         log.exception(e)
         if pause_on_error:
             # The --pause-on-error is useful when the user wants to inspect the volume before rollback
-            raw_input('Press Enter to commence rollback')
+            input('Press Enter to commence rollback')
         log.error('Rolling back')
 
         # Create a useful little function for the provider and plugins to use,

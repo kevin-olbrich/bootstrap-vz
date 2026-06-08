@@ -30,7 +30,7 @@ def validate_manifest(data, validator, error):
 
     # Check the provided apt.conf(5) options
     if 'packages' in data:
-        for name, val in data['packages'].get('apt.conf.d', {}).iteritems():
+        for name, val in data['packages'].get('apt.conf.d', {}).items():
             from bootstrapvz.common.tools import log_call
 
             status, _, _ = log_call(['apt-config', '-c=/dev/stdin', 'dump'],

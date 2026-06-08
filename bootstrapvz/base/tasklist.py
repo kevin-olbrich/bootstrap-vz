@@ -115,7 +115,7 @@ def create_list(taskset, all_tasks):
 
     # Filter out any tasks not in the tasklist
     # We want to maintain ordering, so we don't use set intersection
-    sorted_tasks = filter(lambda task: task in taskset, sorted_tasks)
+    sorted_tasks = list(filter(lambda task: task in taskset, sorted_tasks))
     return sorted_tasks
 
 

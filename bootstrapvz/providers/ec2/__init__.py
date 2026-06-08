@@ -14,7 +14,7 @@ def validate_manifest(data, validator, error):
     from bootstrapvz.common.bytes import Bytes
     if data['volume']['backing'] == 'ebs':
         volume_size = Bytes(0)
-        for key, partition in data['volume']['partitions'].iteritems():
+        for key, partition in data['volume']['partitions'].items():
             if key != 'type':
                 volume_size += Bytes(partition['size'])
         if int(volume_size % Bytes('1GiB')) != 0:

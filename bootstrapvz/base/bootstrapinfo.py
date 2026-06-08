@@ -90,7 +90,7 @@ class BootstrapInformation(object):
             :param dict obj: dictionary to set the values on
             :param dict data: dictionary of values to set on the obj
             """
-            for key, value in data.iteritems():
+            for key, value in data.items():
                 if isinstance(value, dict):
                     obj[key] = DictClass()
                     set_manifest_vars(obj[key], value)

@@ -49,7 +49,7 @@ class InstallPackages(Task):
                             'apt-get', 'install',
                                        '--no-install-recommends',
                                        '--assume-yes'] +
-                           map(str, remote_packages),
+                           list(map(str, remote_packages)),
                            env=env)
         except CalledProcessError as e:
             import logging
