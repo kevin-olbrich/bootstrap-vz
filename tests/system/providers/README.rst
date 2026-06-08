@@ -30,7 +30,7 @@ Example:
 
 .. code-block:: python
 
-    #!/usr/bin/env python
+    #!/usr/bin/env python3
 
     from tests.system.docker_tests import test_stable
     from bootstrapvz.base.main import setup_loggers
