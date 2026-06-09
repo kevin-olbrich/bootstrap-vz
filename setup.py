@@ -42,5 +42,7 @@ Its aim is to provide a reproducible bootstrapping process using manifests
 as well as supporting a high degree of customizability through plugins.''',
       author='Anders Ingemann',
       author_email='anders@ingemann.de',
+      maintainer='Kevin Olbrich',
+      maintainer_email='ko@sv01.de',
       url='https://github.com/kevin-olbrich/bootstrap-vz',
       )

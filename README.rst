@@ -2,9 +2,17 @@ Maintained fork
 ===============
 
 The upstream `bootstrap-vz <https://github.com/andsens/bootstrap-vz>`__ project is
-no longer maintained. This is a long-standing fork that I forked a long time ago
-and continue to actively maintain, since I rely on it as part of my daily workflow.
-It has been migrated to run on Python 3 and receives ongoing fixes as needed.
+no longer maintained. Anders Ingemann maintained it through 2019, at which point I
+adopted it. This is a long-standing fork that I continue to actively maintain, since
+I rely on it as part of my daily workflow. It has been migrated to run on Python 3
+and receives ongoing fixes as needed.
+
+I would like to express my sincere thanks for the excellent work done so far — my
+goal is simply to keep this project alive.
+
+This fork does not affect any existing rights. It remains licensed under the Apache
+License, Version 2.0, and the original author's copyright is retained in full
+(see the `LICENSE <LICENSE>`__ file).
 
 bootstrap-vz
 ============
