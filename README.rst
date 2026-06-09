@@ -1,5 +1,10 @@
-bootstrap-vz is no longer maintained
-====================================
+Maintained fork
+===============
+
+The upstream `bootstrap-vz <https://github.com/andsens/bootstrap-vz>`__ project is
+no longer maintained. This is a long-standing fork that I forked a long time ago
+and continue to actively maintain, since I rely on it as part of my daily workflow.
+It has been migrated to run on Python 3 and receives ongoing fixes as needed.
 
 bootstrap-vz
 ============
