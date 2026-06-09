@@ -42,5 +42,5 @@ Its aim is to provide a reproducible bootstrapping process using manifests
 as well as supporting a high degree of customizability through plugins.''',
       author='Anders Ingemann',
       author_email='anders@ingemann.de',
-      url='http://www.github.com/andsens/bootstrap-vz',
+      url='https://github.com/kevin-olbrich/bootstrap-vz',
       )
