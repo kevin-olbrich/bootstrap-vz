@@ -47,6 +47,7 @@ class QEMUVolume(LoopbackVolume):
         self._check_nbd_module()
         self.loop_device_path = self._find_free_nbd_device()
         log_check_call(['qemu-nbd', '--connect', self.loop_device_path, self.image_path])
+        self._wait_for_nbd_device(self.loop_device_path)
         self.device_path = self.loop_device_path
 
     def _before_detach(self, e):
@@ -82,6 +83,25 @@ class QEMUVolume(LoopbackVolume):
             if not self._is_nbd_used(device_name):
                 return os.path.join('/dev', device_name)
         raise VolumeError('Unable to find free nbd device.')
+
+    def _wait_for_nbd_device(self, device_path, timeout=10):
+        # `qemu-nbd --connect' returns before the kernel has finished
+        # negotiating the device size, so the device is not immediately ready
+        # for partitioning. The size in sysfs becomes non-zero once it is.
+        import os.path
+        import time
+        size_path = os.path.join('/sys/block', os.path.basename(device_path), 'size')
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            try:
+                with open(size_path) as size_file:
+                    if int(size_file.read().strip()) > 0:
+                        return
+            except IOError:
+                pass
+            time.sleep(0.1)
+        raise VolumeError('The nbd device {device_path} did not become ready in time.'
+                          .format(device_path=device_path))
 
     def __setstate__(self, state):
         for key in state:
