@@ -61,9 +61,9 @@ rex = _Release('rex', 1.2)
 buzz = _Release('buzz', 1.1)
 
 unstable = _ReleaseAlias('unstable', sid)
-testing = _ReleaseAlias('testing', trixie)
-stable = _ReleaseAlias('stable', bookworm)
-oldstable = _ReleaseAlias('oldstable', bullseye)
+testing = _ReleaseAlias('testing', forky)
+stable = _ReleaseAlias('stable', trixie)
+oldstable = _ReleaseAlias('oldstable', bookworm)
 
 
 def get_release(release_name):
