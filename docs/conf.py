@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'bootstrap-vz'
-copyright = u'2014, Anders Ingemann'
+copyright = u'2013-2019, Anders Ingemann; 2019-2026, Kevin Olbrich'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -207,7 +207,7 @@ latex_elements = {}
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [('index', 'bootstrap-vz.tex', u'bootstrap-vz Documentation',
-                    u'Anders Ingemann', 'manual'),
+                    u'Kevin Olbrich; original author Anders Ingemann', 'manual'),
                    ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -235,7 +235,7 @@ latex_documents = [('index', 'bootstrap-vz.tex', u'bootstrap-vz Documentation',
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [('index', 'bootstrap-vz', u'bootstrap-vz Documentation', [u'Anders Ingemann'], 1)]
+man_pages = [('index', 'bootstrap-vz', u'bootstrap-vz Documentation', [u'Kevin Olbrich', u'Anders Ingemann'], 1)]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
@@ -247,7 +247,7 @@ man_pages = [('index', 'bootstrap-vz', u'bootstrap-vz Documentation', [u'Anders 
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [('index', 'bootstrap-vz', u'bootstrap-vz Documentation',
-                      u'Anders Ingemann', 'bootstrap-vz', 'One line description of project.',
+                      u'Kevin Olbrich; original author Anders Ingemann', 'bootstrap-vz', 'One line description of project.',
                       'Miscellaneous'),
                      ]
 
@@ -316,10 +316,10 @@ baseurl = 'https://github.com/andsens/bootstrap-vz'
 
 import subprocess
 try:
-    git_head = subprocess.check_output('git describe --tags 2>/dev/null', shell=True)
+    git_head = subprocess.check_output('git describe --tags 2>/dev/null', shell=True, universal_newlines=True)
 except subprocess.CalledProcessError:
     try:
-        git_head = subprocess.check_output('git rev-parse HEAD', shell=True).strip()[:10]
+        git_head = subprocess.check_output('git rev-parse HEAD', shell=True, universal_newlines=True).strip()[:10]
     except subprocess.CalledProcessError:
         pass
 

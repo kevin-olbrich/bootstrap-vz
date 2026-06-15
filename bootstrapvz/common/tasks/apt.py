@@ -45,7 +45,7 @@ class AddManifestSources(Task):
 
     @classmethod
     def run(cls, info):
-        for name, lines in info.manifest.packages['sources'].iteritems():
+        for name, lines in info.manifest.packages['sources'].items():
             for line in lines:
                 info.source_lists.add(name, line)
 
@@ -105,7 +105,7 @@ class AddManifestPreferences(Task):
 
     @classmethod
     def run(cls, info):
-        for name, preferences in info.manifest.packages['preferences'].iteritems():
+        for name, preferences in info.manifest.packages['preferences'].items():
             info.preference_lists.add(name, preferences)
 
 
@@ -130,7 +130,7 @@ class WriteConfiguration(Task):
 
     @classmethod
     def run(cls, info):
-        for name, val in info.manifest.packages.get('apt.conf.d', {}).iteritems():
+        for name, val in info.manifest.packages.get('apt.conf.d', {}).items():
             if name == 'main':
                 path = os.path.join(info.root, 'etc/apt/apt.conf')
             else:
@@ -151,7 +151,7 @@ class WriteSources(Task):
             log = logging.getLogger(__name__)
             log.warn('No default target has been specified in the sources list, '
                      'installing packages may fail')
-        for name, sources in info.source_lists.sources.iteritems():
+        for name, sources in info.source_lists.sources.items():
             if name == 'main':
                 list_path = os.path.join(info.root, 'etc/apt/sources.list')
             else:
@@ -167,7 +167,7 @@ class WritePreferences(Task):
 
     @classmethod
     def run(cls, info):
-        for name, preferences in info.preference_lists.preferences.iteritems():
+        for name, preferences in info.preference_lists.preferences.items():
             if name == 'main':
                 list_path = os.path.join(info.root, 'etc/apt/preferences')
             else:

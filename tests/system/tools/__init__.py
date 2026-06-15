@@ -70,7 +70,7 @@ def read_from_socket(socket_path, termination_string, timeout, read_timeout=0.5)
                     else:
                         ptr = len(output) - len(termination_string)
                     break
-                except socket.error, e:
+                except socket.error as e:
                     if e.errno != errno.EWOULDBLOCK:
                         raise Exception(e)
                     continue_select = False

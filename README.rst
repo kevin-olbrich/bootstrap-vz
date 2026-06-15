@@ -1,5 +1,18 @@
-bootstrap-vz is no longer maintained
-====================================
+Maintained fork
+===============
+
+The upstream `bootstrap-vz <https://github.com/andsens/bootstrap-vz>`__ project is
+no longer maintained. Anders Ingemann maintained it through 2019, at which point I
+adopted it. This is a long-standing fork that I continue to actively maintain, since
+I rely on it as part of my daily workflow. It has been migrated to run on Python 3
+and receives ongoing fixes as needed.
+
+I would like to express my sincere thanks for the excellent work done so far — my
+goal is simply to keep this project alive.
+
+This fork does not affect any existing rights. It remains licensed under the Apache
+License, Version 2.0, and the original author's copyright is retained in full
+(see the `LICENSE <LICENSE>`__ file).
 
 bootstrap-vz
 ============
@@ -38,7 +51,7 @@ and learn `how you create a manifest <manifests>`__.
 Note to developers: The shared documentation links on github and readthedocs
 are transformed in `a rather peculiar and nifty way`__.
 
-__ https://github.com/andsens/bootstrap-vz/blob/master/docs/transform_github_links.py
+__ https://github.com/kevin-olbrich/bootstrap-vz/blob/master/docs/transform_github_links.py
 
 Installation
 ------------
@@ -81,7 +94,7 @@ Docker
 .. code-block:: sh
 
     user@host:~$ sudo -i # become root
-    root@host:~# git clone https://github.com/andsens/bootstrap-vz.git # Clone the repo
+    root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
     root@host:~# apt-get install debootstrap python-pip docker.io # Install dependencies from aptitude
     root@host:~# pip install termcolor jsonschema fysom docopt pyyaml pyrfc3339 # Install python dependencies
     root@host:~# bootstrap-vz/bootstrap-vz bootstrap-vz/manifests/examples/docker/jessie-minimized.yml
@@ -99,7 +112,7 @@ VirtualBox Vagrant
 .. code-block:: sh
 
     user@host:~$ sudo -i # become root
-    root@host:~# git clone https://github.com/andsens/bootstrap-vz.git # Clone the repo
+    root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
     root@host:~# apt-get install qemu-utils debootstrap python-pip # Install dependencies from aptitude
     root@host:~# pip install termcolor jsonschema fysom docopt pyyaml # Install python dependencies
     root@host:~# modprobe nbd max_part=16
@@ -119,7 +132,7 @@ Amazon EC2 EBS backed AMI
 .. code-block:: sh
 
     user@host:~$ sudo -i # become root
-    root@host:~# git clone https://github.com/andsens/bootstrap-vz.git # Clone the repo
+    root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
     root@host:~# apt-get install debootstrap python-pip # Install dependencies from aptitude
     root@host:~# pip install termcolor jsonschema fysom docopt pyyaml boto3 json_minify # Install python dependencies
     root@host:~# bootstrap-vz/bootstrap-vz bootstrap-vz/manifests/official/ec2/ebs-jessie-amd64-hvm.yml

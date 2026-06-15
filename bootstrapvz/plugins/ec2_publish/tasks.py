@@ -49,7 +49,7 @@ class PublishAmiManifest(Task):
         import json
         amis_json = json.dumps(info._ec2['region_amis'])
 
-        from urlparse import urlparse
+        from urllib.parse import urlparse
         parsed_url = urlparse(manifest_url)
         parsed_host = parsed_url.netloc
         if not parsed_url.scheme:

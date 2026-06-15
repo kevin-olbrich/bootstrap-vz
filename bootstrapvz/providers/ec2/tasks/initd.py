@@ -16,5 +16,5 @@ class AddEC2InitScripts(Task):
                         'ec2-run-user-data': 'ec2-run-user-data'}
 
         init_scripts_dir = os.path.join(assets, 'init.d')
-        for name, path in init_scripts.iteritems():
+        for name, path in init_scripts.items():
             info.initd['install'][name] = os.path.join(init_scripts_dir, path)

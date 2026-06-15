@@ -10,8 +10,8 @@ def setup_logger():
     root = logging.getLogger()
     root.setLevel(logging.NOTSET)
 
-    import StringIO
-    output = StringIO.StringIO()
+    import io
+    output = io.StringIO()
     string_handler = logging.StreamHandler(output)
     string_handler.setLevel(logging.DEBUG)
     root.addHandler(string_handler)

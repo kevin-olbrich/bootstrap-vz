@@ -17,7 +17,7 @@ class InstallInitScripts(Task):
                      stat.S_IRGRP                | stat.S_IXGRP |
                      stat.S_IROTH                | stat.S_IXOTH)
         from shutil import copy
-        for name, src in info.initd['install'].iteritems():
+        for name, src in info.initd['install'].items():
             dst = os.path.join(info.root, 'etc/init.d', name)
             copy(src, dst)
             os.chmod(dst, rwxr_xr_x)

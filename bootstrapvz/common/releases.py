@@ -1,12 +1,20 @@
+from functools import total_ordering
 
 
+@total_ordering
 class _Release(object):
     def __init__(self, codename, version):
         self.codename = codename
         self.version = version
 
-    def __cmp__(self, other):
-        return self.version - other.version
+    def __eq__(self, other):
+        return self.version == other.version
+
+    def __lt__(self, other):
+        return self.version < other.version
+
+    def __hash__(self):
+        return hash(self.version)
 
     def __str__(self):
         return self.codename

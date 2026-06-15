@@ -48,7 +48,7 @@ def get_tarball_filename(info):
     executable, options, arguments = get_bootstrap_args(info)
     # Filter info.root which points at /target/volume-id, we won't ever hit anything with that in there.
     hash_args = [arg for arg in arguments if arg != info.root]
-    tarball_id = sha1(repr(frozenset(options + hash_args))).hexdigest()[0:8]
+    tarball_id = sha1(repr(frozenset(options + hash_args)).encode('utf-8')).hexdigest()[0:8]
     tarball_filename = 'debootstrap-' + tarball_id + '.tar'
     return os.path.join(info.manifest.bootstrapper['workspace'], tarball_filename)
 

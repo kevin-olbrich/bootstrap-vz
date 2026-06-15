@@ -2,7 +2,8 @@ from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import apt
 import os
-import urllib2
+import urllib.request
+import urllib.error
 
 
 class CheckAptProxy(Task):
@@ -15,11 +16,11 @@ class CheckAptProxy(Task):
         proxy_port = info.manifest.plugins['apt_proxy']['port']
         proxy_url = 'http://{address}:{port}'.format(address=proxy_address, port=proxy_port)
         try:
-            urllib2.urlopen(proxy_url, timeout=5)
-        except urllib2.URLError as e:
+            urllib.request.urlopen(proxy_url, timeout=5)
+        except urllib.error.URLError as e:
             # Default response from `apt-cacher-ng`
             # pylint: disable=no-member
-            if isinstance(e, urllib2.HTTPError) and e.code in [404, 406] and e.msg == 'Usage Information':
+            if isinstance(e, urllib.error.HTTPError) and e.code in [404, 406] and e.msg == 'Usage Information':
                 pass
             else:
                 import logging

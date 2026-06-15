@@ -36,7 +36,7 @@ class SourceLists(object):
         """
         target = target.format(**self.manifest_vars)
         # Run through all the sources and return True if the target exists
-        for lines in self.sources.itervalues():
+        for lines in self.sources.values():
             if target in (source.distribution for source in lines):
                 return True
         return False

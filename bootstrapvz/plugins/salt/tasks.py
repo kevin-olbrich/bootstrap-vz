@@ -4,7 +4,7 @@ from bootstrapvz.common.tasks import packages
 from bootstrapvz.common.tools import log_check_call
 from bootstrapvz.common.tools import sed_i
 import os
-import urllib
+import urllib.request
 
 
 class InstallSaltDependencies(Task):
@@ -27,8 +27,8 @@ class BootstrapSaltMinion(Task):
         # Download bootstrap script
         bootstrap_script = os.path.join(info.root, 'install_salt.sh')
         with open(bootstrap_script, 'w') as f:
-            d = urllib.urlopen('http://bootstrap.saltstack.org')
-            f.write(d.read())
+            d = urllib.request.urlopen('http://bootstrap.saltstack.org')
+            f.write(d.read().decode('utf-8'))
 
         # This is needed since bootstrap doesn't handle -X for debian distros properly.
         # We disable checking for running services at end since we do not start them.

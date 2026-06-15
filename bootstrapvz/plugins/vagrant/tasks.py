@@ -170,7 +170,7 @@ class PackageBox(Task):
                       }
 
         def attr(element, name, value=None):
-            for prefix, ns in namespaces.iteritems():
+            for prefix, ns in namespaces.items():
                 name = name.replace(prefix + ':', '{' + ns + '}')
             if value is None:
                 return element.attrib[name]

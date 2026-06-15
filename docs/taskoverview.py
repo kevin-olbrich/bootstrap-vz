@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import os.path
 
@@ -44,7 +44,7 @@ def generate_graph_data():
     def mk_node(task):
         return {'name': task.__name__,
                 'module': modules.index(task.__module__),
-                'phase': (i for i, phase in enumerate(phases.order) if phase is task.phase).next(),
+                'phase': next(i for i, phase in enumerate(phases.order) if phase is task.phase),
                 }
 
     def mk_link(link):
@@ -52,10 +52,10 @@ def generate_graph_data():
             link[key] = tasks.index(link[key])
         return link
 
-    return {'phases': map(mk_phase, phases.order),
-            'modules': map(mk_module, modules),
-            'nodes': map(mk_node, tasks),
-            'links': map(mk_link, task_links)}
+    return {'phases': list(map(mk_phase, phases.order)),
+            'modules': list(map(mk_module, modules)),
+            'nodes': list(map(mk_node, tasks)),
+            'links': list(map(mk_link, task_links))}
 
 
 def write_data(data, output_path=None):

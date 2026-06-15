@@ -25,7 +25,7 @@ def boot_image(manifest, build_server, bootstrap_info):
     image = VirtualBoxImage(image_path)
 
     import hashlib
-    image_hash = hashlib.sha1(image_path).hexdigest()
+    image_hash = hashlib.sha1(image_path.encode('utf-8')).hexdigest()
     instance_name = 'bootstrap-vz-{hash}'.format(hash=image_hash[:8])
 
     try:

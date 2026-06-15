@@ -85,8 +85,8 @@ class FilterLocales(Task):
             '/usr/share/man/man8',
             '/usr/share/man/man9',
         ] +
-            map(lambda l: '/usr/share/locale/' + l + '/', locales) +
-            map(lambda l: '/usr/share/man/' + l + '/', locales)
+            list(map(lambda l: '/usr/share/locale/' + l + '/', locales)) +
+            list(map(lambda l: '/usr/share/man/' + l + '/', locales))
         )
 
         # Filter when installing things with dpkg

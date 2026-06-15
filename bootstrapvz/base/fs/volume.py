@@ -5,12 +5,10 @@ from .exceptions import VolumeError
 from .partitionmaps.none import NoPartitions
 
 
-class Volume(FSMProxy):
+class Volume(FSMProxy, metaclass=ABCMeta):
     """Represents an abstract volume.
     This class is a finite state machine and represents the state of the real volume.
     """
-
-    __metaclass__ = ABCMeta
 
     # States this volume can be in
     events = [{'name': 'create', 'src': 'nonexistent', 'dst': 'detached'},

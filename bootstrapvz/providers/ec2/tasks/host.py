@@ -21,10 +21,10 @@ class GetInstanceMetadata(Task):
 
     @classmethod
     def run(cls, info):
-        import urllib2
+        import urllib.request
         import json
         metadata_url = 'http://169.254.169.254/latest/dynamic/instance-identity/document'
-        response = urllib2.urlopen(url=metadata_url, timeout=5)
+        response = urllib.request.urlopen(url=metadata_url, timeout=5)
         info._ec2['host'] = json.load(response)
         info._ec2['region'] = info._ec2['host']['region']
 

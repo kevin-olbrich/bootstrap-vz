@@ -22,7 +22,7 @@ def pick_build_server(build_servers, manifest, preferences={}):
             return False
         return True
 
-    for name, settings in build_servers.iteritems():
+    for name, settings in build_servers.items():
         if not matches(name, settings):
             continue
         if settings['type'] == 'local':  # pylint: disable=no-else-return

@@ -1,6 +1,23 @@
 
 
-class Task(object):
+class TaskMeta(type):
+    """Metaclass to control how the class is coerced into a string
+    """
+    def __repr__(cls):
+        """
+        :return str: The full module path to the Task
+        """
+        return cls.__module__ + '.' + cls.__name__
+
+    def __str__(cls):
+        """
+        :return: The full module path to the Task
+        :rtype: str
+        """
+        return repr(cls)
+
+
+class Task(object, metaclass=TaskMeta):
     """The task class represents a task that can be run.
     It is merely a wrapper for the run function and should never be instantiated.
     """
@@ -10,22 +27,6 @@ class Task(object):
     predecessors = []
     # List of tasks that should run after this task has run
     successors = []
-
-    class __metaclass__(type):
-        """Metaclass to control how the class is coerced into a string
-        """
-        def __repr__(cls):
-            """
-            :return str: The full module path to the Task
-            """
-            return cls.__module__ + '.' + cls.__name__
-
-        def __str__(cls):
-            """
-            :return: The full module path to the Task
-            :rtype: str
-            """
-            return repr(cls)
 
     @classmethod
     def run(cls, info):
