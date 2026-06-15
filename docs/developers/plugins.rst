@@ -127,7 +127,7 @@ like ``manifest-schema.yml`` are included when the package is built:
     include example/manifest-schema.yml
     include example/README.rst
 
-To test your package from source you can run ``python setup.py develop``
+To test your package from source you can run ``python3 setup.py develop``
 to register the package so that bootstrap-vz can find the entry-point of your
 plugin.
 

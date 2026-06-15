@@ -59,7 +59,7 @@ Installation
 bootstrap-vz has a master branch into which stable feature branches are merged.
 
 After checking out the branch of your choice you can install the
-python dependencies by running ``python setup.py install``. However,
+python dependencies by running ``python3 setup.py install``. However,
 depending on what kind of image you'd like to bootstrap, there are
 other debian package dependencies as well, at the very least you will
 need ``debootstrap``.

@@ -11,7 +11,7 @@ Building
 --------
 To build the documentation, simply run ``tox -e docs`` in the project root.
 Serving the docs through http can be achieved by subsequently running
-``(cd docs/_build/html; python -m SimpleHTTPServer 8080)`` and accessing them
+``(cd docs/_build/html; python3 -m http.server 8080)`` and accessing them
 on ``http://localhost:8080/``.
 
 
