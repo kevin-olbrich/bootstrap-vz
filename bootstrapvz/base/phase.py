@@ -1,5 +1,7 @@
+from functools import total_ordering
 
 
+@total_ordering
 class Phase(object):
     """The Phase class represents a phase a task may be in.
     It has no function other than to act as an anchor in the task graph.
@@ -21,11 +23,20 @@ class Phase(object):
         from bootstrapvz.common.phases import order
         return next(i for i, phase in enumerate(order) if phase is self)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         """Compares the phase order in relation to the other phases
-        :return int:
+        :return bool:
         """
-        return self.pos() - other.pos()
+        return self.pos() == other.pos()
+
+    def __lt__(self, other):
+        """Compares the phase order in relation to the other phases
+        :return bool:
+        """
+        return self.pos() < other.pos()
+
+    def __hash__(self):
+        return hash(self.name)
 
     def __str__(self):
         """
