@@ -90,10 +90,11 @@ class AddBackports(Task):
         if info.source_lists.target_exists('{system.release}-backports'):
             msg = ('{system.release}-backports target already exists').format(**info.manifest_vars)
             logging.getLogger(__name__).info(msg)
-        elif info.manifest.release == testing:
-            logging.getLogger(__name__).info('There are no backports for testing')
         elif info.manifest.release == unstable:
             logging.getLogger(__name__).info('There are no backports for sid/unstable')
+        elif info.manifest.release >= testing:
+            # Covers testing and the announced releases after it, which are not released yet
+            logging.getLogger(__name__).info('There are no backports for testing and unreleased releases')
         else:
             info.source_lists.add('backports', 'deb     {apt_mirror} {system.release}-backports main')
             info.source_lists.add('backports', 'deb-src {apt_mirror} {system.release}-backports main')
