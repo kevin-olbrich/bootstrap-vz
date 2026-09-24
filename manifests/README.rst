@@ -256,18 +256,18 @@ Example:
     packages:
       install:
         - /root/packages/custom_app.deb
-        - puppet
+        - openvox-agent
       install_standard: true
-      mirror: http://cloudfront.debian.net/debian
+      mirror: http://deb.debian.org/debian
       security: http://security.debian.org/
       sources:
-        puppet:
-          - deb http://apt.puppetlabs.com wheezy main dependencies
+        openvox:
+          - deb https://apt.voxpupuli.org debian12 openvox8
       components:
         - contrib
         - non-free
       trusted-keys:
-        - /root/keys/puppet.gpg
+        - /root/keys/openvox.gpg
       apt.conf.d:
         00InstallRecommends: >-
           APT::Install-Recommends "false";
@@ -276,13 +276,13 @@ Example:
       preferences:
         main:
           - package: '*'
-            pin: release o=Debian, n=wheezy
+            pin: release o=Debian, n=bookworm
             pin-priority: 800
           - package: '*'
-            pin: release o=Debian Backports, a=wheezy-backports, n=wheezy-backports
+            pin: release o=Debian Backports, a=bookworm-backports, n=bookworm-backports
             pin-priority: 760
-          - package: puppet puppet-common
-            pin: version 2.7.25-1puppetlabs1
+          - package: openvox-agent
+            pin: version 8.*
             pin-priority: 840
 
 
