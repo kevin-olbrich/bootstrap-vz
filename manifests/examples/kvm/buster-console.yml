@@ -10,7 +10,7 @@ provider:
 bootstrapper:
   workspace: /target
 system:
-  release: stretch
+  release: buster
   architecture: amd64
   bootloader: grub
   charmap: UTF-8
