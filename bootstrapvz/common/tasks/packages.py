@@ -54,9 +54,9 @@ class InstallPackages(Task):
         except CalledProcessError as e:
             import logging
             disk_stat = os.statvfs(info.root)
-            root_free_mb = disk_stat.f_bsize * disk_stat.f_bavail / 1024 / 1024
+            root_free_mb = disk_stat.f_bsize * disk_stat.f_bavail // 1024 // 1024
             disk_stat = os.statvfs(os.path.join(info.root, 'boot'))
-            boot_free_mb = disk_stat.f_bsize * disk_stat.f_bavail / 1024 / 1024
+            boot_free_mb = disk_stat.f_bsize * disk_stat.f_bavail // 1024 // 1024
             free_mb = min(root_free_mb, boot_free_mb)
             if free_mb < 50:
                 msg = ('apt exited with a non-zero status, '
