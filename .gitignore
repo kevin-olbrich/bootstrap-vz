@@ -15,4 +15,4 @@
 /.pytest_cache/
 /.venv
 /build-servers.yml
-/integration.html
+/system.html

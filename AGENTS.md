@@ -111,7 +111,7 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
 
 ## Boundaries
 - Never commit build or test output: `build/`, `dist/`, `*.egg-info/`, `.tox/`,
-  `docs/_build/`, `.coverage`, `build-servers.yml` or `integration.html`.
+  `docs/_build/`, `.coverage`, `build-servers.yml` or `system.html`.
 - `build-servers.yml` holds local credentials for remote builds. Never create it
   with real values or read secrets out of it.
 - Do not edit `LICENSE` or remove the original author's attribution. The fork
