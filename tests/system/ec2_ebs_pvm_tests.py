@@ -1,7 +1,6 @@
 from .manifests import merge_manifest_data
 from .tools import boot_manifest
 
-# pylint: disable=print-statement
 
 partials = {'ebs_pvm': '''
 provider:
