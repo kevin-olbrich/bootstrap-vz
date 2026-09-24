@@ -9,19 +9,21 @@ def prepare_bootstrap(manifest, build_server):
     if manifest.volume['backing'] == 's3':
         credentials = {'access-key': build_server.build_settings['ec2-credentials']['access-key'],
                        'secret-key': build_server.build_settings['ec2-credentials']['secret-key']}
-        from boto.s3 import connect_to_region as s3_connect
-        s3_connection = s3_connect(manifest.image['region'],
-                                   aws_access_key_id=credentials['access-key'],
-                                   aws_secret_access_key=credentials['secret-key'])
+        import boto3
+        s3 = boto3.resource('s3', region_name=manifest.image['region'],
+                            aws_access_key_id=credentials['access-key'],
+                            aws_secret_access_key=credentials['secret-key'])
         log.debug('Creating S3 bucket')
-        bucket = s3_connection.create_bucket(manifest.image['bucket'], location=manifest.image['region'])
+        bucket_args = {'Bucket': manifest.image['bucket']}
+        if manifest.image['region'] != 'us-east-1':
+            bucket_args['CreateBucketConfiguration'] = {'LocationConstraint': manifest.image['region']}
+        bucket = s3.create_bucket(**bucket_args)
         try:
             yield
         finally:
             log.debug('Deleting S3 bucket')
-            for item in bucket.list():
-                bucket.delete_key(item.key)
-            s3_connection.delete_bucket(manifest.image['bucket'])
+            bucket.objects.all().delete()
+            bucket.delete()
     else:
         yield
 
@@ -31,52 +33,57 @@ def boot_image(manifest, build_server, bootstrap_info, instance_type=None):
 
     credentials = {'access-key': build_server.run_settings['ec2-credentials']['access-key'],
                    'secret-key': build_server.run_settings['ec2-credentials']['secret-key']}
-    from boto.ec2 import connect_to_region as ec2_connect
-    ec2_connection = ec2_connect(bootstrap_info._ec2['region'],
-                                 aws_access_key_id=credentials['access-key'],
-                                 aws_secret_access_key=credentials['secret-key'])
-    from boto.vpc import connect_to_region as vpc_connect
-    vpc_connection = vpc_connect(bootstrap_info._ec2['region'],
-                                 aws_access_key_id=credentials['access-key'],
-                                 aws_secret_access_key=credentials['secret-key'])
+    import boto3
+    ec2 = boto3.resource('ec2', region_name=bootstrap_info._ec2['region'],
+                         aws_access_key_id=credentials['access-key'],
+                         aws_secret_access_key=credentials['secret-key'])
 
+    image_id = bootstrap_info._ec2['image']['ImageId']
     if manifest.volume['backing'] == 'ebs':
         from .images import EBSImage
-        image = EBSImage(bootstrap_info._ec2['image'], ec2_connection)
+        image = EBSImage(image_id, ec2)
     if manifest.volume['backing'] == 's3':
         from .images import S3Image
-        image = S3Image(bootstrap_info._ec2['image'], ec2_connection)
+        image = S3Image(image_id, ec2)
 
     try:
-        with run_instance(image, manifest, instance_type, ec2_connection, vpc_connection) as instance:
+        with run_instance(image, manifest, instance_type, ec2) as instance:
             yield instance
     finally:
         image.destroy()
 
 
 @contextmanager
-def run_instance(image, manifest, instance_type, ec2_connection, vpc_connection):
+def run_instance(image, manifest, instance_type, ec2):
 
-    with create_env(ec2_connection, vpc_connection) as boot_env:
+    with create_env(ec2) as boot_env:
 
         def waituntil_instance_is(state):
             def instance_has_state():
-                instance.update()
-                return instance.state == state
+                instance.reload()
+                return instance.state['Name'] == state
             return waituntil(instance_has_state, timeout=600, interval=3)
+
+        def get_console_output():
+            return instance.console_output().get('Output')
 
         instance = None
         try:
             log.debug('Booting ec2 instance')
-            reservation = image.ami.run(instance_type=instance_type,
-                                        subnet_id=boot_env['subnet_id'])
-            [instance] = reservation.instances
-            instance.add_tag('Name', 'bootstrap-vz test instance')
+            run_args = {'ImageId': image.ami.id,
+                        'SubnetId': boot_env['subnet_id'],
+                        'MinCount': 1,
+                        'MaxCount': 1,
+                        }
+            if instance_type is not None:
+                run_args['InstanceType'] = instance_type
+            [instance] = ec2.create_instances(**run_args)
+            instance.create_tags(Tags=[{'Key': 'Name', 'Value': 'bootstrap-vz test instance'}])
 
             if not waituntil_instance_is('running'):
                 raise EC2InstanceStartupException('Timeout while booting instance')
 
-            if not waituntil(lambda: instance.get_console_output().output is not None, timeout=600, interval=3):
+            if not waituntil(lambda: get_console_output() is not None, timeout=600, interval=3):
                 raise EC2InstanceStartupException('Timeout while fetching console output')
 
             from bootstrapvz.common.releases import wheezy
@@ -85,7 +92,7 @@ def run_instance(image, manifest, instance_type, ec2_connection, vpc_connection)
             else:
                 termination_string = 'Debian GNU/Linux'
 
-            console_output = instance.get_console_output().output
+            console_output = get_console_output()
             if termination_string not in console_output:
                 last_lines = '\n'.join(console_output.split('\n')[-50:])
                 message = ('The instance did not boot properly.\n'
@@ -105,7 +112,7 @@ def run_instance(image, manifest, instance_type, ec2_connection, vpc_connection)
 
 
 @contextmanager
-def create_env(ec2_connection, vpc_connection):
+def create_env(ec2):
 
     vpc_cidr = '10.0.0.0/28'
     subnet_cidr = '10.0.0.0/28'
@@ -113,22 +120,22 @@ def create_env(ec2_connection, vpc_connection):
     @contextmanager
     def vpc():
         log.debug('Creating VPC')
-        vpc = vpc_connection.create_vpc(vpc_cidr)
+        vpc = ec2.create_vpc(CidrBlock=vpc_cidr)
         try:
             yield vpc
         finally:
             log.debug('Deleting VPC')
-            vpc_connection.delete_vpc(vpc.id)
+            vpc.delete()
 
     @contextmanager
     def subnet(vpc):
         log.debug('Creating subnet')
-        subnet = vpc_connection.create_subnet(vpc.id, subnet_cidr)
+        subnet = ec2.create_subnet(VpcId=vpc.id, CidrBlock=subnet_cidr)
         try:
             yield subnet
         finally:
             log.debug('Deleting subnet')
-            vpc_connection.delete_subnet(subnet.id)
+            subnet.delete()
 
     with vpc() as _vpc:
         with subnet(_vpc) as _subnet:
