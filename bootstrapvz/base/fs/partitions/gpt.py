@@ -15,11 +15,11 @@ class GPTPartition(BasePartition):
         :param BasePartition previous: The partition that preceeds this one
         """
         self.name = name
-        super(GPTPartition, self).__init__(size, filesystem, format_command, mountopts, previous)
+        super().__init__(size, filesystem, format_command, mountopts, previous)
 
     def _before_create(self, e):
         # Create the partition and then set the name of the partition afterwards
-        super(GPTPartition, self)._before_create(e)
+        super()._before_create(e)
         # partition name only works for gpt, for msdos that becomes the part-type (primary, extended, logical)
         name_command = 'name {idx} {name}'.format(idx=self.get_index(), name=self.name)
         log_check_call(['parted', '--script', e.volume.device_path,

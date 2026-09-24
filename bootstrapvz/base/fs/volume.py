@@ -44,7 +44,7 @@ class Volume(FSMProxy, metaclass=ABCMeta):
 
         # Create the configuration for our finite state machine
         cfg = {'initial': 'nonexistent', 'events': self.events, 'callbacks': callbacks}
-        super(Volume, self).__init__(cfg)
+        super().__init__(cfg)
 
     def _after_create(self, e):
         if isinstance(self.partition_map, NoPartitions):

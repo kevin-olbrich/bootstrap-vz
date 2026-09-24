@@ -33,7 +33,7 @@ class _ReleaseAlias(_Release):
     def __init__(self, alias, release):
         self.alias = alias
         self.release = release
-        super(_ReleaseAlias, self).__init__(self.release.codename, self.release.version)
+        super().__init__(self.release.codename, self.release.version)
 
     def __str__(self):
         return self.alias

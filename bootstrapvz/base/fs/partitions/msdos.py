@@ -13,4 +13,4 @@ class MSDOSPartition(BasePartition):
         :param BasePartition previous: The partition that preceeds this one
         """
         self.name = name
-        super(MSDOSPartition, self).__init__(size, filesystem, format_command, mountopts, previous)
+        super().__init__(size, filesystem, format_command, mountopts, previous)

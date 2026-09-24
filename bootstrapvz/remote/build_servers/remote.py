@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 class RemoteBuildServer(BuildServer):
 
     def __init__(self, name, settings):
-        super(RemoteBuildServer, self).__init__(name, settings)
+        super().__init__(name, settings)
         self.address = settings['address']
         self.port = settings['port']
         self.username = settings['username']

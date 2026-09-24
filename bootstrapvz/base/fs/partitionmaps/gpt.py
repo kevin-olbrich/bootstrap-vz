@@ -92,7 +92,7 @@ class GPTPartitionMap(AbstractPartitionMap):
         self.partitions[-1].pad_end += secondary_gpt_size
         self.partitions[-1].size -= secondary_gpt_size
 
-        super(GPTPartitionMap, self).__init__(bootloader)
+        super().__init__(bootloader)
 
     def _before_create(self, event):
         """Creates the partition map

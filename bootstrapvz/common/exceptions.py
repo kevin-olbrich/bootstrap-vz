@@ -2,7 +2,7 @@
 
 class ManifestError(Exception):
     def __init__(self, message, manifest_path=None, data_path=None):
-        super(ManifestError, self).__init__(message)
+        super().__init__(message)
         self.message = message
         self.manifest_path = manifest_path
         self.data_path = data_path
@@ -18,7 +18,7 @@ class ManifestError(Exception):
 
 class TaskListError(Exception):
     def __init__(self, message):
-        super(TaskListError, self).__init__(message)
+        super().__init__(message)
         self.message = message
         self.args = (self.message,)
 

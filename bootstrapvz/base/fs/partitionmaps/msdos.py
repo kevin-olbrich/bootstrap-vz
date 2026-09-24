@@ -81,7 +81,7 @@ class MSDOSPartitionMap(AbstractPartitionMap):
         self.partitions[-1].pad_end += 1
         self.partitions[-1].size -= 1
 
-        super(MSDOSPartitionMap, self).__init__(bootloader)
+        super().__init__(bootloader)
 
     def _before_create(self, event):
         volume = event.volume

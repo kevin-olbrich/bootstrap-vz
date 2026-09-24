@@ -22,7 +22,7 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
         """
         # Create the configuration for the state machine
         cfg = {'initial': 'nonexistent', 'events': self.events, 'callbacks': {}}
-        super(AbstractPartitionMap, self).__init__(cfg)
+        super().__init__(cfg)
 
     def is_blocking(self):
         """Returns whether the partition map is blocking volume detach operations

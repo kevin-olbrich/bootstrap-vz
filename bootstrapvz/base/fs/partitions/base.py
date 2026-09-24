@@ -34,7 +34,7 @@ class BasePartition(AbstractPartition):
         self.flags = []
         # Path to symlink in /dev/disk/by-uuid (manually maintained by this class)
         self.disk_by_uuid_path = None
-        super(BasePartition, self).__init__(size, filesystem, format_command, mountopts)
+        super().__init__(size, filesystem, format_command, mountopts)
 
     def create(self, volume):
         """Creates the partition

@@ -6,7 +6,7 @@ import os
 class LogicalVolume(Volume):
 
     def __init__(self, partitionmap):
-        super(LogicalVolume, self).__init__(partitionmap)
+        super().__init__(partitionmap)
         self.vg = ''
         self.lv = ''
 

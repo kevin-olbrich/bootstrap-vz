@@ -5,7 +5,7 @@ class LogForwarder(logging.Handler):
 
     def __init__(self, level=logging.NOTSET):
         self.server = None
-        super(LogForwarder, self).__init__(level)
+        super().__init__(level)
 
     def set_server(self, server):
         self.server = server

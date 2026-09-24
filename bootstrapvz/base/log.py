@@ -78,7 +78,7 @@ class SourceFormatter(logging.Formatter):
         if 'source' in extra:
             record.msg = '[{source}] {message}'.format(source=record.extra['source'],
                                                        message=record.msg)
-        return super(SourceFormatter, self).format(record)
+        return super().format(record)
 
 
 class ColorFormatter(SourceFormatter):
@@ -93,7 +93,7 @@ class ColorFormatter(SourceFormatter):
         # Colorize the message if we have a color for it (DEBUG has no color)
         from termcolor import colored
         record.msg = colored(record.msg, self.level_colors.get(record.levelno, None))
-        return super(ColorFormatter, self).format(record)
+        return super().format(record)
 
 
 class FileFormatter(SourceFormatter):

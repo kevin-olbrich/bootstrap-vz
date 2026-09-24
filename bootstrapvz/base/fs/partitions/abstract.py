@@ -38,7 +38,7 @@ class AbstractPartition(FSMProxy, metaclass=ABCMeta):
 
         # Create the configuration for our state machine
         cfg = {'initial': 'nonexistent', 'events': self.events, 'callbacks': {}}
-        super(AbstractPartition, self).__init__(cfg)
+        super().__init__(cfg)
 
     def get_uuid(self):
         """Gets the UUID of the partition
