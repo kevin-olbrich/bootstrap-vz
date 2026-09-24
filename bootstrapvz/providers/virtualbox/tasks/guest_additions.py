@@ -52,11 +52,17 @@ class InstallGuestAdditions(Task):
     @classmethod
     def run(cls, info):
         from bootstrapvz.common.tools import log_call, log_check_call
+        kernel_version = None
         for line in log_check_call(['chroot', info.root, 'apt-cache', 'show', info.kernel['headers_pkg']]):
-            key, value = line.split(':')
-            if key.strip() == 'Depends':
-                kernel_version = value.strip().split('linux-headers-')[-1]
+            key, separator, value = line.partition(':')
+            if separator and key.strip() == 'Depends':
+                # e.g. "linux-headers-6.1.0-18-amd64 (= 6.1.76-1), ..." -> "6.1.0-18-amd64"
+                headers_pkg = value.split(',')[0].split()[0]
+                kernel_version = headers_pkg.split('linux-headers-', 1)[-1]
                 break
+        if kernel_version is None:
+            raise TaskError('Unable to determine the kernel version from the dependencies of {pkg}'
+                            .format(pkg=info.kernel['headers_pkg']))
 
         guest_additions_path = rel_path(info.manifest.path, info.manifest.provider['guest_additions'])
         mount_dir = 'mnt/guest_additions'
