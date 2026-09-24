@@ -8,9 +8,10 @@ def validate_manifest(data, validator, error):
 
 def resolve_tasks(taskset, manifest):
     taskset.add(tasks.CheckRequestedDebianRelease)
-    taskset.add(tasks.AddPuppetlabsPC1SourcesList)
-    taskset.add(tasks.InstallPuppetlabsPC1ReleaseKey)
-    taskset.add(tasks.InstallPuppetAgent)
+    if manifest.release in tasks.PC1_RELEASES:
+        taskset.add(tasks.AddPuppetlabsPC1SourcesList)
+        taskset.add(tasks.InstallPuppetlabsPC1ReleaseKey)
+    taskset.add(tasks.AddPuppetPackage)
     if 'assets' in manifest.plugins['puppet']:
         taskset.add(tasks.CheckAssetsPath)
         taskset.add(tasks.CopyPuppetAssets)

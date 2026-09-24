@@ -3,28 +3,34 @@ from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import apt
 from bootstrapvz.common.exceptions import TaskError
-from bootstrapvz.common.releases import jessie, wheezy, stretch, buster, bullseye, bookworm, trixie, forky
+from bootstrapvz.common.releases import wheezy, jessie, stretch, bookworm
 from bootstrapvz.common.tools import sed_i, log_check_call, rel_path
 
+# Releases that install puppet-agent from the Puppetlabs PC1 repository, with its bundled keyring.
+# Newer releases install Puppet from Debian itself, since PC1 was discontinued.
+PC1_RELEASES = (wheezy, jessie, stretch)
 
-ASSETS_DIR_FORKY = rel_path(__file__, 'assets/gpg-keyrings-PC1/forky')
-ASSETS_DIR_TRIXIE = rel_path(__file__, 'assets/gpg-keyrings-PC1/trixie')
-ASSETS_DIR_BOOKWORM = rel_path(__file__, 'assets/gpg-keyrings-PC1/bookworm')
-ASSETS_DIR_BULLSEYE = rel_path(__file__, 'assets/gpg-keyrings-PC1/bullseye')
-ASSETS_DIR_BUSTER = rel_path(__file__, 'assets/gpg-keyrings-PC1/buster')
-ASSETS_DIR_STRETCH = rel_path(__file__, 'assets/gpg-keyrings-PC1/stretch')
-ASSETS_DIR_JESSIE = rel_path(__file__, 'assets/gpg-keyrings-PC1/jessie')
-ASSETS_DIR_WHEEZY = rel_path(__file__, 'assets/gpg-keyrings-PC1/wheezy')
+
+def uses_pc1(info):
+    return info.manifest.release in PC1_RELEASES
+
+
+def puppet_binary(info):
+    return '/opt/puppetlabs/bin/puppet' if uses_pc1(info) else '/usr/bin/puppet'
+
+
+def puppet_config_dir(info):
+    return 'etc/puppetlabs' if uses_pc1(info) else 'etc/puppet'
 
 
 class CheckRequestedDebianRelease(Task):
-    description = 'Checking whether there is a release available for {info.manifest.release}'
+    description = 'Checking whether Puppet is available for {info.manifest.release}'
     phase = phases.validation
 
     @classmethod
     def run(cls, info):
-        if info.manifest.release not in (jessie, wheezy, stretch, buster, bullseye, bookworm, trixie, forky):
-            msg = 'Debian {info.manifest.release} is not (yet) available in the Puppetlabs.com APT repository.'
+        if info.manifest.release < wheezy:
+            msg = 'Puppet is not available for Debian {release}.'.format(release=info.manifest.release)
             raise TaskError(msg)
 
 
@@ -68,22 +74,8 @@ class InstallPuppetlabsPC1ReleaseKey(Task):
     @classmethod
     def run(cls, info):
         from shutil import copy
-        if (info.manifest.release == forky):
-            key_path = os.path.join(ASSETS_DIR_FORKY, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == trixie):
-            key_path = os.path.join(ASSETS_DIR_TRIXIE, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == bookworm):
-            key_path = os.path.join(ASSETS_DIR_BOOKWORM, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == bullseye):
-            key_path = os.path.join(ASSETS_DIR_BULLSEYE, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == buster):
-            key_path = os.path.join(ASSETS_DIR_BUSTER, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == stretch):
-            key_path = os.path.join(ASSETS_DIR_STRETCH, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == jessie):
-            key_path = os.path.join(ASSETS_DIR_JESSIE, 'puppetlabs-pc1-keyring.gpg')
-        if (info.manifest.release == wheezy):
-            key_path = os.path.join(ASSETS_DIR_WHEEZY, 'puppetlabs-pc1-keyring.gpg')
+        key_path = rel_path(__file__, os.path.join('assets/gpg-keyrings-PC1', info.manifest.release.codename,
+                                                   'puppetlabs-pc1-keyring.gpg'))
         destination = os.path.join(info.root, 'etc/apt/trusted.gpg.d/puppetlabs-pc1-keyring.gpg')
         copy(key_path, destination)
 
@@ -94,50 +86,36 @@ class AddPuppetlabsPC1SourcesList(Task):
 
     @classmethod
     def run(cls, info):
-        if (info.manifest.release == forky):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com forky PC1')
-        if (info.manifest.release == trixie):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com trixie PC1')
-        if (info.manifest.release == bookworm):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com bookworm PC1')
-        if (info.manifest.release == bullseye):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com bullseye PC1')
-        if (info.manifest.release == buster):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com buster PC1')
-        if (info.manifest.release == stretch):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com stretch PC1')
-        if (info.manifest.release == jessie):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com jessie PC1')
-        if (info.manifest.release == wheezy):
-            info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com wheezy PC1')
+        info.source_lists.add('puppetlabs', 'deb http://apt.puppetlabs.com {codename} PC1'
+                              .format(codename=info.manifest.release.codename))
 
 
-class InstallPuppetAgent(Task):
-    description = 'Install puppet-agent from https://apt.puppetlabs.com for {system.release}'
-    phase = phases.system_modification
+class AddPuppetPackage(Task):
+    description = 'Adding the Puppet agent package'
+    phase = phases.preparation
 
     @classmethod
     def run(cls, info):
-        log_check_call(['chroot', info.root, 'apt-get', 'install', '--assume-yes', 'puppet-agent'])
+        if uses_pc1(info):
+            # puppet-agent from the PC1 repository
+            info.packages.add('puppet-agent')
+        elif info.manifest.release < bookworm:
+            info.packages.add('puppet')
+        else:
+            # Debian renamed the agent package in bookworm
+            info.packages.add('puppet-agent')
 
 
 class InstallModules(Task):
     description = 'Installing Puppet modules'
     phase = phases.system_modification
-    predecessors = [InstallPuppetAgent]
 
     @classmethod
     def run(cls, info):
         for module in info.manifest.plugins['puppet']['install_modules']:
-            command = ['chroot', info.root, '/opt/puppetlabs/bin/puppet', 'module', 'install', '--force']
-            if (len(module) == 1):
-                [module_name] = module
-                command.append(str(module_name))
-            if (len(module) == 2):
-                [module_name, module_version] = module
-                command.append(str(module_name))
-                command.append('--version')
-                command.append(str(module_version))
+            command = ['chroot', info.root, puppet_binary(info), 'module', 'install', '--force', str(module[0])]
+            if len(module) == 2:
+                command.extend(['--version', str(module[1])])
             log_check_call(command)
 
 
@@ -149,7 +127,7 @@ class CopyPuppetAssets(Task):
     @classmethod
     def run(cls, info):
         from bootstrapvz.common.tools import copy_tree
-        copy_tree(info.manifest.plugins['puppet']['assets'], os.path.join(info.root, 'etc/puppetlabs/'))
+        copy_tree(info.manifest.plugins['puppet']['assets'], os.path.join(info.root, puppet_config_dir(info)))
 
 
 class ApplyPuppetManifest(Task):
@@ -169,7 +147,7 @@ class ApplyPuppetManifest(Task):
         manifest_dst = os.path.join(info.root, manifest_rel_dst)
         copy(pp_manifest, manifest_dst)
         manifest_path = os.path.join('/', manifest_rel_dst)
-        log_check_call(['chroot', info.root, 'puppet', 'apply', '--verbose', '--debug', manifest_path])
+        log_check_call(['chroot', info.root, puppet_binary(info), 'apply', '--verbose', '--debug', manifest_path])
         os.remove(manifest_dst)
         hosts_path = os.path.join(info.root, 'etc/hosts')
         sed_i(hosts_path, r'127.0.0.1\s*{hostname}\n?'.format(hostname=hostname), '')
@@ -181,5 +159,8 @@ class EnableAgent(Task):
 
     @classmethod
     def run(cls, info):
-        puppet_defaults = os.path.join(info.root, 'etc/defaults/puppet')
-        sed_i(puppet_defaults, 'START=no', 'START=yes')
+        if info.manifest.release == wheezy:
+            # wheezy boots with sysvinit
+            log_check_call(['chroot', info.root, 'update-rc.d', 'puppet', 'enable'])
+        else:
+            log_check_call(['chroot', info.root, 'systemctl', 'enable', 'puppet.service'])

@@ -1,19 +1,27 @@
 Puppet
 ------
 
-Installs `puppet version 4 <http://puppetlabs.com/>` PC1 From the site 
-repository `<http://apt.puppetlabs.com/>` and optionally applies a
-manifest inside the chroot. You can also have it copy your puppet
-configuration into the image so it is readily available once the image
-is booted.
+Installs the Puppet agent and optionally applies a manifest inside the
+chroot. You can also have it copy your puppet configuration into the
+image so it is readily available once the image is booted.
+
+Where the agent comes from depends on the Debian release:
+
+-  ``wheezy``, ``jessie`` and ``stretch``: ``puppet-agent`` (Puppet 4) from
+   the Puppetlabs PC1 repository `<http://apt.puppetlabs.com/>`__, using
+   the PC1 keyrings shipped with this plugin. It is installed in
+   ``/opt/puppetlabs`` and configured in ``/etc/puppetlabs``.
+-  ``buster`` and newer: Puppet from Debian itself (``puppet`` on buster and
+   bullseye, ``puppet-agent`` from bookworm on), because the PC1
+   repository has been discontinued. It is installed in ``/usr/bin`` and
+   configured in ``/etc/puppet``.
 
 Rationale and use case in a masterless setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You want to use this plugin when you wish to create an image and to be able to
-manage that image with Puppet. You have a Puppet 4 setup in mind and thus you 
-want the image to contain the puppet agent software from the puppetlabs repo. 
-You want it to almost contain everything you need to get it up and running 
+manage that image with Puppet, with the puppet agent software already
+installed. You want it to almost contain everything you need to get it up and running 
 This plugin does just that!
 While you're at it, throw in some modules from the forge as well!
 Want to include your own modules? Include them as assets!
@@ -24,8 +32,6 @@ structure. This allows you thus to work "masterless".
 
 You can use this to bootstrap any kind of appliance, like a puppet master!
  
-For now this plugin is only compatible with Debian versions Wheezy, Jessie and 
-Stretch. These are Debian distributions supported by puppetlabs.
 
 About Master/agent setups
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,21 +44,15 @@ In a puppet PE environment you will probably not need this plugin since the PE
 server console gives you an URL that installs the agent corresponding to your 
 PE server. 
 
-About Puppet 5
-~~~~~~~~~~~~~~
-
-Although Puppet 5 is available for some time, there is still heavy development 
-going on in that version. This module does NOT support the installation of this
-version at this time. If you think this should be the case, please open up an 
-issue on `<https://github.com/NeatNerdPrime/bootstrap-vz/>`.
-
 Settings
 ~~~~~~~~
 
 -  ``manifest``: Path to the puppet manifest that should be applied.
    ``optional``
--  ``assets``: Path to puppet assets. The contents will be copied into
-   ``/etc/puppetlabs`` on the image. Any existing files will be overwritten.
+-  ``assets``: Path to puppet assets. The contents will be copied into the
+   puppet configuration directory on the image (``/etc/puppetlabs`` on
+   wheezy to stretch, ``/etc/puppet`` on buster and newer). Any existing
+   files will be overwritten.
    ``optional``
 -  ``install_modules``: A list of modules you wish to install available from 
    `<https://forge.puppetlabs.com/>` inside the chroot. It will assume a FORCED
@@ -61,7 +61,8 @@ Settings
    name. A version is optional, when no version is given, it will take the 
    latest version available from the forge. 
    Format: [module_name (required), version (optional)]
--  ``enable_agent``: Whether the puppet agent daemon should be enabled. 
+-  ``enable_agent``: Whether the puppet agent service should be enabled
+   (with ``systemctl enable``, or ``update-rc.d`` on wheezy).
    ``optional - not recommended``. disabled by default. UNTESTED
    
 An example bootstrap-vz manifest is included in the ``KVM`` folder of the 
@@ -72,8 +73,8 @@ Limitations
 (Help is always welcome, feel free to chip in!)
 General:
 
-- This plugin only installs the PC1 package for now, needs to be extended to 
-  be able to install the package of choice
+- The Puppet version is the one the PC1 repository or the Debian release
+  provides, it cannot be chosen in the manifest.
 
 Manifests:
 
