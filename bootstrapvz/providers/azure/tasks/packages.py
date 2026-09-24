@@ -10,8 +10,14 @@ class DefaultPackages(Task):
     @classmethod
     def run(cls, info):
         info.packages.add('openssl')
-        info.packages.add('python-openssl')
-        info.packages.add('python-pyasn1')
+        from bootstrapvz.common.releases import bullseye
+        # Debian dropped the Python 2 modules in bullseye
+        if info.manifest.release < bullseye:
+            info.packages.add('python-openssl')
+            info.packages.add('python-pyasn1')
+        else:
+            info.packages.add('python3-openssl')
+            info.packages.add('python3-pyasn1')
         info.packages.add('sudo')
         info.packages.add('parted')
 

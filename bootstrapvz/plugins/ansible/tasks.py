@@ -39,7 +39,12 @@ class AddPackages(Task):
 
     @classmethod
     def run(cls, info):
-        info.packages.add('python')
+        from bootstrapvz.common.releases import bullseye
+        # Debian dropped the Python 2 'python' package in bullseye
+        if info.manifest.release < bullseye:
+            info.packages.add('python')
+        else:
+            info.packages.add('python3')
 
 
 class RunAnsiblePlaybook(Task):
