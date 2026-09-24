@@ -65,7 +65,7 @@ class GPTPartitionMap(AbstractPartitionMap):
 
         # Create all additional partitions
         for partition in data:
-            if partition not in ["boot", "swap", "root", "type"] and not None:
+            if partition not in ["boot", "swap", "root", "type"]:
                 part_tmp = GPTPartition(Sectors(data[partition]['size'], sector_size),
                                         data[partition]['filesystem'], data[partition].get('format_command', None),
                                         data[partition].get('mountopts', None), partition, last_partition())
