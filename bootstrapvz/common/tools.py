@@ -27,41 +27,40 @@ def log_call(command, stdin=None, env=None, shell=False, cwd=None):
     else:
         log.debug('Executing: {command}'.format(command=command))
 
-    process = subprocess.Popen(args=command, env=env, shell=shell, cwd=cwd,
-                               stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
+    with subprocess.Popen(args=command, env=env, shell=shell, cwd=cwd,
+                          stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          universal_newlines=True) as process:
+        if stdin is not None:
+            log.debug('  stdin: ' + stdin)
+            process.stdin.write(stdin + "\n")
+            process.stdin.flush()
+        process.stdin.close()
 
-    if stdin is not None:
-        log.debug('  stdin: ' + stdin)
-        process.stdin.write(stdin + "\n")
-        process.stdin.flush()
-    process.stdin.close()
+        stdout = []
+        stderr = []
 
-    stdout = []
-    stderr = []
+        def handle_stdout(line):
+            log.debug(line)
+            stdout.append(line)
 
-    def handle_stdout(line):
-        log.debug(line)
-        stdout.append(line)
+        def handle_stderr(line):
+            log.error(line)
+            stderr.append(line)
 
-    def handle_stderr(line):
-        log.error(line)
-        stderr.append(line)
+        handlers = {process.stdout: handle_stdout,
+                    process.stderr: handle_stderr}
 
-    handlers = {process.stdout: handle_stdout,
-                process.stderr: handle_stderr}
+        def stream_readline(stream):
+            for line in iter(stream.readline, ''):
+                handlers[stream](line.strip())
 
-    def stream_readline(stream):
-        for line in iter(stream.readline, ''):
-            handlers[stream](line.strip())
-
-    pool = ThreadPool(2)
-    pool.map(stream_readline, [process.stdout, process.stderr])
-    pool.close()
-    pool.join()
-    process.wait()
+        pool = ThreadPool(2)
+        pool.map(stream_readline, [process.stdout, process.stderr])
+        pool.close()
+        pool.join()
+        process.wait()
     return process.returncode, stdout, stderr
 
 

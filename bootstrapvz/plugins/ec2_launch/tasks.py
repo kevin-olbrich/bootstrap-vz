@@ -52,20 +52,17 @@ class PrintPublicIPAddress(Task):
         filename = info.manifest.plugins['ec2_launch']['print_public_ip']
         if not filename:
             filename = '/dev/null'
-        f = open(filename, 'w')
-
-        try:
-            waiter = conn.get_waiter('instance_status_ok')
-            waiter.wait(InstanceIds=[info._ec2['instance']['InstanceId']],
-                        Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-            info._ec2['instance'] = conn.describe_instances(InstanceIds=[info._ec2['instance']['InstanceId']])['Reservations'][0]['Instances'][0]
-            logger.info('******* EC2 IP ADDRESS: %s *******' % info._ec2['instance']['PublicIpAddress'])
-            f.write(info._ec2['instance']['PublicIpAddress'])
-        except Exception:  # pylint: disable=broad-except
-            logger.error('Could not get IP address for the instance')
-            f.write('')
-
-        f.close()
+        with open(filename, 'w') as f:
+            try:
+                waiter = conn.get_waiter('instance_status_ok')
+                waiter.wait(InstanceIds=[info._ec2['instance']['InstanceId']],
+                            Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+                info._ec2['instance'] = conn.describe_instances(InstanceIds=[info._ec2['instance']['InstanceId']])['Reservations'][0]['Instances'][0]
+                logger.info('******* EC2 IP ADDRESS: %s *******' % info._ec2['instance']['PublicIpAddress'])
+                f.write(info._ec2['instance']['PublicIpAddress'])
+            except Exception:  # pylint: disable=broad-except
+                logger.error('Could not get IP address for the instance')
+                f.write('')
 
 
 class DeregisterAMI(Task):

@@ -16,7 +16,8 @@ class CheckAptProxy(Task):
         proxy_port = info.manifest.plugins['apt_proxy']['port']
         proxy_url = 'http://{address}:{port}'.format(address=proxy_address, port=proxy_port)
         try:
-            urllib.request.urlopen(proxy_url, timeout=5)
+            with urllib.request.urlopen(proxy_url, timeout=5):
+                pass
         except urllib.error.URLError as e:
             # Default response from `apt-cacher-ng`
             # pylint: disable=no-member

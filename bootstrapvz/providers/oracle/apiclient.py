@@ -110,28 +110,28 @@ class OracleStorageAPIClient:
         return url
 
     def upload_file(self):
-        f = open(self.file_path, 'rb')
-        n = 1
-        while True:
-            chunk = f.read(self.chunk_size)
-            if not chunk:
-                break
-            chunk_name = '{name}-{number}'.format(
-                name=self.file_name,
-                number='{0:04d}'.format(n),
-            )
-            headers = {
-                'X-Auth-Token': self.auth_token,
-            }
-            url = '{base}/v1/Storage-{id_domain}/{container}/{object_chunk_name}'.format(
-                base=self.base_url,
-                id_domain=self.identity_domain,
-                container=self.container,
-                object_chunk_name=chunk_name,
-            )
-            self.log.debug('Uploading chunk ' + chunk_name)
-            response = requests.put(url, data=chunk, headers=headers, timeout=REQUEST_TIMEOUT)
-            if response.status_code != 201:
-                self._fail(response.text)
-            n += 1
+        with open(self.file_path, 'rb') as f:
+            n = 1
+            while True:
+                chunk = f.read(self.chunk_size)
+                if not chunk:
+                    break
+                chunk_name = '{name}-{number}'.format(
+                    name=self.file_name,
+                    number='{0:04d}'.format(n),
+                )
+                headers = {
+                    'X-Auth-Token': self.auth_token,
+                }
+                url = '{base}/v1/Storage-{id_domain}/{container}/{object_chunk_name}'.format(
+                    base=self.base_url,
+                    id_domain=self.identity_domain,
+                    container=self.container,
+                    object_chunk_name=chunk_name,
+                )
+                self.log.debug('Uploading chunk ' + chunk_name)
+                response = requests.put(url, data=chunk, headers=headers, timeout=REQUEST_TIMEOUT)
+                if response.status_code != 201:
+                    self._fail(response.text)
+                n += 1
         self.create_manifest()
