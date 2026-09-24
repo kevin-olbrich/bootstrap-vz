@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # bootstrap-vz documentation build configuration file, created by
 # sphinx-quickstart on Sun Mar 23 16:17:28 2014.
