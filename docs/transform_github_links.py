@@ -38,13 +38,8 @@ links_mapping = {
     r'^CHANGELOG\.rst$': r'changelog.html',
 }
 
-for key, val in includes_mapping.items():
-    del includes_mapping[key]
-    includes_mapping[re.compile(key)] = val
-
-for key, val in links_mapping.items():
-    del links_mapping[key]
-    links_mapping[re.compile(key)] = val
+includes_mapping = {re.compile(key): val for key, val in includes_mapping.items()}
+links_mapping = {re.compile(key): val for key, val in links_mapping.items()}
 
 
 def find_original(path):
