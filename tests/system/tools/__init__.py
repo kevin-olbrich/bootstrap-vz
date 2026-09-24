@@ -56,6 +56,8 @@ def read_from_socket(socket_path, termination_string, timeout, read_timeout=0.5)
     from timeit import default_timer
     start = default_timer()
 
+    import codecs
+    decoder = codecs.getincrementaldecoder('utf-8')('replace')
     output = ''
     ptr = 0
     continue_select = True
@@ -64,7 +66,7 @@ def read_from_socket(socket_path, termination_string, timeout, read_timeout=0.5)
         if console in read_ready:
             while True:
                 try:
-                    output += console.recv(1024)
+                    output += decoder.decode(console.recv(1024))
                     if termination_string in output[ptr:]:
                         continue_select = False
                     else:
