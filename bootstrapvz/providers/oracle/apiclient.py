@@ -4,6 +4,10 @@ import os
 import requests
 from bootstrapvz.common.bytes import Bytes
 
+# (connect, read) timeout in seconds for every HTTP request. The read timeout
+# applies per socket read, not to the whole transfer, so large uploads still work.
+REQUEST_TIMEOUT = (30, 300)
+
 
 class OracleStorageAPIClient:
     def __init__(self, username, password, identity_domain, container):
@@ -31,7 +35,7 @@ class OracleStorageAPIClient:
             'X-Storage-Pass': self.password,
         }
         url = self.base_url + '/auth/v1.0'
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.headers.get('x-auth-token')
         else:
@@ -74,7 +78,7 @@ class OracleStorageAPIClient:
         }
         url = self.object_url
         self.log.debug('Creating remote manifest to join chunks')
-        response = requests.put(url, headers=headers)
+        response = requests.put(url, headers=headers, timeout=REQUEST_TIMEOUT)
         if response.status_code != 201:
             self._fail(response.text)
 
@@ -83,7 +87,7 @@ class OracleStorageAPIClient:
             'X-Auth-Token': self.auth_token,
         }
         url = self.object_url
-        response = requests.get(url, headers=headers, stream=True)
+        response = requests.get(url, headers=headers, stream=True, timeout=REQUEST_TIMEOUT)
         if response.status_code != 200:
             self._fail(response.text)
         with open(self.target_file_path, 'wb') as f:
@@ -126,7 +130,7 @@ class OracleStorageAPIClient:
                 object_chunk_name=chunk_name,
             )
             self.log.debug('Uploading chunk ' + chunk_name)
-            response = requests.put(url, data=chunk, headers=headers)
+            response = requests.put(url, data=chunk, headers=headers, timeout=REQUEST_TIMEOUT)
             if response.status_code != 201:
                 self._fail(response.text)
             n += 1
