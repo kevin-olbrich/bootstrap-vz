@@ -110,7 +110,7 @@ class DisableSSHDNSLookup(Task):
     @classmethod
     def run(cls, info):
         sshd_config_path = os.path.join(info.root, 'etc/ssh/sshd_config')
-        with open(sshd_config_path, 'a') as sshd_config:
+        with open(sshd_config_path, 'a', encoding='utf-8') as sshd_config:
             sshd_config.write('UseDNS no')
 
 

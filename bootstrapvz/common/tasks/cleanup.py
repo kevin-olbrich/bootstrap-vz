@@ -10,7 +10,7 @@ class ClearMOTD(Task):
 
     @classmethod
     def run(cls, info):
-        with open('/var/run/motd', 'w'):
+        with open('/var/run/motd', 'w', encoding='utf-8'):
             pass
 
 
@@ -43,7 +43,7 @@ class ClearMachineId(Task):
         for machineid_file in [os.path.join(info.root, f) for f in ['etc/machine-id', 'var/lib/dbus/machine-id']]:
             if os.path.isfile(machineid_file):
                 log.debug(machineid_file + ' found, clearing')
-                with open(machineid_file, 'w'):
+                with open(machineid_file, 'w', encoding='utf-8'):
                     pass
             else:
                 log.debug(machineid_file + ' not found, not clearing')

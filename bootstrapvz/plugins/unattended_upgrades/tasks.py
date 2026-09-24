@@ -22,7 +22,7 @@ class EnablePeriodicUpgrades(Task):
         update_interval = info.manifest.plugins['unattended_upgrades']['update_interval']
         download_interval = info.manifest.plugins['unattended_upgrades']['download_interval']
         upgrade_interval = info.manifest.plugins['unattended_upgrades']['upgrade_interval']
-        with open(periodic_path, 'w') as periodic:
+        with open(periodic_path, 'w', encoding='utf-8') as periodic:
             periodic.write(('// Enable the update/upgrade script (0=disable)\n'
                             'APT::Periodic::Enable "1";\n\n'
                             '// Do "apt-get update" automatically every n-days (0=disable)\n'

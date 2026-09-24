@@ -53,7 +53,7 @@ class RunAnsiblePlaybook(Task):
 
         # build the inventory file
         inventory = os.path.join(info.root, 'tmp/bootstrap-inventory')
-        with open(inventory, 'w') as handle:
+        with open(inventory, 'w', encoding='utf-8') as handle:
             conn = '{} ansible_connection=chroot'.format(info.root)
             content = ""
 

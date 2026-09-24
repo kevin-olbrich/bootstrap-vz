@@ -31,7 +31,7 @@ class SetHostname(Task):
     def run(cls, info):
         hostname = info.manifest.system['hostname'].format(**info.manifest_vars)
         hostname_file_path = os.path.join(info.root, 'etc/hostname')
-        with open(hostname_file_path, 'w') as hostname_file:
+        with open(hostname_file_path, 'w', encoding='utf-8') as hostname_file:
             hostname_file.write(hostname)
 
         hosts_path = os.path.join(info.root, 'etc/hosts')
@@ -50,5 +50,5 @@ class ConfigureNetworkIF(Task):
         if_config = config_get(network_config_path, [info.manifest.release.codename])
 
         interfaces_path = os.path.join(info.root, 'etc/network/interfaces')
-        with open(interfaces_path, 'a') as interfaces:
+        with open(interfaces_path, 'a', encoding='utf-8') as interfaces:
             interfaces.write(if_config + '\n')

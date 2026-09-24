@@ -270,6 +270,6 @@ class FStab(Task):
                                        pass_num=mount_point['pass_num']))
 
         fstab_path = os.path.join(info.root, 'etc/fstab')
-        with open(fstab_path, 'w') as fstab:
+        with open(fstab_path, 'w', encoding='utf-8') as fstab:
             fstab.write('\n'.join(fstab_lines))
             fstab.write('\n')

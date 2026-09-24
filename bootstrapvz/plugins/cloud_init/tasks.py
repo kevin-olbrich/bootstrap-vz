@@ -96,7 +96,7 @@ class DisableModules(Task):
 
         cloud_cfg = os.path.join(info.root, 'etc/cloud/cloud.cfg')
         import fileinput
-        for line in fileinput.input(files=cloud_cfg, inplace=True):
+        for line in fileinput.input(files=cloud_cfg, inplace=True, encoding='utf-8'):
             if not regex.match(line):
                 print(line, end='')
 
@@ -115,7 +115,7 @@ class EnableModules(Task):
             for entry in info.manifest.plugins['cloud_init']['enable_modules'][section]:
                 count = 0
                 counting = 0
-                for line in fileinput.input(files=cloud_cfg, inplace=True):
+                for line in fileinput.input(files=cloud_cfg, inplace=True, encoding='utf-8'):
                     if regex.match(line) and not counting:
                         counting = True
                     if counting:

@@ -68,7 +68,7 @@ class PasswordlessSudo(Task):
     @classmethod
     def run(cls, info):
         sudo_vagrant_path = os.path.join(info.root, 'etc/sudoers.d/vagrant')
-        with open(sudo_vagrant_path, 'w') as sudo_vagrant:
+        with open(sudo_vagrant_path, 'w', encoding='utf-8') as sudo_vagrant:
             sudo_vagrant.write('vagrant ALL=(ALL) NOPASSWD:ALL')
         import stat
         ug_read_only = (stat.S_IRUSR | stat.S_IRGRP)
@@ -86,11 +86,11 @@ class AddInsecurePublicKey(Task):
         os.mkdir(ssh_dir)
 
         authorized_keys_source_path = os.path.join(assets, 'authorized_keys')
-        with open(authorized_keys_source_path, 'r') as authorized_keys_source:
+        with open(authorized_keys_source_path, 'r', encoding='utf-8') as authorized_keys_source:
             insecure_public_key = authorized_keys_source.read()
 
         authorized_keys_path = os.path.join(ssh_dir, 'authorized_keys')
-        with open(authorized_keys_path, 'a') as authorized_keys:
+        with open(authorized_keys_path, 'a', encoding='utf-8') as authorized_keys:
             authorized_keys.write(insecure_public_key)
 
         import stat
@@ -138,7 +138,7 @@ class PackageBox(Task):
             metadata['virtual_size'] = virtual_size
 
         metadata_file = os.path.join(info._vagrant['folder'], 'metadata.json')
-        with open(metadata_file, 'w') as f:
+        with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(metadata, f)
 
         from bootstrapvz.common.tools import log_check_call

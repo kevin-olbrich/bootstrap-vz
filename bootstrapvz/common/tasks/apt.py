@@ -136,7 +136,7 @@ class WriteConfiguration(Task):
             else:
                 path = os.path.join(info.root, 'etc/apt/apt.conf.d', name)
 
-            with open(path, 'w') as conf_file:
+            with open(path, 'w', encoding='utf-8') as conf_file:
                 conf_file.write(val + '\n')
 
 
@@ -156,7 +156,7 @@ class WriteSources(Task):
                 list_path = os.path.join(info.root, 'etc/apt/sources.list')
             else:
                 list_path = os.path.join(info.root, 'etc/apt/sources.list.d/', name + '.list')
-            with open(list_path, 'w') as source_list:
+            with open(list_path, 'w', encoding='utf-8') as source_list:
                 for source in sources:
                     source_list.write(str(source) + '\n')
 
@@ -172,7 +172,7 @@ class WritePreferences(Task):
                 list_path = os.path.join(info.root, 'etc/apt/preferences')
             else:
                 list_path = os.path.join(info.root, 'etc/apt/preferences.d/', name)
-            with open(list_path, 'w') as preference_list:
+            with open(list_path, 'w', encoding='utf-8') as preference_list:
                 for preference in preferences:
                     preference_list.write(str(preference) + '\n')
 
@@ -184,12 +184,12 @@ class DisableDaemonAutostart(Task):
     @classmethod
     def run(cls, info):
         rc_policy_path = os.path.join(info.root, 'usr/sbin/policy-rc.d')
-        with open(rc_policy_path, 'w') as rc_policy:
+        with open(rc_policy_path, 'w', encoding='utf-8') as rc_policy:
             rc_policy.write(('#!/bin/sh\n'
                              'exit 101'))
         os.chmod(rc_policy_path, 0o755)
         initictl_path = os.path.join(info.root, 'sbin/initctl')
-        with open(initictl_path, 'w') as initctl:
+        with open(initictl_path, 'w', encoding='utf-8') as initctl:
             initctl.write(('#!/bin/sh\n'
                            'exit 0'))
         os.chmod(initictl_path, 0o755)

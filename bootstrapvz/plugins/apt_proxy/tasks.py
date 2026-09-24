@@ -48,7 +48,7 @@ class SetAptProxy(Task):
         else:
             proxy_auth = ''
 
-        with open(proxy_path, 'w') as proxy_file:
+        with open(proxy_path, 'w', encoding='utf-8') as proxy_file:
             proxy_file.write(
                 'Acquire::http {{ Proxy "http://{auth}{address}:{port}"; }};\n'
                 .format(auth=proxy_auth, address=proxy_address, port=proxy_port))

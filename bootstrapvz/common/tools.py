@@ -79,7 +79,7 @@ def inline_replace(file_path, pattern, subst):
     import fileinput
     import re
     replacement_count = 0
-    for line in fileinput.input(files=file_path, inplace=True):
+    for line in fileinput.input(files=file_path, inplace=True, encoding='utf-8'):
         (replacement, count) = re.subn(pattern, subst, line)
         replacement_count += count
         print(replacement, end='')
@@ -89,13 +89,13 @@ def inline_replace(file_path, pattern, subst):
 def load_json(path):
     import json
     from json_minify import json_minify
-    with open(path) as stream:
+    with open(path, encoding='utf-8') as stream:
         return json.loads(json_minify(stream.read(), False))
 
 
 def load_yaml(path):
     import yaml
-    with open(path, 'r') as stream:
+    with open(path, 'r', encoding='utf-8') as stream:
         return yaml.safe_load(stream)
 
 

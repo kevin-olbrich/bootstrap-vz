@@ -271,7 +271,7 @@ for readme_path in glob.glob('../bootstrapvz/providers/*/README.rst'):
     include_path = os.path.join('providers', provider_name + '.rst')
     if not os.path.exists(include_path):
         path_to_readme = os.path.join('../../bootstrapvz/providers', provider_name, 'README.rst')
-        with open(include_path, 'w') as include:
+        with open(include_path, 'w', encoding='utf-8') as include:
             include.write('.. include:: ' + path_to_readme)
 
 
@@ -280,7 +280,7 @@ for readme_path in glob.glob('../bootstrapvz/plugins/*/README.rst'):
     include_path = os.path.join('plugins', plugin_name + '.rst')
     if not os.path.exists(include_path):
         path_to_readme = os.path.join('../../bootstrapvz/plugins', plugin_name, 'README.rst')
-        with open(include_path, 'w') as include:
+        with open(include_path, 'w', encoding='utf-8') as include:
             include.write('.. include:: ' + path_to_readme)
 
 
@@ -289,7 +289,7 @@ for readme_path in glob.glob('../tests/system/providers/*/README.rst'):
     include_path = os.path.join('testing/system_test_providers', provider_name + '.rst')
     if not os.path.exists(include_path):
         path_to_readme = os.path.join('../../../tests/system/providers', provider_name, 'README.rst')
-        with open(include_path, 'w') as include:
+        with open(include_path, 'w', encoding='utf-8') as include:
             include.write('.. include:: ' + path_to_readme)
 
 

@@ -59,7 +59,7 @@ class PasswordlessSudo(Task):
     def run(cls, info):
         sudo_admin_path = os.path.join(info.root, 'etc/sudoers.d/99_admin')
         username = info.manifest.plugins['admin_user']['username']
-        with open(sudo_admin_path, 'w') as sudo_admin:
+        with open(sudo_admin_path, 'w', encoding='utf-8') as sudo_admin:
             sudo_admin.write('{username} ALL=(ALL) NOPASSWD:ALL'.format(username=username))
         import stat
         ug_read_only = (stat.S_IRUSR | stat.S_IRGRP)
@@ -100,7 +100,7 @@ class AdminUserPublicKey(Task):
         pubkey_path = rel_path(info.manifest.path,
                                info.manifest.plugins['admin_user']['pubkey'])
 
-        with open(pubkey_path) as pubkey_handle:
+        with open(pubkey_path, encoding='utf-8') as pubkey_handle:
             pubkey = pubkey_handle.read()
 
         # paths
@@ -116,7 +116,7 @@ class AdminUserPublicKey(Task):
 
         # Create (or append to) the authorized keys file (and chmod u=rw,go=)
         import stat
-        with open(auth_keys_abs, 'a') as auth_keys_handle:
+        with open(auth_keys_abs, 'a', encoding='utf-8') as auth_keys_handle:
             auth_keys_handle.write(pubkey + '\n')
         os.chmod(auth_keys_abs, (stat.S_IRUSR | stat.S_IWUSR))
 

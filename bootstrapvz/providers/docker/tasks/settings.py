@@ -47,5 +47,5 @@ class SystemdContainer(Task):
     @classmethod
     def run(cls, info):
         os.makedirs(os.path.join(info.root, 'run/systemd'))
-        with open(os.path.join(info.root, 'run/systemd/container'), 'w') as systemd:
+        with open(os.path.join(info.root, 'run/systemd/container'), 'w', encoding='utf-8') as systemd:
             systemd.write('docker')

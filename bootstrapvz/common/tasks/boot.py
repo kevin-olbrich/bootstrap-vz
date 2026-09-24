@@ -22,7 +22,7 @@ class BlackListModules(Task):
     @classmethod
     def run(cls, info):
         blacklist_path = os.path.join(info.root, 'etc/modprobe.d/blacklist.conf')
-        with open(blacklist_path, 'a') as blacklist:
+        with open(blacklist_path, 'a', encoding='utf-8') as blacklist:
             blacklist.write(('# disable pc speaker and floppy\n'
                              'blacklist pcspkr\n'
                              'blacklist floppy\n'))

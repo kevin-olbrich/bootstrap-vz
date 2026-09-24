@@ -5,7 +5,7 @@ import os.path
 
 def find_version(path):
     import re
-    with open(path) as version_file_stream:
+    with open(path, encoding='utf-8') as version_file_stream:
         version_file = version_file_stream.read()
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:

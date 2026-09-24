@@ -64,7 +64,7 @@ def write_data(data, output_path=None):
         import sys
         json.dump(data, sys.stdout, indent=4, separators=(',', ': '))
     else:
-        with open(output_path, 'w') as output:
+        with open(output_path, 'w', encoding='utf-8') as output:
             json.dump(data, output)
 
 

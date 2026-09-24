@@ -58,7 +58,7 @@ class QEMUVolume(LoopbackVolume):
     def _module_loaded(self, module):
         import re
         regexp = re.compile('^{module} +'.format(module=module))
-        with open('/proc/modules') as loaded_modules:
+        with open('/proc/modules', encoding='utf-8') as loaded_modules:
             for line in loaded_modules:
                 match = regexp.match(line)
                 if match is not None:
@@ -68,7 +68,7 @@ class QEMUVolume(LoopbackVolume):
     def _module_param(self, module, param):
         import os.path
         param_path = os.path.join('/sys/module', module, 'parameters', param)
-        with open(param_path) as param_file:
+        with open(param_path, encoding='utf-8') as param_file:
             return param_file.read().strip()
 
     # From http://lists.gnu.org/archive/html/qemu-devel/2011-11/msg02201.html
@@ -94,7 +94,7 @@ class QEMUVolume(LoopbackVolume):
         deadline = time.time() + timeout
         while time.time() < deadline:
             try:
-                with open(size_path) as size_file:
+                with open(size_path, encoding='utf-8') as size_file:
                     if int(size_file.read().strip()) > 0:
                         return
             except OSError:

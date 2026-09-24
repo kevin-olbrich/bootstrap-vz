@@ -52,7 +52,7 @@ class PrintPublicIPAddress(Task):
         filename = info.manifest.plugins['ec2_launch']['print_public_ip']
         if not filename:
             filename = '/dev/null'
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             try:
                 waiter = conn.get_waiter('instance_status_ok')
                 waiter.wait(InstanceIds=[info._ec2['instance']['InstanceId']],

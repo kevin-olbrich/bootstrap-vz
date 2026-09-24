@@ -159,9 +159,9 @@ class ApplyPuppetManifest(Task):
 
     @classmethod
     def run(cls, info):
-        with open(os.path.join(info.root, 'etc/hostname')) as handle:
+        with open(os.path.join(info.root, 'etc/hostname'), encoding='utf-8') as handle:
             hostname = handle.read().strip()
-        with open(os.path.join(info.root, 'etc/hosts'), 'a') as handle:
+        with open(os.path.join(info.root, 'etc/hosts'), 'a', encoding='utf-8') as handle:
             handle.write('127.0.0.1\t{hostname}\n'.format(hostname=hostname))
         from shutil import copy
         pp_manifest = info.manifest.plugins['puppet']['manifest']

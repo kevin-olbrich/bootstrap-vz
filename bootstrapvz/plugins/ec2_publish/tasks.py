@@ -53,7 +53,7 @@ class PublishAmiManifest(Task):
         parsed_url = urlparse(manifest_url)
         parsed_host = parsed_url.netloc
         if not parsed_url.scheme:
-            with open(parsed_url.path, 'w') as local_out:
+            with open(parsed_url.path, 'w', encoding='utf-8') as local_out:
                 local_out.write(amis_json)
         elif parsed_host.endswith('amazonaws.com') and 's3' in parsed_host:
             region = 'us-east-1'

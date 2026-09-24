@@ -72,14 +72,14 @@ class InstallGuestAdditions(Task):
         root.add_mount(guest_additions_path, mount_path, ['-o', 'loop'])
         install_script = os.path.join('/', mount_dir, 'VBoxLinuxAdditions.run')
         install_wrapper_name = 'install_guest_additions.sh'
-        with open(os.path.join(assets, install_wrapper_name)) as template:
+        with open(os.path.join(assets, install_wrapper_name), encoding='utf-8') as template:
             install_wrapper = template.read()
         install_wrapper = install_wrapper \
             .replace("KERNEL_VERSION", kernel_version) \
             .replace("KERNEL_ARCH", info.kernel['arch']) \
             .replace("INSTALL_SCRIPT", install_script)
         install_wrapper_path = os.path.join(info.root, install_wrapper_name)
-        with open(install_wrapper_path, 'w') as f:
+        with open(install_wrapper_path, 'w', encoding='utf-8') as f:
             f.write(install_wrapper + '\n')
 
         # Don't check the return code of the scripts here, because 1 not necessarily means they have failed

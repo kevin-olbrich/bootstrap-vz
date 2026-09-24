@@ -63,7 +63,7 @@ class ConfigureExtlinuxJessie(Task):
         os.mkdir(extlinux_path)
 
         from . import assets
-        with open(os.path.join(assets, 'extlinux/extlinux.conf')) as template:
+        with open(os.path.join(assets, 'extlinux/extlinux.conf'), encoding='utf-8') as template:
             extlinux_config_tpl = template.read()
 
         config_vars = {'root_uuid': info.volume.partition_map.root.get_uuid(),
@@ -77,7 +77,7 @@ class ConfigureExtlinuxJessie(Task):
 
         extlinux_config = extlinux_config_tpl.format(**config_vars)
 
-        with open(os.path.join(extlinux_path, 'extlinux.conf'), 'w') as extlinux_conf_handle:
+        with open(os.path.join(extlinux_path, 'extlinux.conf'), 'w', encoding='utf-8') as extlinux_conf_handle:
             extlinux_conf_handle.write(extlinux_config)
 
         # Copy the boot message

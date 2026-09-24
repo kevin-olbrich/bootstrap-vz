@@ -45,7 +45,7 @@ class SetTimezone(Task):
     def run(cls, info):
         tz_path = os.path.join(info.root, 'etc/timezone')
         timezone = info.manifest.system['timezone']
-        with open(tz_path, 'w') as tz_file:
+        with open(tz_path, 'w', encoding='utf-8') as tz_file:
             tz_file.write(timezone)
 
 

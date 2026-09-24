@@ -102,9 +102,9 @@ class FilterLocales(Task):
         locales_path = os.path.join(info.root, 'etc/dpkg/dpkg.cfg.d/10filter-locales')
         manpages_path = os.path.join(info.root, 'etc/dpkg/dpkg.cfg.d/10filter-manpages')
 
-        with open(locales_path, 'w') as locale_filter:
+        with open(locales_path, 'w', encoding='utf-8') as locale_filter:
             locale_filter.write('\n'.join(locale_lines) + '\n')
-        with open(manpages_path, 'w') as manpages_filter:
+        with open(manpages_path, 'w', encoding='utf-8') as manpages_filter:
             manpages_filter.write('\n'.join(manpages_lines) + '\n')
 
 
@@ -121,7 +121,7 @@ class ExcludeDocs(Task):
         # So doing this should cause no problems.
         info._minimize_size['bootstrap_filter']['exclude'].append('/usr/share/doc/')
         exclude_docs_path = os.path.join(info.root, 'etc/dpkg/dpkg.cfg.d/10exclude-docs')
-        with open(exclude_docs_path, 'w') as exclude_docs:
+        with open(exclude_docs_path, 'w', encoding='utf-8') as exclude_docs:
             exclude_docs.write('path-exclude=/usr/share/doc/*\n')
 
 

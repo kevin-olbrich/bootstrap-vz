@@ -71,7 +71,7 @@ class InstallNetworkingUDevHotplugAndDHCPSubinterface(Task):
              os.path.join(script_dst, 'dhcp/dhclient-exit-hooks.d/ec2dhcp.sh'))
         os.chmod(os.path.join(script_dst, 'dhcp/dhclient-exit-hooks.d/ec2dhcp.sh'), rwxr_xr_x)
 
-        with open(os.path.join(script_dst, 'network/interfaces'), "a") as interfaces:
+        with open(os.path.join(script_dst, 'network/interfaces'), "a", encoding='utf-8') as interfaces:
             interfaces.write("iface eth1 inet dhcp\n")
             interfaces.write("iface eth2 inet dhcp\n")
             interfaces.write("iface eth3 inet dhcp\n")
@@ -113,7 +113,7 @@ class InstallEnhancedNetworking(Task):
                                '--directory', os.path.join(info.root, 'usr',
                                                            'src')])
 
-        with open(os.path.join(module_path, 'dkms.conf'), 'w') as dkms_conf:
+        with open(os.path.join(module_path, 'dkms.conf'), 'w', encoding='utf-8') as dkms_conf:
             dkms_conf.write("""PACKAGE_NAME="ixgbevf"
 PACKAGE_VERSION="%s"
 CLEAN="cd src/; sed -i '1s/^/EXTRA_CFLAGS := -fno-pie/' Makefile && make clean"
@@ -159,7 +159,7 @@ class InstallENANetworking(Task):
                                '--directory', os.path.join(info.root, 'usr',
                                                            'src')])
 
-        with open(os.path.join(module_path, 'dkms.conf'), 'w') as dkms_conf:
+        with open(os.path.join(module_path, 'dkms.conf'), 'w', encoding='utf-8') as dkms_conf:
             dkms_conf.write("""PACKAGE_NAME="ena"
 PACKAGE_VERSION="%s"
 CLEAN="make -C kernel/linux/ena clean"

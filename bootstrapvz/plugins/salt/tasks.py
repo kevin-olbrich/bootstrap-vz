@@ -29,7 +29,7 @@ class BootstrapSaltMinion(Task):
     def run(cls, info):
         # Download bootstrap script
         bootstrap_script = os.path.join(info.root, 'install_salt.sh')
-        with open(bootstrap_script, 'w') as f:
+        with open(bootstrap_script, 'w', encoding='utf-8') as f:
             with urllib.request.urlopen(SALT_BOOTSTRAP_URL, timeout=60) as d:
                 f.write(d.read().decode('utf-8'))
 
@@ -58,6 +58,6 @@ class SetSaltGrains(Task):
     def run(cls, info):
         grains_file = os.path.join(info.root, 'etc/salt/grains')
         grains = info.manifest.plugins['salt']['grains']
-        with open(grains_file, 'a') as f:
+        with open(grains_file, 'a', encoding='utf-8') as f:
             for g in grains:
                 f.write('%s: %s\n' % (g, grains[g]))

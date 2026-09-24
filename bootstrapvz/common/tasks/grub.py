@@ -218,7 +218,7 @@ class WriteGrubConfig(Task):
                 raise TaskError('Don\'t know how to handle type {}, '
                                 'when creating grub config'.format(type(value)))
         grub_defaults = os.path.join(info.root, 'etc/default/grub')
-        with open(grub_defaults, 'w') as grub_defaults_handle:
+        with open(grub_defaults, 'w', encoding='utf-8') as grub_defaults_handle:
             grub_defaults_handle.write(grub_config_contents)
 
 
@@ -363,7 +363,7 @@ class InstallGrub_1_99(Task):
             partition_prefix = 'msdos'
             if isinstance(p_map, partitionmaps.gpt.GPTPartitionMap):
                 partition_prefix = 'gpt'
-            with open(device_map_path, 'w') as device_map:
+            with open(device_map_path, 'w', encoding='utf-8') as device_map:
                 device_map.write('(hd0) {device_path}\n'.format(device_path=device_path))
                 if not isinstance(p_map, partitionmaps.none.NoPartitions):
                     for idx, partition in enumerate(info.volume.partition_map.partitions):

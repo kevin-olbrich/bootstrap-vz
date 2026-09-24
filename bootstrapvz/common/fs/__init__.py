@@ -6,7 +6,7 @@ def get_partitions():
     regexp = re.compile(r'^ *(?P<major>\d+) *(?P<minor>\d+) *(?P<num_blks>\d+) (?P<dev_name>\S+)$')
     matches = {}
     path = '/proc/partitions'
-    with open(path) as partitions:
+    with open(path, encoding='utf-8') as partitions:
         next(partitions)
         next(partitions)
         for line in partitions:
