@@ -97,7 +97,7 @@ class QEMUVolume(LoopbackVolume):
                 with open(size_path) as size_file:
                     if int(size_file.read().strip()) > 0:
                         return
-            except IOError:
+            except OSError:
                 pass
             time.sleep(0.1)
         raise VolumeError('The nbd device {device_path} did not become ready in time.'

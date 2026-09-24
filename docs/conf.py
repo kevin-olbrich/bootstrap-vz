@@ -350,6 +350,6 @@ def linkcode_resolve(domain, info):
             fmt_args['linestart'] = first
             fmt_args['lineend'] = first + len(lines) - 1
             return '{baseurl}/blob/{commit}/{path}#L{linestart}-L{lineend}'.format(**fmt_args)
-        except IOError:
+        except OSError:
             pass
     return '{baseurl}/blob/{commit}/{path}'.format(**fmt_args)
