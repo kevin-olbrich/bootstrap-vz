@@ -62,7 +62,7 @@ class Manifest(object):
                         'plugins': [],
                         }
         # Run through all the plugins mentioned in the manifest and load them
-        from pkg_resources import iter_entry_points
+        from importlib.metadata import entry_points as get_entry_points
         if 'plugins' in self.data:
             for plugin_name in self.data['plugins'].keys():
                 log.debug('Loading plugin ' + plugin_name)
@@ -71,7 +71,7 @@ class Manifest(object):
                     modname = 'bootstrapvz.plugins.' + plugin_name
                     plugin = importlib.import_module(modname)
                 except ImportError:
-                    entry_points = list(iter_entry_points('bootstrapvz.plugins', name=plugin_name))
+                    entry_points = list(get_entry_points(group='bootstrapvz.plugins', name=plugin_name))
                     num_entry_points = len(entry_points)
                     if num_entry_points < 1:
                         raise

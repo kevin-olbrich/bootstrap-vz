@@ -57,8 +57,6 @@ them, and never paper over them:
 - `flake8` reports existing F401/E741 findings in `common/tasks/apt.py` and in
   `plugins/minimize_size/tasks/`, and `pylint` exits non-zero.
 - `docs` crashes on current Sphinx (`dictionary keys changed during iteration`).
-- `bootstrapvz/base/manifest.py` imports `pkg_resources`, which setuptools 81+ no
-  longer ships. Install `setuptools<81` in the environment before any run or dry-run.
 - Only `yamllint` currently passes. Do not add new findings to any env.
 
 ## Structure
