@@ -123,4 +123,4 @@ def test_imod_int():
 
 def test_convert_int():
     secsize = 512
-    assert pow(1024, 3) / secsize == int(Sectors('1GiB', secsize))
+    assert pow(1024, 3) // secsize == int(Sectors('1GiB', secsize))
