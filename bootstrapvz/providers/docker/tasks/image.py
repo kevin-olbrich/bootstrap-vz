@@ -18,7 +18,7 @@ class CreateImage(Task):
 
     @classmethod
     def run(cls, info):
-        from pipes import quote
+        from shlex import quote
         tar_cmd = ['tar', '--create', '--numeric-owner',
                    '--directory', info.volume.path, '.']
         docker_cmd = ['docker', 'import']
@@ -50,7 +50,7 @@ class PopulateLabels(Task):
             for label, value in info.manifest.provider['labels'].items():
                 labels[label] = value.format(**info.manifest_vars)
 
-        from pipes import quote
+        from shlex import quote
         for label, value in labels.items():
             info._docker['dockerfile'].append('LABEL {}={}'.format(label, quote(value)))
 
