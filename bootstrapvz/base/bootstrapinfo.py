@@ -148,13 +148,19 @@ class DictClass(dict):
     """Tiny extension of dict to allow setting and getting keys via attributes
     """
     def __getattr__(self, name):
-        return self[name]
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
 
     def __setattr__(self, name, value):
         self[name] = value
 
     def __delattr__(self, name):
-        del self[name]
+        try:
+            del self[name]
+        except KeyError:
+            raise AttributeError(name)
 
     def __getstate__(self):
         return self.__dict__
