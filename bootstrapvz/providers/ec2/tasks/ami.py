@@ -119,9 +119,9 @@ class RegisterAMI(Task):
             registration_params['VirtualizationType'] = 'paravirtual'
             akis_path = rel_path(__file__, 'ami-akis.yml')
             from bootstrapvz.common.tools import config_get
-            registration_params['kernel_id'] = config_get(akis_path,
-                                                          [info._ec2['region'],
-                                                           info.manifest.system['architecture']])
+            registration_params['KernelId'] = config_get(akis_path,
+                                                         [info._ec2['region'],
+                                                          info.manifest.system['architecture']])
 
         if info.manifest.provider.get('enhanced_networking', None) == 'simple':
             registration_params['SriovNetSupport'] = 'simple'
