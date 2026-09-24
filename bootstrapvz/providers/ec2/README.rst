@@ -221,9 +221,9 @@ __ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restr
 Dependencies
 ------------
 
-To communicate with the AWS API `boto3 <https://github.com/boto/boto>`__
-is required you can install boto with
-``pip install boto3`` (on wheezy, the packaged version is too low). S3
+To communicate with the AWS API `boto3 <https://github.com/boto/boto3>`__
+is required you can install boto3 with
+``pip install boto3``. S3
 images are chopped up and uploaded using
 `euca2ools <https://github.com/eucalyptus/euca2ools>`__ (install with
 ``apt-get install euca2ools``).

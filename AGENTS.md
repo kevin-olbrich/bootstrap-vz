@@ -26,7 +26,7 @@ These rules favor caution over speed. For trivial tasks, use judgment.
   Use `python3` in shebangs and invocations, never bare `python`.
 - Packaging: `setup.py` (setuptools). Version lives in `bootstrapvz/__init__.py`.
 - Main libraries: `fysom` (task state machine), `jsonschema` + `pyyaml` (manifest
-  validation), `boto`/`boto3` (EC2), `pyro4` (remote bootstrapping).
+  validation), `boto3` (EC2), `pyro4` (remote bootstrapping).
 - All checks run through `tox`. CI config is `.travis.yml`, which just runs `tox`.
 - Docs: Sphinx (`docs/`), published on Read the Docs.
 
