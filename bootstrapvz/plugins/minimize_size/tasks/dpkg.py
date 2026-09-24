@@ -85,8 +85,8 @@ class FilterLocales(Task):
             '/usr/share/man/man8',
             '/usr/share/man/man9',
         ] +
-            list(map(lambda l: '/usr/share/locale/' + l + '/', locales)) +
-            list(map(lambda l: '/usr/share/man/' + l + '/', locales))
+            list(map(lambda locale: '/usr/share/locale/' + locale + '/', locales)) +
+            list(map(lambda locale: '/usr/share/man/' + locale + '/', locales))
         )
 
         # Filter when installing things with dpkg
@@ -96,8 +96,8 @@ class FilterLocales(Task):
                           'path-include=/usr/share/man/man[1-9]']
 
         locales = info.manifest.plugins['minimize_size']['dpkg']['locales']
-        locale_lines.extend(map(lambda l: 'path-include=/usr/share/locale/' + l + '/*', locales))
-        manpages_lines.extend(map(lambda l: 'path-include=/usr/share/man/' + l + '/*', locales))
+        locale_lines.extend(map(lambda locale: 'path-include=/usr/share/locale/' + locale + '/*', locales))
+        manpages_lines.extend(map(lambda locale: 'path-include=/usr/share/man/' + locale + '/*', locales))
 
         locales_path = os.path.join(info.root, 'etc/dpkg/dpkg.cfg.d/10filter-locales')
         manpages_path = os.path.join(info.root, 'etc/dpkg/dpkg.cfg.d/10filter-manpages')

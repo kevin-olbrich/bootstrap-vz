@@ -30,7 +30,7 @@ class FilterTranslationFiles(Task):
     @classmethod
     def run(cls, info):
         langs = info.manifest.plugins['minimize_size']['apt']['languages']
-        config = '; '.join(map(lambda l: '"' + l + '"', langs))
+        config = '; '.join(map(lambda lang: '"' + lang + '"', langs))
         config_path = os.path.join(info.root, 'etc/apt/apt.conf.d/20languages')
         shutil.copy(os.path.join(assets, 'apt-languages'), config_path)
         sed_i(config_path, r'ACQUIRE_LANGUAGES_FILTER', config)
