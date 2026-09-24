@@ -11,8 +11,9 @@ Kevin Olbrich:
       running every tox env
     * docker_daemon: install Docker CE from download.docker.com, pin versions with APT
       preferences, apply docker_opts with a systemd drop-in, and make pull_images usable
-    * puppet: install Puppet from Debian on buster and newer (the PC1 repository is
-      discontinued), and fix the puppet binary path, enable_agent and the module schema
+    * Replace the puppet plugin with an openvox plugin that installs openvox-agent from
+      apt.voxpupuli.org on bullseye, bookworm and trixie. Manifests must rename the
+      ``puppet`` plugin key to ``openvox``
     * pip_install, pip3_install, ansible, GCE and Azure: install Python 3 packages on
       bullseye and newer, and allow pip to install into the system Python on bookworm+
     * salt: download the bootstrap script over HTTPS from its current location
