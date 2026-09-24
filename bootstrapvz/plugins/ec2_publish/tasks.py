@@ -13,26 +13,26 @@ class CopyAmiToRegions(Task):
     @classmethod
     def run(cls, info):
         source_region = info._ec2['region']
-        source_ami = info._ec2['image']
+        source_ami = info._ec2['image']['ImageId']
         name = info._ec2['ami_name']
         copy_description = "Copied from %s (%s)" % (source_ami, source_region)
 
         connect_args = {
             'aws_access_key_id': info.credentials['access-key'],
-            'aws_secret_access_key': info.credentials['secret-key']
+            'aws_secret_access_key': info.credentials['secret-key'],
+            'aws_session_token': info.credentials.get('security-token', None),
         }
-        if 'security-token' in info.credentials:
-            connect_args['security_token'] = info.credentials['security-token']
 
         region_amis = {source_region: source_ami}
         region_conns = {source_region: info._ec2['connection']}
-        from boto.ec2 import connect_to_region
+        import boto3
         regions = info.manifest.plugins['ec2_publish'].get('regions', ())
         for region in regions:
-            conn = connect_to_region(region, **connect_args)
+            conn = boto3.client('ec2', region_name=region, **connect_args)
             region_conns[region] = conn
-            copied_image = conn.copy_image(source_region, source_ami, name=name, description=copy_description)
-            region_amis[region] = copied_image.image_id
+            copied_image = conn.copy_image(SourceRegion=source_region, SourceImageId=source_ami,
+                                           Name=name, Description=copy_description)
+            region_amis[region] = copied_image['ImageId']
         info._ec2['region_amis'] = region_amis
         info._ec2['region_conns'] = region_conns
 
@@ -67,11 +67,10 @@ class PublishAmiManifest(Task):
             else:
                 bucket, path = path.split('/', 1)
 
-            from boto.s3 import connect_to_region
-            conn = connect_to_region(region)
-            key = conn.get_bucket(bucket, validate=False).new_key(path)
-            headers = {'Content-Type': 'application/json'}
-            key.set_contents_from_string(amis_json, headers=headers, policy='public-read')
+            import boto3
+            conn = boto3.client('s3', region_name=region)
+            conn.put_object(Bucket=bucket, Key=path, Body=amis_json,
+                            ContentType='application/json', ACL='public-read')
 
 
 class PublishAmi(Task):
@@ -88,9 +87,10 @@ class PublishAmi(Task):
         import time
         for region, region_ami in region_amis.items():
             conn = region_conns[region]
-            current_image = conn.get_image(region_ami)
-            while current_image.state == 'pending':
-                logger.debug('Waiting for %s in %s (currently: %s)', region_ami, region, current_image.state)
+            current_state = conn.describe_images(ImageIds=[region_ami])['Images'][0]['State']
+            while current_state == 'pending':
+                logger.debug('Waiting for %s in %s (currently: %s)', region_ami, region, current_state)
                 time.sleep(5)
-                current_image = conn.get_image(region_ami)
-            conn.modify_image_attribute(region_ami, attribute='launchPermission', operation='add', groups='all')
+                current_state = conn.describe_images(ImageIds=[region_ami])['Images'][0]['State']
+            conn.modify_image_attribute(ImageId=region_ami,
+                                        LaunchPermission={'Add': [{'Group': 'all'}]})
