@@ -1,15 +1,18 @@
 ---
 $schema: http://json-schema.org/draft-04/schema#
-title: Puppet plugin manifest
+title: OpenVox plugin manifest
 type: object
 properties:
   plugins:
     type: object
     properties:
-      puppet:
+      openvox:
         type: object
         properties:
           assets: {$ref: '#/definitions/absolute_path'}
+          collection:
+            type: string
+            pattern: ^openvox[0-9]+$
           enable_agent: {type: boolean}
           manifest: {$ref: '#/definitions/absolute_path'}
           install_modules:
