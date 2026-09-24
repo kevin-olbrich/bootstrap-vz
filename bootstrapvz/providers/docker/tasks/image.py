@@ -37,15 +37,14 @@ class PopulateLabels(Task):
     @classmethod
     def run(cls, info):
         import pyrfc3339
-        from datetime import datetime
-        import pytz
+        from datetime import datetime, timezone
         labels = {}
         labels['name'] = info.manifest.name.format(**info.manifest_vars)
         # Inspired by https://github.com/projectatomic/ContainerApplicationGenericLabels
         # See here for the discussion on the debian-cloud mailing list
         # https://lists.debian.org/debian-cloud/2015/05/msg00071.html
         labels['architecture'] = info.manifest.system['architecture']
-        labels['build-date'] = pyrfc3339.generate(datetime.utcnow().replace(tzinfo=pytz.utc))
+        labels['build-date'] = pyrfc3339.generate(datetime.now(timezone.utc))
         if 'labels' in info.manifest.provider:
             for label, value in info.manifest.provider['labels'].items():
                 labels[label] = value.format(**info.manifest_vars)
