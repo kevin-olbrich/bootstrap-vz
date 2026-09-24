@@ -275,10 +275,10 @@ Example:
         00IPv4: 'Acquire::ForceIPv4 "false";'
       preferences:
         main:
-          - package: *
+          - package: '*'
             pin: release o=Debian, n=wheezy
             pin-priority: 800
-          - package: *
+          - package: '*'
             pin: release o=Debian Backports, a=wheezy-backports, n=wheezy-backports
             pin-priority: 760
           - package: puppet puppet-common
