@@ -160,7 +160,7 @@ def get_all_tasks(loaded_modules):
     def is_task(obj):
         from .task import Task
         return issubclass(obj, Task) and obj is not Task
-    return filter(is_task, classes)  # Only return classes that are tasks
+    return list(filter(is_task, classes))  # Only return classes that are tasks
 
 
 def get_all_classes(path=None, prefix='', excludes=[]):
