@@ -5,7 +5,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class VirtualBoxInstance(object):
+class VirtualBoxInstance:
 
     cpus = 1
     memory = 256

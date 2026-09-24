@@ -1,6 +1,6 @@
 
 
-class FSMProxy(object):
+class FSMProxy:
 
     def __init__(self, cfg):
         from fysom import Fysom

@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class Manifest(object):
+class Manifest:
     """This class holds all the information that providers and plugins need
     to perform the bootstrapping process. All actions that are taken originate from
     here. The manifest shall not be modified after it has been loaded.

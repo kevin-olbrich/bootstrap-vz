@@ -1,6 +1,6 @@
 
 
-class PreferenceLists(object):
+class PreferenceLists:
     """Represents a list of preferences lists for apt
     """
 
@@ -24,7 +24,7 @@ class PreferenceLists(object):
         self.preferences[name] = [Preference(p) for p in preferences]
 
 
-class Preference(object):
+class Preference:
     """Represents a single preference
     """
 

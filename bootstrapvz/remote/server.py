@@ -47,7 +47,7 @@ Options:
     return docopt(usage)
 
 
-class Server(object):
+class Server:
 
     def __init__(self, listen_port, log_forwarder):
         self.stop_serving = False

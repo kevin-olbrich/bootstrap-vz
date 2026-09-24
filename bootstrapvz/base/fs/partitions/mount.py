@@ -3,7 +3,7 @@ import os.path
 from bootstrapvz.common.tools import log_check_call
 
 
-class Mount(object):
+class Mount:
     """Represents a mount into the partition
     """
     def __init__(self, source, destination, opts):

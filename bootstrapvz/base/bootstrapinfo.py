@@ -1,6 +1,6 @@
 
 
-class BootstrapInformation(object):
+class BootstrapInformation:
     """The BootstrapInformation class holds all information about the bootstrapping process.
     The nature of the attributes of this class are rather diverse.
     Tasks may set their own attributes on this class for later retrieval by another task.

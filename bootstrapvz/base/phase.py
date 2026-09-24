@@ -2,7 +2,7 @@ from functools import total_ordering
 
 
 @total_ordering
-class Phase(object):
+class Phase:
     """The Phase class represents a phase a task may be in.
     It has no function other than to act as an anchor in the task graph.
     All phases are instantiated in common.phases

@@ -11,7 +11,7 @@ def onlybytes(msg):
     return decorator
 
 
-class Bytes(object):
+class Bytes:
 
     units = {'B': 1,
              'KiB': 1024,

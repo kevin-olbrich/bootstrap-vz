@@ -17,7 +17,7 @@ class TaskMeta(type):
         return repr(cls)
 
 
-class Task(object, metaclass=TaskMeta):
+class Task(metaclass=TaskMeta):
     """The task class represents a task that can be run.
     It is merely a wrapper for the run function and should never be instantiated.
     """

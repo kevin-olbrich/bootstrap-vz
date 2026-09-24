@@ -3,7 +3,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class VirtualBoxImage(object):
+class VirtualBoxImage:
 
     def __init__(self, image_path):
         self.image_path = image_path

@@ -1,6 +1,6 @@
 
 
-class SourceLists(object):
+class SourceLists:
     """Represents a list of sources lists for apt
     """
 
@@ -42,7 +42,7 @@ class SourceLists(object):
         return False
 
 
-class Source(object):
+class Source:
     """Represents a single source line
     """
 

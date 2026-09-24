@@ -2,7 +2,7 @@ from functools import total_ordering
 
 
 @total_ordering
-class _Release(object):
+class _Release:
     def __init__(self, codename, version):
         self.codename = codename
         self.version = version

@@ -9,7 +9,7 @@ class LocalBuildServer(BuildServer):
         yield LocalConnection()
 
 
-class LocalConnection(object):
+class LocalConnection:
 
     def run(self, *args, **kwargs):
         from bootstrapvz.base.main import run

@@ -5,7 +5,7 @@ Pyro4.config.REQUIRE_EXPOSE = True
 log = logging.getLogger(__name__)
 
 
-class CallbackServer(object):
+class CallbackServer:
 
     def __init__(self, listen_port, remote_port):
         self.daemon = Pyro4.Daemon(host='localhost', port=listen_port,

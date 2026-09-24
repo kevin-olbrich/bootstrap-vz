@@ -3,7 +3,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class Image(object):
+class Image:
 
     def __init__(self, image_id, docker_env):
         self.image_id = image_id
@@ -27,7 +27,7 @@ class Image(object):
             log.exception(e)
 
 
-class Container(object):
+class Container:
 
     def __init__(self, image_id, docker_env):
         self.image_id = image_id

@@ -1,6 +1,6 @@
 
 
-class BuildServer(object):
+class BuildServer:
 
     def __init__(self, name, settings):
         self.name = name

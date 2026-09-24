@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class AmazonMachineImage(object):
+class AmazonMachineImage:
 
     def __init__(self, image_id, ec2):
         self.ec2 = ec2

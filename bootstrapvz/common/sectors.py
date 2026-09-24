@@ -12,7 +12,7 @@ def onlysectors(msg):
     return decorator
 
 
-class Sectors(object):
+class Sectors:
 
     def __init__(self, quantity, sector_size):
         if isinstance(sector_size, Bytes):

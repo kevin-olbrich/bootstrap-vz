@@ -6,7 +6,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class TaskList(object):
+class TaskList:
     """The tasklist class aggregates all tasks that should be run
     and orders them according to their dependencies.
     """

@@ -1,10 +1,10 @@
 
 
-class PackageList(object):
+class PackageList:
     """Represents a list of packages
     """
 
-    class Remote(object):
+    class Remote:
         """A remote package with an optional target
         """
         def __init__(self, name, target):
@@ -24,7 +24,7 @@ class PackageList(object):
                 return self.name
             return self.name + '/' + self.target
 
-    class Local(object):
+    class Local:
         """A local package
         """
         def __init__(self, path):

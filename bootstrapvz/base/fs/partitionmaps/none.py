@@ -1,7 +1,7 @@
 from ..partitions.single import SinglePartition
 
 
-class NoPartitions(object):
+class NoPartitions:
     """Represents a virtual 'NoPartitions' partitionmap.
     This virtual partition map exists because it is easier for tasks to
     simply always deal with partition maps and then let the base abstract that away.
