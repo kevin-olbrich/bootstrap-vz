@@ -1,6 +1,25 @@
 Changelog
 =========
 
+2026-09-24
+----------
+Kevin Olbrich:
+    * Run on Python 3.13 only: replace removed modules (pipes, distutils, imp via nose),
+      pkg_resources and boto 2, and fix Python 3 behavior changes (bytes/str, dict views,
+      hashing, set ordering, text encodings)
+    * Migrate the test suite from nose to pytest, and replace Travis CI with GitHub Actions
+      running every tox env
+    * docker_daemon: install Docker CE from download.docker.com, pin versions with APT
+      preferences, apply docker_opts with a systemd drop-in, and make pull_images usable
+    * puppet: install Puppet from Debian on buster and newer (the PC1 repository is
+      discontinued), and fix the puppet binary path, enable_agent and the module schema
+    * pip_install, pip3_install, ansible, GCE and Azure: install Python 3 packages on
+      bullseye and newer, and allow pip to install into the system Python on bookworm+
+    * salt: download the bootstrap script over HTTPS from its current location
+    * google_cloud_repo: install the key without apt-key (removed in trixie)
+    * ec2_publish: port to boto3. RegisterAMI: pass KernelId for PV images
+    * Cache debootstrap tarballs again (deterministic tarball names)
+
 2017-02-20
 ----------
 Hugo Antoniio Sepulveda Manriquez:
