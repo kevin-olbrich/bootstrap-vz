@@ -5,7 +5,7 @@
 def main():
     """Main function for invoking the bootstrap process
 
-    :raises Exception: When the invoking user is not root and --dry-run isn't specified
+    :raises PermissionError: When the invoking user is not root and --dry-run isn't specified
     """
     # Get the commandline arguments
     opts = get_opts()
@@ -13,7 +13,7 @@ def main():
     # Require root privileges, except when doing a dry-run where they aren't needed
     import os
     if os.geteuid() != 0 and not opts['--dry-run']:
-        raise Exception('This program requires root privileges.')
+        raise PermissionError('This program requires root privileges.')
 
     # Set up logging
     setup_loggers(opts)

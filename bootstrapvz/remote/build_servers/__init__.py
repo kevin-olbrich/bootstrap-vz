@@ -32,7 +32,7 @@ def pick_build_server(build_servers, manifest, preferences={}):
             from .remote import RemoteBuildServer
             return RemoteBuildServer(name, settings)
 
-    raise Exception('Unable to find a build server that matches your preferences.')
+    raise LookupError('Unable to find a build server that matches your preferences.')
 
 
 def getNPorts(n, port_range=(1024, 65535)):

@@ -102,13 +102,13 @@ def load_yaml(path):
 def load_data(path):
     filename, extension = os.path.splitext(path)
     if not os.path.isfile(path):
-        raise Exception('The path {path} does not point to a file.'.format(path=path))
+        raise FileNotFoundError('The path {path} does not point to a file.'.format(path=path))
     if extension == '.json':
         return load_json(path)
     elif extension == '.yml' or extension == '.yaml':
         return load_yaml(path)
     else:
-        raise Exception('Unrecognized extension: {ext}'.format(ext=extension))
+        raise ValueError('Unrecognized extension: {ext}'.format(ext=extension))
 
 
 def config_get(path, config_path):

@@ -13,7 +13,7 @@ for path in partial_json + partial_yaml:
     key = os.path.splitext(os.path.basename(path))[0]
     if key in partials:
         msg = 'Error when loading partial manifests: The partial {key} exists twice'.format(key=key)
-        raise Exception(msg)
+        raise ValueError(msg)
     partials[key] = load_data(path)
 
 pool = string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -48,7 +48,7 @@ def merge_dicts(*args):
                 elif a[key] == b[key]:
                     pass
                 else:
-                    raise Exception('Conflict at `{path}\''.format(path='.'.join(path + [str(key)])))
+                    raise ValueError('Conflict at `{path}\''.format(path='.'.join(path + [str(key)])))
             else:
                 a[key] = clone(b[key])
         return a
