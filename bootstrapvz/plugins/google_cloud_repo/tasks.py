@@ -5,6 +5,9 @@ from bootstrapvz.common.tasks import packages
 from bootstrapvz.common.tools import log_check_call
 import os
 
+# Name of the bootstrap key in /etc/apt/trusted.gpg.d, the extension depends on the key format
+BOOTSTRAP_KEY_NAME = 'google-cloud-bootstrap'
+
 
 class AddGoogleCloudRepoKey(Task):
     description = 'Adding Google Cloud Repo key.'
@@ -16,8 +19,14 @@ class AddGoogleCloudRepoKey(Task):
     def run(cls, info):
         key_file = os.path.join(info.root, 'google.gpg.key')
         log_check_call(['wget', 'https://packages.cloud.google.com/apt/doc/apt-key.gpg', '-O', key_file])
-        log_check_call(['chroot', info.root, 'apt-key', 'add', 'google.gpg.key'])
-        os.remove(key_file)
+        # apt-key was removed in apt 3.0 (trixie), apt reads keys from trusted.gpg.d instead.
+        # Files there must be named .asc when ASCII-armored and .gpg when binary.
+        with open(key_file, 'rb') as key:
+            armored = key.read(5) == b'-----'
+        destination = os.path.join(info.root, 'etc/apt/trusted.gpg.d',
+                                   BOOTSTRAP_KEY_NAME + ('.asc' if armored else '.gpg'))
+        os.rename(key_file, destination)
+        os.chmod(destination, 0o644)
 
 
 class AddGoogleCloudRepoKeyringRepo(Task):
@@ -46,4 +55,7 @@ class CleanupBootstrapRepoKey(Task):
 
     @classmethod
     def run(cls, info):
-        os.remove(os.path.join(info.root, 'etc', 'apt', 'trusted.gpg'))
+        for extension in ('.asc', '.gpg'):
+            key_path = os.path.join(info.root, 'etc/apt/trusted.gpg.d', BOOTSTRAP_KEY_NAME + extension)
+            if os.path.exists(key_path):
+                os.remove(key_path)
