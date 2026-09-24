@@ -3,6 +3,24 @@ Unattended, manifest-driven bootstrapper that builds ready-to-boot Debian images
 for EC2, GCE, Azure, Oracle, KVM, VirtualBox and Docker. This repository is the
 maintained fork of the no longer maintained upstream `andsens/bootstrap-vz`.
 
+## Working style
+These rules favor caution over speed. For trivial tasks, use judgment.
+- Think before coding. State your assumptions. When a request has several
+  readings, present them instead of picking one silently. If something is
+  unclear, stop and ask. Point out a simpler approach when one exists.
+- Keep it simple. Write the minimum code that solves the problem, with no
+  unrequested features, configurability or single-use abstractions, and no
+  error handling for impossible cases. If 200 lines could be 50, rewrite them.
+- Make surgical changes. Every changed line must trace back to the request.
+  Do not reformat, refactor or "improve" adjacent code, and match the existing
+  style. Remove imports and functions that your own change orphaned. Mention
+  unrelated dead code instead of deleting it.
+- Work toward verifiable goals. Turn a task into a check, such as a failing
+  test that reproduces the bug and then passes, or tests that pass before and
+  after a refactor. For multi-step work, state a short plan with a
+  verification for each step, and loop until it passes. See "Known state" below
+  for which checks can currently run.
+
 ## Stack
 - Python 3.13 only (`python_requires='>=3.13'` in `setup.py`, `basepython` in `tox.ini`).
   Use `python3` in shebangs and invocations, never bare `python`.
@@ -86,6 +104,7 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
 - When you add or change a provider or plugin, update its `README.rst`. Link
   other rst files with relative links that work on GitHub, and point at folder
   names instead of `README.rst`.
+- Work directly on `master`. Do not create feature branches unless asked.
 - Record significant changes (new plugin, new manifest setting, security fix)
   in `CHANGELOG.rst`.
 - Commit messages: write a short imperative subject line, for example "Wait for
