@@ -70,7 +70,7 @@ class Manifest:
                     # Internal bootstrap-vz plugins take precedence wrt. plugin name
                     modname = 'bootstrapvz.plugins.' + plugin_name
                     plugin = importlib.import_module(modname)
-                except ImportError:
+                except ImportError as exc:
                     entry_points = list(get_entry_points(group='bootstrapvz.plugins', name=plugin_name))
                     num_entry_points = len(entry_points)
                     if num_entry_points < 1:
@@ -79,7 +79,7 @@ class Manifest:
                         msg = ('Unable to load plugin {name}, '
                                'there are {num} entry points to choose from.'
                                .format(name=plugin_name, num=num_entry_points))
-                        raise ImportError(msg)
+                        raise ImportError(msg) from exc
                     plugin = entry_points[0].load()
                 self.modules['plugins'].append(plugin)
 

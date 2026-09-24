@@ -38,8 +38,6 @@ def boot_image(manifest, build_server, bootstrap_info):
                 build_server.download(remote_image_path, image_path)
                 log.debug('Importing image')
                 log_check_call(['docker', 'load', '--input=' + image_path], env=docker_env)
-            except (Exception, KeyboardInterrupt):
-                raise
             finally:
                 log.debug('Deleting exported image from build server and locally')
                 build_server.delete(remote_image_path)

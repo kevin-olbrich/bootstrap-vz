@@ -74,7 +74,7 @@ def read_from_socket(socket_path, termination_string, timeout, read_timeout=0.5)
                     break
                 except OSError as e:
                     if e.errno != errno.EWOULDBLOCK:
-                        raise Exception(e)
+                        raise
                     continue_select = False
         if default_timer() - start > timeout:
             from .exceptions import SocketReadTimeout

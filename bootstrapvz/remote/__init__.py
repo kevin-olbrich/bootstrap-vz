@@ -70,7 +70,7 @@ def deserialize(fq_classname, data):
             state[key] = ser.recreate_classes(value)
         except SecurityError as e:
             msg = 'Unable to deserialize key `{key}\' on {class_name}'.format(key=key, class_name=fq_classname)
-            raise Exception(msg, e)
+            raise Exception(msg, e) from e
 
     instance = class_object.__new__(class_object)
     instance.__setstate__(state)

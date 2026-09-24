@@ -151,7 +151,7 @@ class DictClass(dict):
         try:
             return self[name]
         except KeyError:
-            raise AttributeError(name)
+            raise AttributeError(name) from None
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -160,7 +160,7 @@ class DictClass(dict):
         try:
             del self[name]
         except KeyError:
-            raise AttributeError(name)
+            raise AttributeError(name) from None
 
     def __getstate__(self):
         return self.__dict__
