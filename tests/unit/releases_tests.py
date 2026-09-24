@@ -1,4 +1,4 @@
-from nose.tools import raises
+import pytest
 from bootstrapvz.common import releases
 
 
@@ -41,6 +41,6 @@ def test_alias():
     assert releases.unstable == releases.sid
 
 
-@raises(releases.UnknownReleaseException)
 def test_bogus_releasename():
-    releases.get_release('nemo')
+    with pytest.raises(releases.UnknownReleaseException):
+        releases.get_release('nemo')

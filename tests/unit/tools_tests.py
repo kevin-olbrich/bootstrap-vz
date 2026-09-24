@@ -1,5 +1,4 @@
 import os
-from nose.tools import eq_
 from bootstrapvz.common.tools import log_call
 
 subprocess_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'subprocess.sh')
@@ -28,13 +27,13 @@ def test_log_call_output_order():
 1 0.4 three\\\\n
 """
     status, stdout, stderr = log_call([subprocess_path], stdin=fixture)
-    eq_(status, 0)
-    eq_(stderr, ['one', 'No, three..'])
-    eq_(stdout, ['two', 'four', 'three'])
+    assert status == 0
+    assert stderr == ['one', 'No, three..']
+    assert stdout == ['two', 'four', 'three']
     expected_order = ['one',
                       'two',
                       'four',
                       'No, three..',
                       'three',
                       ]
-    eq_(expected_order, logged.getvalue().split("\n")[8:-1])
+    assert expected_order == logged.getvalue().split("\n")[8:-1]

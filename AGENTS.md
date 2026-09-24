@@ -39,7 +39,7 @@ tox -e flake8                                    # style check (max line length 
 tox -e pylint                                    # static analysis (pylintrc)
 tox -e yamllint                                  # lint manifests/ (max line length 160)
 tox -e unit                                      # unit tests (tests/unit)
-tox -e unit tests.unit.releases_tests:test_lt    # a single test
+tox -e unit -- tests/unit/releases_tests.py::test_lt  # a single test (pytest)
 tox -e integration                               # dry-run every manifest in manifests/
 tox -e docs                                      # Sphinx build with -W (warnings are errors)
 ./bootstrap-vz --dry-run manifests/examples/kvm/buster-cloudimg.yml  # no root, no side effects
@@ -51,9 +51,6 @@ costs cloud money, so run them only when the user explicitly asks.
 
 Known state as of the Python 3.13 migration. Fix these issues or work around
 them, and never paper over them:
-- `unit` and `integration` fail on Python 3.13 because `nose` imports the removed
-  `imp` module. The tests use nose-style `yield` generators, so running pytest on
-  them directly does not work either.
 - `flake8` reports existing F401/E741 findings in `common/tasks/apt.py` and in
   `plugins/minimize_size/tasks/`, and `pylint` exits non-zero.
 - `docs` crashes on current Sphinx (`dictionary keys changed during iteration`).

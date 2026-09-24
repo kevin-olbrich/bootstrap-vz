@@ -12,6 +12,7 @@
 # Testing
 /.coverage
 /.tox/
+/.pytest_cache/
 /.venv
 /build-servers.yml
 /integration.html

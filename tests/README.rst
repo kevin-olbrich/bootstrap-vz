@@ -7,16 +7,17 @@ entire manifests by bootstrapping and booting them.
 
 Selecting tests
 ---------------
-To run one specific test suite simply append the module path to tox:
+The tests are run with `pytest <https://docs.pytest.org/>`__.
+To run one specific test suite simply append its file path to tox after ``--``:
 
 .. code-block:: sh
 
-    $ tox -e unit tests.unit.releases_tests
+    $ tox -e unit -- tests/unit/releases_tests.py
 
-Specific tests can be selected by appending the function name with a colon
-to the modulepath -- to run more than one tests, simply attach more arguments.
+Specific tests can be selected by appending the function name with ``::``
+to the file path -- to run more than one tests, simply attach more arguments.
 
 
 .. code-block:: sh
 
-    $ tox -e unit tests.unit.releases_tests:test_lt tests.unit.releases_tests:test_eq
+    $ tox -e unit -- tests/unit/releases_tests.py::test_lt tests/unit/releases_tests.py::test_eq
