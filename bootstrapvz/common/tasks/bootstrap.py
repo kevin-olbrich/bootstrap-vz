@@ -35,9 +35,9 @@ def get_bootstrap_args(info):
             from bootstrapvz.common.exceptions import ManifestError
             raise ManifestError('force-check-gpg is only support in Stretch and newer releases')
     if info.include_packages:
-        options.append('--include=' + ','.join(info.include_packages))
+        options.append('--include=' + ','.join(sorted(info.include_packages)))
     if info.exclude_packages:
-        options.append('--exclude=' + ','.join(info.exclude_packages))
+        options.append('--exclude=' + ','.join(sorted(info.exclude_packages)))
     mirror = info.manifest.bootstrapper.get('mirror', info.apt_mirror)
     arguments = [info.manifest.system['release'], info.root, mirror]
     return executable, options, arguments
@@ -48,7 +48,7 @@ def get_tarball_filename(info):
     executable, options, arguments = get_bootstrap_args(info)
     # Filter info.root which points at /target/volume-id, we won't ever hit anything with that in there.
     hash_args = [arg for arg in arguments if arg != info.root]
-    tarball_id = sha1(repr(frozenset(options + hash_args)).encode('utf-8')).hexdigest()[0:8]
+    tarball_id = sha1(repr(sorted(set(options + hash_args))).encode('utf-8')).hexdigest()[0:8]
     tarball_filename = 'debootstrap-' + tarball_id + '.tar'
     return os.path.join(info.manifest.bootstrapper['workspace'], tarball_filename)
 
