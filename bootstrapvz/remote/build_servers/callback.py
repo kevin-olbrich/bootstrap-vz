@@ -30,7 +30,9 @@ class CallbackServer(object):
     @Pyro4.expose
     def handle_log(self, pickled_record):
         import pickle
-        record = pickle.loads(pickled_record)
+        import serpent
+        # Pyro4's default serializer (serpent) transports bytes as a base64 dict
+        record = pickle.loads(serpent.tobytes(pickled_record))
         record.extra = getattr(record, 'extra', {})
         record.extra['source'] = 'remote'
         log.handle(record)
