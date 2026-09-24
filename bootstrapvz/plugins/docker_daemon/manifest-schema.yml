@@ -8,7 +8,7 @@ properties:
     properties:
       architecture:
         type: string
-        enum: [amd64]
+        enum: [amd64, arm64]
       release:
         type: string
   plugins:
@@ -18,8 +18,15 @@ properties:
         type: object
         properties:
           version:
-            pattern: '^\d\.\d{1,2}\.\d$'
+            pattern: '^\d+\.\d+\.\d+$'
             type: string
           docker_opts:
             type: string
+          pull_images:
+            type: array
+            items:
+              type: string
+          pull_images_retries:
+            type: integer
+            minimum: 1
         additionalProperties: false

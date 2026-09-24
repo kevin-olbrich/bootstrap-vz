@@ -1,61 +1,84 @@
 from bootstrapvz.base import Task
 from bootstrapvz.common import phases
+from bootstrapvz.common.tasks import apt
 from bootstrapvz.common.tasks import grub
-from bootstrapvz.common.tasks import initd
-from bootstrapvz.common.tools import log_check_call, sed_i, rel_path
+from bootstrapvz.common.tools import log_check_call, rel_path
 import os
-import os.path
 import shutil
 import subprocess
 import time
 
 ASSETS_DIR = rel_path(__file__, 'assets')
+# Location of Docker's APT signing key inside the image
+KEYRING_PATH = '/etc/apt/keyrings/docker.asc'
+DOCKER_PACKAGES = ['docker-ce', 'docker-ce-cli', 'containerd.io']
 
 
-class AddDockerDeps(Task):
-    description = 'Add packages for docker deps'
+class AddDockerAptSource(Task):
+    description = 'Adding the Docker APT repository'
     phase = phases.preparation
-    DOCKER_DEPS = ['aufs-tools', 'btrfs-tools', 'git', 'iptables',
-                   'procps', 'xz-utils', 'ca-certificates']
+    predecessors = [apt.AddManifestSources]
 
     @classmethod
     def run(cls, info):
-        for pkg in cls.DOCKER_DEPS:
-            info.packages.add(pkg)
+        # The repository is served over HTTPS
+        info.include_packages.add('ca-certificates')
+        line = ('deb [signed-by={keyring}] https://download.docker.com/linux/debian {codename} stable'
+                .format(keyring=KEYRING_PATH, codename=info.manifest.release.codename))
+        info.source_lists.add('docker', line)
 
 
-class AddDockerBinary(Task):
-    description = 'Add docker binary'
+class AddDockerPackages(Task):
+    description = 'Adding the Docker packages'
+    phase = phases.preparation
+
+    @classmethod
+    def run(cls, info):
+        for package in DOCKER_PACKAGES:
+            info.packages.add(package)
+
+
+class PinDockerVersion(Task):
+    description = 'Pinning the Docker version'
+    phase = phases.preparation
+
+    @classmethod
+    def run(cls, info):
+        version = info.manifest.plugins['docker_daemon']['version']
+        info.preference_lists.add('docker', [{'package': 'docker-ce docker-ce-cli',
+                                              'pin': 'version 5:{version}-*'.format(version=version),
+                                              'pin-priority': 1001}])
+
+
+class InstallDockerAptKey(Task):
+    description = 'Installing the Docker APT signing key'
+    phase = phases.package_installation
+    predecessors = [apt.WriteSources]
+    successors = [apt.AptUpdate]
+
+    @classmethod
+    def run(cls, info):
+        destination = os.path.join(info.root, KEYRING_PATH.lstrip('/'))
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        shutil.copy(os.path.join(ASSETS_DIR, 'docker.asc'), destination)
+        os.chmod(destination, 0o644)
+
+
+class SetDockerOpts(Task):
+    description = 'Setting the Docker daemon options'
     phase = phases.system_modification
 
     @classmethod
     def run(cls, info):
-        docker_version = info.manifest.plugins['docker_daemon'].get('version', False)
-        docker_url = 'https://get.docker.io/builds/Linux/x86_64/docker-'
-        if docker_version:
-            docker_url += docker_version
-        else:
-            docker_url += 'latest'
-        bin_docker = os.path.join(info.root, 'usr/bin/docker')
-        log_check_call(['wget', '-O', bin_docker, docker_url])
-        os.chmod(bin_docker, 0o755)
-
-
-class AddDockerInit(Task):
-    description = 'Add docker init script'
-    phase = phases.system_modification
-    successors = [initd.InstallInitScripts]
-
-    @classmethod
-    def run(cls, info):
-        init_src = os.path.join(ASSETS_DIR, 'init.d/docker')
-        info.initd['install']['docker'] = init_src
-        default_src = os.path.join(ASSETS_DIR, 'default/docker')
-        default_dest = os.path.join(info.root, 'etc/default/docker')
-        shutil.copy(default_src, default_dest)
-        docker_opts = info.manifest.plugins['docker_daemon'].get('docker_opts')
-        if docker_opts:
-            sed_i(default_dest, r'^#*DOCKER_OPTS=.*$', 'DOCKER_OPTS="%s"' % docker_opts)
+        docker_opts = info.manifest.plugins['docker_daemon']['docker_opts']
+        dropin_dir = os.path.join(info.root, 'etc/systemd/system/docker.service.d')
+        os.makedirs(dropin_dir, exist_ok=True)
+        with open(os.path.join(dropin_dir, 'bootstrap-vz.conf'), 'w', encoding='utf-8') as dropin:
+            # Replace the ExecStart of the docker-ce unit, appending the configured options
+            dropin.write('[Service]\n'
+                         'ExecStart=\n'
+                         'ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock {opts}\n'
+                         .format(opts=docker_opts))
 
 
 class EnableMemoryCgroup(Task):
@@ -71,7 +94,6 @@ class EnableMemoryCgroup(Task):
 class PullDockerImages(Task):
     description = 'Pull docker images'
     phase = phases.system_modification
-    predecessors = [AddDockerBinary]
 
     @classmethod
     def run(cls, info):
@@ -80,39 +102,49 @@ class PullDockerImages(Task):
         images = info.manifest.plugins['docker_daemon'].get('pull_images', [])
         retries = info.manifest.plugins['docker_daemon'].get('pull_images_retries', 10)
 
-        bin_docker = os.path.join(info.root, 'usr/bin/docker')
-        graph_dir = os.path.join(info.root, 'var/lib/docker')
+        # Run the daemon installed in the image on the host, storing everything inside the image.
+        # Only the image store is needed, so networking and iptables setup are disabled.
+        bin_dir = os.path.join(info.root, 'usr/bin')
+        env = os.environ.copy()
+        # dockerd starts the containerd from the image when it is first in PATH
+        env['PATH'] = bin_dir + os.pathsep + env.get('PATH', '')
         socket = 'unix://' + os.path.join(info.workspace, 'docker.sock')
-        pidfile = os.path.join(info.workspace, 'docker.pid')
+        docker = [os.path.join(bin_dir, 'docker'), '-H', socket]
 
-        try:
-            # start docker daemon temporarly.
-            daemon = subprocess.Popen([bin_docker, '-d', '--graph', graph_dir, '-H', socket, '-p', pidfile])
-            # wait for docker daemon to start.
-            for _ in range(retries):
-                try:
-                    log_check_call([bin_docker, '-H', socket, 'version'])
-                    break
-                except CalledProcessError:
-                    time.sleep(1)
-            for img in images:
-                # docker load if tarball.
-                if img.endswith('.tar.gz') or img.endswith('.tgz'):
-                    cmd = [bin_docker, '-H', socket, 'load', '-i', img]
+        dockerd = [os.path.join(bin_dir, 'dockerd'),
+                   '--data-root', os.path.join(info.root, 'var/lib/docker'),
+                   '--exec-root', os.path.join(info.workspace, 'docker-exec'),
+                   '--pidfile', os.path.join(info.workspace, 'docker.pid'),
+                   '--host', socket,
+                   '--iptables=false',
+                   '--bridge=none']
+        with subprocess.Popen(dockerd, env=env) as daemon:
+            try:
+                # wait for the docker daemon to start
+                for _ in range(retries):
                     try:
-                        log_check_call(cmd)
-                    except CalledProcessError as e:
-                        msg = 'error {e} loading docker image {img}.'.format(img=img, e=e)
-                        raise TaskError(msg)
-                # docker pull if image name.
+                        log_check_call(docker + ['version'])
+                        break
+                    except CalledProcessError:
+                        time.sleep(1)
                 else:
-                    cmd = [bin_docker, '-H', socket, 'pull', img]
+                    raise TaskError('The docker daemon did not start within {retries} seconds'.format(retries=retries))
+                for img in images:
+                    # docker load if tarball, docker pull if image name
+                    if img.endswith('.tar.gz') or img.endswith('.tgz'):
+                        cmd, action = docker + ['load', '--input', img], 'loading'
+                    else:
+                        cmd, action = docker + ['pull', img], 'pulling'
                     try:
                         log_check_call(cmd)
                     except CalledProcessError as e:
-                        msg = 'error {e} pulling docker image {img}.'.format(img=img, e=e)
-                        raise TaskError(msg)
-        finally:
-            # shutdown docker daemon.
-            daemon.terminate()
-            os.remove(os.path.join(info.workspace, 'docker.sock'))
+                        msg = 'error {e} {action} docker image {img}.'.format(e=e, action=action, img=img)
+                        raise TaskError(msg) from e
+            finally:
+                # shut down the docker daemon
+                daemon.terminate()
+                try:
+                    daemon.wait(timeout=60)
+                except subprocess.TimeoutExpired:
+                    daemon.kill()
+                    daemon.wait()

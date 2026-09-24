@@ -1,27 +1,33 @@
+from bootstrapvz.common.tasks import apt
 from bootstrapvz.common.tools import rel_path
 from . import tasks
-from bootstrapvz.common.tasks import apt
-from bootstrapvz.common.releases import wheezy
+
+# Debian releases for which Docker publishes packages at download.docker.com
+SUPPORTED_RELEASES = ('buster', 'bullseye', 'bookworm', 'trixie')
 
 
 def validate_manifest(data, validator, error):
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
 
     from bootstrapvz.common.releases import get_release
-    if get_release(data['system']['release']) == wheezy:
-        # prefs is a generator of apt preferences across files in the manifest
-        prefs = (item for vals in data.get('packages', {}).get('preferences', {}).values() for item in vals)
-        if not any('linux-image' in item['package'] and 'wheezy-backports' in item['pin'] for item in prefs):
-            msg = 'The backports kernel is required for the docker daemon to function properly'
-            error(msg, ['packages', 'preferences'])
+    release = get_release(data['system']['release'])
+    if release.codename not in SUPPORTED_RELEASES:
+        msg = ('Docker does not provide packages for Debian {release}, supported releases are: {supported}'
+               .format(release=release.codename, supported=', '.join(SUPPORTED_RELEASES)))
+        error(msg, ['system', 'release'])
 
 
 def resolve_tasks(taskset, manifest):
-    if manifest.release == wheezy:
-        taskset.add(apt.AddBackports)
-    taskset.add(tasks.AddDockerDeps)
-    taskset.add(tasks.AddDockerBinary)
-    taskset.add(tasks.AddDockerInit)
+    settings = manifest.plugins['docker_daemon']
+    taskset.add(tasks.AddDockerAptSource)
+    taskset.add(tasks.InstallDockerAptKey)
+    taskset.add(tasks.AddDockerPackages)
     taskset.add(tasks.EnableMemoryCgroup)
-    if manifest.plugins['docker_daemon'].get('pull_images', []):
+    if 'version' in settings:
+        taskset.add(tasks.PinDockerVersion)
+        # Only added by default when the manifest has its own preferences
+        taskset.add(apt.WritePreferences)
+    if settings.get('docker_opts'):
+        taskset.add(tasks.SetDockerOpts)
+    if settings.get('pull_images', []):
         taskset.add(tasks.PullDockerImages)
