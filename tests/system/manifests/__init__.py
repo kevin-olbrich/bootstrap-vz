@@ -24,7 +24,7 @@ partials['root_password']['plugins']['root_password']['password'] = random_passw
 def merge_manifest_data(standard_partials=[], custom=[]):
     import yaml
     manifest_data = [partials[name] for name in standard_partials]
-    manifest_data.extend(yaml.load(data) for data in custom)
+    manifest_data.extend(yaml.safe_load(data) for data in custom)
     return merge_dicts(*manifest_data)
 
 
