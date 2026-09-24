@@ -1,5 +1,6 @@
 from bootstrapvz.base import Task
 from bootstrapvz.common import phases
+from bootstrapvz.common.releases import bookworm
 
 
 class AddPip3Package(Task):
@@ -21,5 +22,9 @@ class Pip3InstallCommand(Task):
         from bootstrapvz.common.tools import log_check_call
         packages = info.manifest.plugins['pip3_install']['packages']
         pip_install_command = ['chroot', info.root, 'pip3', 'install']
+        if info.manifest.release >= bookworm:
+            # The system Python is marked as externally managed (PEP 668) since bookworm,
+            # installing into it is exactly what this plugin is for.
+            pip_install_command.append('--break-system-packages')
         pip_install_command.extend(packages)
         log_check_call(pip_install_command)

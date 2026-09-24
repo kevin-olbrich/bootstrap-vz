@@ -6,6 +6,9 @@ Install packages from the Python Package Index via pip for python3
 Installs ``build-essential`` and ``python3-dev`` debian packages, so
 Python extension modules can be built.
 
+From bookworm onward the system Python is marked as externally managed
+(PEP 668), so packages are installed with ``--break-system-packages``.
+
 Settings
 ~~~~~~~~
 
