@@ -42,9 +42,11 @@ def boot_image(manifest, build_server, bootstrap_info, instance_type=None):
     if manifest.volume['backing'] == 'ebs':
         from .images import EBSImage
         image = EBSImage(image_id, ec2)
-    if manifest.volume['backing'] == 's3':
+    elif manifest.volume['backing'] == 's3':
         from .images import S3Image
         image = S3Image(image_id, ec2)
+    else:
+        raise ValueError('Unsupported volume backing: {backing}'.format(backing=manifest.volume['backing']))
 
     try:
         with run_instance(image, manifest, instance_type, ec2) as instance:
