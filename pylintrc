@@ -7,8 +7,6 @@
 # pygtk.require().
 #init-hook=
 
-# Profiled execution.
-profile=no
 
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
@@ -32,7 +30,7 @@ enable=
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time.
-disable=W0511,C0111,I0011,I0020,R0201,R0801,E0632,E1121,W0102,W0106,W0108,W0110,W0201,W0212,W0311,W0402,W0612,W0613,W0640,W1201,W1202,W1401,C0103,C0301,C0325,C0326,C0330,C0411,R0401,R0914,R1710
+disable=W0511,C0111,I0011,I0020,R0801,E0632,E1121,W0102,W0106,W0108,W0201,W0212,W0311,W0402,W0612,W0613,W0640,W1201,W1202,W1401,C0103,C0301,C0325,C0411,R0401,R0914,R1710
 # W0511 fixme
 # C0111 missing-docstring
 # I0011 locally-disabled
@@ -45,7 +43,6 @@ disable=W0511,C0111,I0011,I0020,R0201,R0801,E0632,E1121,W0102,W0106,W0108,W0110,
 # W0102(dangerous-default-value)
 # W0106(expression-not-assigned)
 # W0108(unnecessary-lambda)
-# W0110(deprecated-lambda)
 # W0201(attribute-defined-outside-init)
 # W0212(protected-access)
 # W0311(bad-indentation)
@@ -60,9 +57,6 @@ disable=W0511,C0111,I0011,I0020,R0201,R0801,E0632,E1121,W0102,W0106,W0108,W0110,
 # C0411(wrong-import-order)
 # C0301(line-too-long)
 # C0325(superfluous-parens)
-# C0326(bad-whitespace)
-# C0330(bad-continuation)
-# R0201(no-self-use)
 # R0401(cyclic-import)
 # R0914(too-many-locals)
 # R1710(inconsistent-return-statements)
@@ -74,13 +68,6 @@ disable=W0511,C0111,I0011,I0020,R0201,R0801,E0632,E1121,W0102,W0106,W0108,W0110,
 # (visual studio) and html
 output-format=colorized
 
-# Include message's id in output
-include-ids=yes
-
-# Put messages in a separate file for each module / package specified on the
-# command line instead of printing them on stdout. Reports (if any) will be
-# written in a file name "pylint_global.[txt|html]".
-files-output=
 
 # Tells whether to display a full report or only the messages
 reports=no
@@ -92,9 +79,6 @@ reports=no
 # (R0004).
 evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
 
-# Add a comment according to your evaluation note. This is used by the global
-# evaluation report (R0004).
-comment=no
 
 # Template used to display messages. This is a python new-style format string
 # used to format the message information. See doc for all details
@@ -115,11 +99,6 @@ additional-builtins=
 
 [BASIC]
 
-# Required attributes for module, separated by a comma
-required-attributes=
-
-# List of builtins function names that should not be used, separated by a comma
-bad-functions=map,filter,apply,input
 
 # Regular expression which should only match correct module names
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
@@ -201,9 +180,6 @@ ignore-mixin-members=yes
 # (useful for classes with attributes dynamically set).
 ignored-classes=Fysom,AbstractPartitionMap,OracleStorageAPIClient
 
-# When zope mode is activated, add a predefined set of Zope acquired attributes
-# to generated-members.
-zope=no
 
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E0201 when accessed.
@@ -226,7 +202,7 @@ max-locals=15
 max-returns=6
 
 # Maximum number of branch for function / method body
-max-branchs=12
+max-branches=12
 
 # Maximum number of statements in function / method body
 max-statements=50
@@ -264,9 +240,6 @@ int-import-graph=
 
 [CLASSES]
 
-# List of interface methods to ignore, separated by a comma. This is used for
-# instance to not check methods defines in Zope's Interface base class.
-ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
 defining-attr-methods=__init__,__new__,setUp
