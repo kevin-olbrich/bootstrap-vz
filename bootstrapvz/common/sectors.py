@@ -40,9 +40,6 @@ class Sectors(object):
     def __int__(self):
         return self.get_sectors()
 
-    def __long__(self):
-        return self.get_sectors()
-
     @onlysectors('Can only compare sectors with sectors')
     def __lt__(self, other):
         return self.bytes < other.bytes

@@ -69,9 +69,6 @@ class Bytes(object):
     def __int__(self):
         return self.qty
 
-    def __long__(self):
-        return self.qty
-
     @onlybytes('Can only compare Bytes to Bytes')
     def __lt__(self, other):
         return self.qty < other.qty
