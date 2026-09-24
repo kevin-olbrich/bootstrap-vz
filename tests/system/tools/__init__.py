@@ -70,7 +70,7 @@ def read_from_socket(socket_path, termination_string, timeout, read_timeout=0.5)
                     if termination_string in output[ptr:]:
                         continue_select = False
                     else:
-                        ptr = len(output) - len(termination_string)
+                        ptr = max(0, len(output) - len(termination_string))
                     break
                 except OSError as e:
                     if e.errno != errno.EWOULDBLOCK:
