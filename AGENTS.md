@@ -50,13 +50,10 @@ sudo ./bootstrap-vz <manifest>                   # real build (root required)
 `tox -e system` runs the system tests. They build and boot real images, which
 costs cloud money, so run them only when the user explicitly asks.
 
-Known state as of the Python 3.13 migration. Fix these issues or work around
-them, and never paper over them:
-- `flake8` reports existing F401/E741 findings in `common/tasks/apt.py` and in
-  `plugins/minimize_size/tasks/`, and `pylint` exits non-zero.
-- `docs` fails only on a YAML highlighting warning: the example in
-  `manifests/README.rst` uses an unquoted `*`, which is invalid YAML.
-- `yamllint`, `unit` and `integration` pass. Do not add new findings to any env.
+All default tox envs (flake8, pylint, yamllint, unit, integration, docs) pass,
+and CI runs each of them. Keep it that way: do not add findings to any env, and
+fix new warnings instead of suppressing them. Disable a pylint check only for a
+deliberate project convention, and document why in `pylintrc`.
 
 ## Structure
 - `bootstrapvz/base/`: the core engine. It loads the manifest, validates it against
