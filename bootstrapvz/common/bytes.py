@@ -88,6 +88,9 @@ class Bytes(object):
     def __ne__(self, other):
         return self.qty != other.qty
 
+    def __hash__(self):
+        return hash(self.qty)
+
     @onlybytes('Can only compare Bytes to Bytes')
     def __ge__(self, other):
         return self.qty >= other.qty

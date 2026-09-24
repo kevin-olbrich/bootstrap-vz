@@ -59,6 +59,9 @@ class Sectors(object):
     def __ne__(self, other):
         return self.bytes != other.bytes
 
+    def __hash__(self):
+        return hash(self.bytes)
+
     @onlysectors('Can only compare sectors with sectors')
     def __ge__(self, other):
         return self.bytes >= other.bytes
