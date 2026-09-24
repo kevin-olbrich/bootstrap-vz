@@ -77,7 +77,7 @@ class Server(object):
     @Pyro4.expose
     def stop(self):
         if hasattr(self, 'bootstrap_process'):
-            log.warn('Sending SIGINT to bootstrapping process')
+            log.warning('Sending SIGINT to bootstrapping process')
             import os
             import signal
             os.killpg(self.bootstrap_process.pid, signal.SIGINT)

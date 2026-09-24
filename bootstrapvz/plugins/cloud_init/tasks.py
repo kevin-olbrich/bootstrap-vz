@@ -74,7 +74,7 @@ class SetMetadataSource(Task):
             if sources is None:
                 msg = ('No cloud-init metadata source mapping found for provider `{provider}\', '
                        'skipping selections setting.').format(provider=info.manifest.provider['name'])
-                logging.getLogger(__name__).warn(msg)
+                logging.getLogger(__name__).warning(msg)
                 return
         sources = "cloud-init    cloud-init/datasources    multiselect    " + sources
         log_check_call(['chroot', info.root, 'debconf-set-selections'], sources)

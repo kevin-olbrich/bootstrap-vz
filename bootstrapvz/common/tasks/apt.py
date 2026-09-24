@@ -149,8 +149,8 @@ class WriteSources(Task):
     def run(cls, info):
         if not info.source_lists.target_exists(info.manifest.system['release']):
             log = logging.getLogger(__name__)
-            log.warn('No default target has been specified in the sources list, '
-                     'installing packages may fail')
+            log.warning('No default target has been specified in the sources list, '
+                        'installing packages may fail')
         for name, sources in info.source_lists.sources.items():
             if name == 'main':
                 list_path = os.path.join(info.root, 'etc/apt/sources.list')
@@ -229,7 +229,7 @@ class AptUpgrade(Task):
                 msg = ('apt exited with status code 100. '
                        'This can sometimes occur when package retrieval times out or a package extraction failed. '
                        'apt might succeed if you try bootstrapping again.')
-                logging.getLogger(__name__).warn(msg)
+                logging.getLogger(__name__).warning(msg)
             raise
 
 

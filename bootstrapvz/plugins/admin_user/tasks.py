@@ -88,9 +88,9 @@ class AdminUserPublicKey(Task):
     @classmethod
     def run(cls, info):
         if 'ec2-get-credentials' in info.initd['install']:
-            log.warn('You are using a static public key for the admin account.'
-                     'This will conflict with the ec2 public key injection mechanism.'
-                     'The ec2-get-credentials startup script will therefore not be enabled.')
+            log.warning('You are using a static public key for the admin account.'
+                        'This will conflict with the ec2 public key injection mechanism.'
+                        'The ec2-get-credentials startup script will therefore not be enabled.')
             del info.initd['install']['ec2-get-credentials']
 
         # Get the stuff we need (username & public key)

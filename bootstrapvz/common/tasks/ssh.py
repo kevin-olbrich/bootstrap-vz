@@ -56,8 +56,8 @@ class AddSSHKeyGeneration(Task):
 
         except CalledProcessError:
             import logging
-            logging.getLogger(__name__).warn('The OpenSSH server has not been installed, '
-                                             'not installing SSH host key generation script.')
+            logging.getLogger(__name__).warning('The OpenSSH server has not been installed, '
+                                                'not installing SSH host key generation script.')
 
 
 class DisableSSHPasswordAuthentication(Task):
@@ -83,8 +83,8 @@ class EnableRootLogin(Task):
             sed_i(sshdconfig_path, '^#?PermitRootLogin .*', 'PermitRootLogin yes')
         else:
             import logging
-            logging.getLogger(__name__).warn('The OpenSSH server has not been installed, '
-                                             'not enabling SSH root login.')
+            logging.getLogger(__name__).warning('The OpenSSH server has not been installed, '
+                                                'not enabling SSH root login.')
 
 
 class DisableRootLogin(Task):
@@ -99,8 +99,8 @@ class DisableRootLogin(Task):
             sed_i(sshdconfig_path, '^#?PermitRootLogin .*', 'PermitRootLogin no')
         else:
             import logging
-            logging.getLogger(__name__).warn('The OpenSSH server has not been installed, '
-                                             'not disabling SSH root login.')
+            logging.getLogger(__name__).warning('The OpenSSH server has not been installed, '
+                                                'not disabling SSH root login.')
 
 
 class DisableSSHDNSLookup(Task):

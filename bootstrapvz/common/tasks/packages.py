@@ -62,13 +62,13 @@ class InstallPackages(Task):
                 msg = ('apt exited with a non-zero status, '
                        'this may be because\nthe image volume is '
                        'running out of disk space ({free}MB left)').format(free=free_mb)
-                logging.getLogger(__name__).warn(msg)
+                logging.getLogger(__name__).warning(msg)
             else:
                 if e.returncode == 100:
                     msg = ('apt exited with status code 100. '
                            'This can sometimes occur when package retrieval times out or a package extraction failed. '
                            'apt might succeed if you try bootstrapping again.')
-                    logging.getLogger(__name__).warn(msg)
+                    logging.getLogger(__name__).warning(msg)
             raise
 
     @classmethod

@@ -22,7 +22,7 @@ def resolve_tasks(taskset, manifest):
     elif manifest.provider['name'] == 'ec2':
         taskset.add(tasks.AdminUserPublicKeyEC2)
     elif 'password' not in manifest.plugins['admin_user']:
-        logging.getLogger(__name__).warn("No SSH key and no password set")
+        logging.getLogger(__name__).warning("No SSH key and no password set")
 
     taskset.update([tasks.AddSudoPackage,
                     tasks.CreateAdminUser,
