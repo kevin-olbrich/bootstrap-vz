@@ -61,10 +61,11 @@ class Source:
                             r'(?P<uri>\S+)\s+'
                             r'(?P<distribution>\S+)'
                             r'(\s+(?P<components>.+\S))?\s*$')
-        match = regexp.match(line).groupdict()
+        match = regexp.match(line)
         if match is None:
             from .exceptions import SourceError
             raise SourceError('Unable to parse source line: ' + line)
+        match = match.groupdict()
         self.type = match['type']
         self.options = []
         if match['options'] is not None:
