@@ -344,7 +344,7 @@ def linkcode_resolve(domain, info):
         value = getattr(value, part, None)
         if value is None:
             break
-    valid_types = (types.ModuleType, types.ClassType, types.MethodType,
+    valid_types = (types.ModuleType, type, types.MethodType,
                    types.FunctionType, types.TracebackType,
                    types.FrameType, types.CodeType)
     if isinstance(value, valid_types):
