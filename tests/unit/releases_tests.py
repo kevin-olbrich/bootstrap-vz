@@ -41,6 +41,15 @@ def test_alias():
     assert releases.unstable == releases.sid
 
 
+def test_future_release():
+    assert releases.duke > releases.forky
+    assert releases.get_release('duke') is releases.duke
+
+
+def test_sid_is_newest():
+    assert releases.sid > releases.duke
+
+
 def test_bogus_releasename():
     with pytest.raises(releases.UnknownReleaseException):
         releases.get_release('nemo')

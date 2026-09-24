@@ -19,6 +19,7 @@ properties:
         - bookworm
         - trixie
         - forky
+        - duke
         - testing
         - sid
         - unstable

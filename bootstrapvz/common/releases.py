@@ -39,7 +39,8 @@ class _ReleaseAlias(_Release):
         return self.alias
 
 
-sid = _Release('sid', 15)
+sid = _Release('sid', 16)
+duke = _Release('duke', 15)
 forky = _Release('forky', 14)
 trixie = _Release('trixie', 13)
 bookworm = _Release('bookworm', 12)

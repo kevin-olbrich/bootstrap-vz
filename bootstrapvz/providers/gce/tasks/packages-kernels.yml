@@ -16,5 +16,7 @@ trixie:
   amd64: linux-image-amd64
 forky:
   amd64: linux-image-amd64
+duke:
+  amd64: linux-image-amd64
 sid:
   amd64: linux-image-amd64

@@ -31,6 +31,10 @@ forky:
   amd64: linux-image-amd64
   i386: linux-image-686-pae
   arm64: linux-image-arm64
+duke:
+  amd64: linux-image-amd64
+  i386: linux-image-686-pae
+  arm64: linux-image-arm64
 sid:
   amd64: linux-image-amd64
   i386: linux-image-686-pae
