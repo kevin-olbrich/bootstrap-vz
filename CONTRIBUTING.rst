@@ -11,8 +11,9 @@ Do you want to contribute to the bootstrap-vz project? Nice! Here is the basic w
 * Make any changes you want/need.
 * Check the coding style of your changes using `tox <http://tox.readthedocs.org/>`__ by running `tox -e flake8`
   and fix any warnings that may appear.
-  This check will be repeated by `Travis CI <https://travis-ci.org/andsens/bootstrap-vz>`__
-  once you send a pull request, so it's better if you check this beforehand.
+  This check, together with the other tox environments, will be repeated by
+  `GitHub Actions <.github/workflows/ci.yml>`__ once you send a pull request,
+  so it's better if you check this beforehand.
 * If the change is significant (e.g. a new plugin, manifest setting or security fix)
   add your name and contribution to the `changelog <CHANGELOG.rst>`__.
 * Commit your changes.

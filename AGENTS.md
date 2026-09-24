@@ -27,7 +27,8 @@ These rules favor caution over speed. For trivial tasks, use judgment.
 - Packaging: `setup.py` (setuptools). Version lives in `bootstrapvz/__init__.py`.
 - Main libraries: `fysom` (task state machine), `jsonschema` + `pyyaml` (manifest
   validation), `boto3` (EC2), `pyro4` (remote bootstrapping).
-- All checks run through `tox`. CI config is `.travis.yml`, which just runs `tox`.
+- All checks run through `tox`. CI (`.github/workflows/ci.yml`) runs each tox env
+  on GitHub Actions.
 - Docs: Sphinx (`docs/`), published on Read the Docs.
 
 ## Commands

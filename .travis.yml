@@ -1,8 +1,0 @@
-sudo: False
-language: python
-python:
-    - "3.13"
-install:
-    - "pip install tox"
-script:
-    - "tox"
