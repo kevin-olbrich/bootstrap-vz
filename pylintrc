@@ -30,12 +30,16 @@ enable=
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time.
-disable=W0511,C0111,I0011,I0020,R0801,E0632,E1121,W0102,W0106,W0108,W0201,W0212,W0311,W0402,W0612,W0613,W0640,W1201,W1202,W1401,C0103,C0301,C0325,C0411,R0401,R0914,R1710
+disable=W0511,C0111,I0011,I0020,R0801,E0632,E1121,W0102,W0106,W0108,W0201,W0212,W0311,W0402,W0612,W0613,W0640,W1201,W1202,W1401,C0103,C0301,C0325,C0411,R0401,R0914,R1710,C0209,C0415,R0917
 # W0511 fixme
 # C0111 missing-docstring
 # I0011 locally-disabled
 # I0020 suppressed-message
 # R0801 duplicate-code
+# C0209 consider-using-f-string: the codebase consistently uses str.format()
+# C0415 import-outside-toplevel: tasks import their dependencies inside run() on
+#       purpose, since every task module is imported just to build the task graph
+# R0917 too-many-positional-arguments: partition constructors are positional by design
 
 #TODO
 # E0632(unbalanced-tuple-unpacking)
