@@ -309,7 +309,7 @@ if on_rtd:
 
 # Snatched from here:
 # https://sourcegraph.com/github.com/Gallopsled/pwntools@master/.PipPackage/pwntools/.def/docs/source/conf/linkcode_resolve/lines
-baseurl = 'https://github.com/andsens/bootstrap-vz'
+baseurl = 'https://github.com/kevin-olbrich/bootstrap-vz'
 
 import subprocess
 try:

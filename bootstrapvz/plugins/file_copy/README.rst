@@ -6,7 +6,7 @@ create directories, and set permissions and ownership.
 
 Note that this necessarily violates the `first development guideline`_.
 
-.. _first development guideline: https://github.com/andsens/bootstrap-vz/blob/master/CONTRIBUTING.rst#the-manifest-should-always-fully-describe-the-resulting-image
+.. _first development guideline: https://github.com/kevin-olbrich/bootstrap-vz/blob/master/CONTRIBUTING.rst#the-manifest-should-always-fully-describe-the-resulting-image
 
 
 Settings

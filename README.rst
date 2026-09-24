@@ -160,7 +160,7 @@ is not the case please consider `opening an issue`__ and attach
 both the error message and your manifest (preferably as a gist or
 similar).
 
-__ https://github.com/andsens/bootstrap-vz/issues
+__ https://github.com/kevin-olbrich/bootstrap-vz/issues
 
 Dependencies
 ------------
