@@ -10,7 +10,7 @@
 # Description-Short: Expand the filesystem of the mounted root volume/partition to its maximum possible size
 # Description:       Expand the filesystem of the mounted root volume/partition to its maximum possible size
 #                    This file was created by bootstrap-vz.
-#                    See https://github.com/andsens/bootstrap-vz/blob/master/LICENSE for
+#                    See https://github.com/kevin-olbrich/bootstrap-vz/blob/master/LICENSE for
 #                    legal notices and disclaimers.
 ### END INIT INFO
 

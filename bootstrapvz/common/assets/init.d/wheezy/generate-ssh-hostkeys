@@ -10,7 +10,7 @@
 # Description-Short: Generate ssh host keys if they do not exist
 # Description:       Generate ssh host keys if they do not exist.
 #                    This file was created by bootstrap-vz.
-#                    See https://github.com/andsens/bootstrap-vz/blob/master/LICENSE for
+#                    See https://github.com/kevin-olbrich/bootstrap-vz/blob/master/LICENSE for
 #                    legal notices and disclaimers.
 ### END INIT INFO
 
