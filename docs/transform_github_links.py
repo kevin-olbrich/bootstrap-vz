@@ -81,7 +81,7 @@ def transform_github_links(app, doctree, fromdocname):
     if original_path is None:
         return
 
-    for node in doctree.traverse(nodes.reference):
+    for node in doctree.findall(nodes.reference):
         if 'refuri' not in node:
             continue
         if node['refuri'].startswith('http'):
