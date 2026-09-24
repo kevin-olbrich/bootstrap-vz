@@ -38,8 +38,7 @@ class OracleStorageAPIClient:
         response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.headers.get('x-auth-token')
-        else:
-            self._fail(response.text)
+        self._fail(response.text)
 
     @property
     def chunk_size(self):

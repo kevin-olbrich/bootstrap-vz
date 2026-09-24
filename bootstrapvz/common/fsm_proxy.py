@@ -4,7 +4,7 @@ class FSMProxy:
 
     def __init__(self, cfg):
         from fysom import Fysom
-        events = set([event['name'] for event in cfg['events']])
+        events = {event['name'] for event in cfg['events']}
         cfg['callbacks'] = self.collect_event_listeners(events, cfg['callbacks'])
         self.fsm = Fysom(cfg)
         self.attach_proxy_methods(self.fsm, events)

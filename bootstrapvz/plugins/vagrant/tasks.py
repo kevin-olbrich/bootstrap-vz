@@ -174,8 +174,7 @@ class PackageBox(Task):
                 name = name.replace(prefix + ':', '{' + ns + '}')
             if value is None:
                 return element.attrib[name]
-            else:
-                element.attrib[name] = str(value)
+            element.attrib[name] = str(value)
 
         template_path = os.path.join(assets, 'box.ovf')
         import xml.etree.ElementTree as ET

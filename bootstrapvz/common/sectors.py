@@ -120,15 +120,13 @@ class Sectors:
     def __mul__(self, other):
         if isinstance(other, int):
             return Sectors(self.bytes * other, self.sector_size)
-        else:
-            raise UnitError('Can only multiply sectors with integers')
+        raise UnitError('Can only multiply sectors with integers')
 
     def __imul__(self, other):
         if isinstance(other, int):
             self.bytes *= other
             return self
-        else:
-            raise UnitError('Can only multiply sectors with integers')
+        raise UnitError('Can only multiply sectors with integers')
 
     def __truediv__(self, other):
         if isinstance(other, int):
@@ -136,8 +134,7 @@ class Sectors:
         if isinstance(other, Sectors):
             if self.sector_size == other.sector_size:
                 return self.bytes / other.bytes
-            else:
-                raise UnitError('Cannot divide sectors with different sector sizes')
+            raise UnitError('Cannot divide sectors with different sector sizes')
         raise UnitError('Can only divide sectors with integers or sectors')
 
     def __itruediv__(self, other):
@@ -148,24 +145,21 @@ class Sectors:
             if self.sector_size == other.sector_size:
                 self.bytes /= other.bytes
                 return self
-            else:
-                raise UnitError('Cannot divide sectors with different sector sizes')
+            raise UnitError('Cannot divide sectors with different sector sizes')
         raise UnitError('Can only divide sectors with integers or sectors')
 
     @onlysectors('Can only take modulus of sectors with sectors')
     def __mod__(self, other):
         if self.sector_size == other.sector_size:
             return Sectors(self.bytes % other.bytes, self.sector_size)
-        else:
-            raise UnitError('Cannot take modulus of sectors with different sector sizes')
+        raise UnitError('Cannot take modulus of sectors with different sector sizes')
 
     @onlysectors('Can only take modulus of sectors with sectors')
     def __imod__(self, other):
         if self.sector_size == other.sector_size:
             self.bytes %= other.bytes
             return self
-        else:
-            raise UnitError('Cannot take modulus of sectors with different sector sizes')
+        raise UnitError('Cannot take modulus of sectors with different sector sizes')
 
     def __getstate__(self):
         return {'__class__': self.__module__ + '.' + self.__class__.__name__,

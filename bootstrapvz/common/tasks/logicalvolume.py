@@ -1,5 +1,5 @@
-import bootstrapvz.common.tasks.host as host
-import bootstrapvz.common.tasks.volume as volume
+from bootstrapvz.common.tasks import host
+from bootstrapvz.common.tasks import volume
 from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 

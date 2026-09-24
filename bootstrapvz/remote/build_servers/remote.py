@@ -68,8 +68,7 @@ class RemoteBuildServer(BuildServer):
                     log.debug('Forcefully terminating SSH connection to the build server')
                     ssh_process.terminate()
                     break
-                else:
-                    time.sleep(0.5)
+                time.sleep(0.5)
 
     def download(self, src, dst):
         log.debug('Downloading file `{src}\' from '

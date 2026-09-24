@@ -100,4 +100,3 @@ class FileFormatter(SourceFormatter):
     """Formats log statements for output to file
     Currently this is just a stub
     """
-    pass

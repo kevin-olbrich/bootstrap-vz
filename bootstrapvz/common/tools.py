@@ -105,10 +105,9 @@ def load_data(path):
         raise FileNotFoundError('The path {path} does not point to a file.'.format(path=path))
     if extension == '.json':
         return load_json(path)
-    elif extension == '.yml' or extension == '.yaml':
+    if extension in {'.yml', '.yaml'}:
         return load_yaml(path)
-    else:
-        raise ValueError('Unrecognized extension: {ext}'.format(ext=extension))
+    raise ValueError('Unrecognized extension: {ext}'.format(ext=extension))
 
 
 def config_get(path, config_path):
@@ -127,8 +126,7 @@ def copy_tree(from_path, to_path):
             if os.path.exists(full_path):
                 if os.path.isdir(full_path):
                     continue
-                else:
-                    os.remove(full_path)
+                os.remove(full_path)
             os.mkdir(full_path)
         for path in files:
             copy(os.path.join(abs_prefix, path),

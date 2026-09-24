@@ -34,4 +34,3 @@ class Task(metaclass=TaskMeta):
 
         :param BootstrapInformation info: The bootstrap info object.
         """
-        pass

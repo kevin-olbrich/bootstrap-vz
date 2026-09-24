@@ -37,7 +37,7 @@ def merge_dicts(*args):
         if isinstance(obj, list):
             copy = [clone(value) for value in obj]
         if isinstance(obj, set):
-            copy = set([clone(value) for value in obj])
+            copy = {clone(value) for value in obj}
         return copy
 
     def merge(a, b, path=[]):  # pylint: disable=redefined-outer-name
