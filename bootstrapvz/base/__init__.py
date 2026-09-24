@@ -15,11 +15,15 @@ def validate_manifest(data, validator, error):
     from bootstrapvz.common.tools import rel_path
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
 
-    from bootstrapvz.common.releases import get_release, wheezy
+    from bootstrapvz.common.releases import get_release, wheezy, trixie
     release = get_release(data['system']['release'])
 
     if release < wheezy:
         error('Only Debian wheezy and later is supported', ['system', 'release'])
+
+    # Debian dropped i386 as a regular architecture (no kernel, no installer) in trixie
+    if release >= trixie and data['system']['architecture'] == 'i386':
+        error('The i386 architecture is only supported up to Debian bookworm', ['system', 'architecture'])
 
     # Check the bootloader/partitioning configuration.
     # Doing this via the schema is a pain and does not output a useful error message.

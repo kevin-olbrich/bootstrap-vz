@@ -20,6 +20,8 @@ Kevin Olbrich:
     * google_cloud_repo: install the key without apt-key (removed in trixie)
     * ec2_publish: port to boto3. RegisterAMI: pass KernelId for PV images
     * Cache debootstrap tarballs again (deterministic tarball names)
+    * Reject manifests that build Debian trixie or newer for i386, which Debian no longer
+      supports (no kernel, no installer), and add Debian 15 (duke) as a release
 
 2017-02-20
 ----------

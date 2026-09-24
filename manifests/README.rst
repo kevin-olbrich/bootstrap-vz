@@ -146,7 +146,8 @@ This section defines anything that pertains directly to the bootstrapped
 system and does not fit under any other section.
 
 -  ``architecture``: The architecture of the system.
-   Valid values: ``i386, amd64``
+   Valid values: ``i386, amd64, arm64``
+   (``i386`` only up to Debian bookworm, Debian dropped it in trixie)
    ``required``
 -  ``bootloader``: The bootloader for the system. Depending on the
    bootmethod of the virtualization platform, the options may be
