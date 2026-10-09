@@ -11,7 +11,7 @@ def test_lt():
 
 
 def test_eq():
-    assert releases.wheezy == releases.wheezy
+    assert releases.wheezy == releases.get_release('wheezy')
 
 
 def test_neq():
@@ -19,7 +19,7 @@ def test_neq():
 
 
 def test_identity():
-    assert releases.wheezy is releases.wheezy
+    assert releases.get_release('wheezy') is releases.wheezy
 
 
 def test_not_identity():
@@ -27,8 +27,8 @@ def test_not_identity():
     assert releases.trixie == releases.stable
     assert releases.trixie is not releases.stable
 
-    assert releases.stable is releases.stable
-    assert releases.trixie is releases.trixie
+    assert releases.get_release('stable') is releases.stable
+    assert releases.get_release('trixie') is releases.trixie
 
     assert releases.bookworm != releases.stable
     assert releases.bookworm is not releases.stable
