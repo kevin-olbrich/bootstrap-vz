@@ -6,7 +6,9 @@ import pytest
 from .. import recursive_glob
 
 manifests = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../manifests')
-manifest_paths = sorted(chain(recursive_glob(manifests, '*.yml'), recursive_glob(manifests, '*.json')))
+manifest_paths = sorted(chain(recursive_glob(manifests, '*.yml'),
+                              recursive_glob(manifests, '*.yaml'),
+                              recursive_glob(manifests, '*.json')))
 
 
 @pytest.mark.parametrize('manifest_path', manifest_paths,
