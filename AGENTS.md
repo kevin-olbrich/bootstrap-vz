@@ -112,6 +112,9 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
   a body that explains what changed and why. Never reference an AI tool or
   agent in a commit: no co-author trailers (for example, never write
   "Co-Authored-By: Claude Fable 5") and no "generated with" lines.
+- Author commits as the maintainer, Kevin Olbrich <ko@sv01.de>. If the
+  environment's git identity differs, set it in the clone with
+  `git config user.name` and `git config user.email` before committing.
 
 ## Boundaries
 - Never commit build or test output: `.venv/`, `build/`, `dist/`, `*.egg-info/`, `.tox/`,
