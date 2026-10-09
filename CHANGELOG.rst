@@ -97,6 +97,8 @@ Kevin Olbrich:
       symlinks that the kernel packages maintain (``link_in_boot = yes`` in
       /etc/kernel-img.conf), so they no longer keep booting the build-time kernel after kernel
       updates
+    * Add bookworm and trixie example manifests for kvm (cloud image, and virtio with separate
+      partitions), VirtualBox (Vagrant box) and Docker
 
 2017-02-20
 ----------

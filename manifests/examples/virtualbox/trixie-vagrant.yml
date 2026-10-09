@@ -1,0 +1,28 @@
+---
+name: debian-{system.release}-{system.architecture}-{%y}{%m}{%d}
+provider:
+  name: virtualbox
+bootstrapper:
+  workspace: /target
+system:
+  release: trixie
+  architecture: amd64
+  bootloader: grub
+  charmap: UTF-8
+  hostname: localhost
+  locale: en_US
+  timezone: UTC
+volume:
+  backing: vmdk
+  partitions:
+    type: msdos
+    boot:
+      filesystem: ext2
+      size: 512MiB
+    root:
+      filesystem: ext4
+      size: 3456MiB
+    swap:
+      size: 128MiB
+plugins:
+  vagrant: {}
