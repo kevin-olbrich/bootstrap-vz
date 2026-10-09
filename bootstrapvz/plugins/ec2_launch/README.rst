@@ -17,6 +17,7 @@ Settings
   ``optional``
 - ``tags``:
   ``optional``
-- ``deregister_ami``: A boolean value describing if AMI should be kept after
-  sinning up instance or not (default: false)
+- ``deregister_ami``: A boolean value describing if the AMI and its snapshot
+  should be deleted once the instance is running. If the instance does not
+  reach the running state, the AMI is kept. (default: false)
   ``optional``

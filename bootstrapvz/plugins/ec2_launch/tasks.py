@@ -4,17 +4,6 @@ from bootstrapvz.common import phases
 from bootstrapvz.providers.ec2.tasks import ami
 
 
-# TODO: Merge with the method available in wip-integration-tests branch
-def waituntil(predicate, timeout=5, interval=0.05):
-    import time
-    threshhold = time.time() + timeout
-    while time.time() < threshhold:
-        if predicate():
-            return True
-        time.sleep(interval)
-    return False
-
-
 class LaunchEC2Instance(Task):
     description = 'Launching EC2 instance'
     phase = phases.image_registration
@@ -72,15 +61,13 @@ class DeregisterAMI(Task):
 
     @classmethod
     def run(cls, info):
-        ec2 = info._ec2
+        from botocore.exceptions import WaiterError
+        conn = info._ec2['connection']
         logger = logging.getLogger(__name__)
-
-        def instance_running():
-            ec2['instance'].update()
-            return ec2['instance'].state == 'running'
-
-        if waituntil(instance_running, timeout=120, interval=5):
-            info._ec2['connection'].deregister_image(info._ec2['image'])
-            info._ec2['snapshot'].delete()
-        else:
-            logger.error('Timeout while booting instance')
+        try:
+            conn.get_waiter('instance_running').wait(InstanceIds=[info._ec2['instance']['InstanceId']])
+        except WaiterError as e:
+            logger.error('The instance did not reach the running state, keeping the AMI: %s', e)
+            return
+        conn.deregister_image(ImageId=info._ec2['image']['ImageId'])
+        conn.delete_snapshot(SnapshotId=info._ec2['snapshot'])

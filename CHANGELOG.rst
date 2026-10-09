@@ -69,6 +69,8 @@ Kevin Olbrich:
       newer (cloud-init 23.3+); ``groups`` are added to the release's default groups
     * prebootstrapped: create and restore EBS snapshots with boto3, which fixes crashes in both
       EBS modes and logs the created snapshot ID again
+    * ec2_launch: port ``deregister_ami`` to boto3; it crashed on every build after launching
+      the instance and left the AMI and its snapshot behind
 
 2017-02-20
 ----------
