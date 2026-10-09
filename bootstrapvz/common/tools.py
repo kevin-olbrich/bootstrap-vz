@@ -1,15 +1,15 @@
 import os
 
 
-def log_check_call(command, stdin=None, env=None, shell=False, cwd=None):
-    status, stdout, stderr = log_call(command, stdin, env, shell, cwd)
+def log_check_call(command, stdin=None, env=None, shell=False, cwd=None, log_stdin=True):
+    status, stdout, stderr = log_call(command, stdin, env, shell, cwd, log_stdin)
     from subprocess import CalledProcessError
     if status != 0:
         raise CalledProcessError(status, ' '.join(command), '\n'.join(stderr))
     return stdout
 
 
-def log_call(command, stdin=None, env=None, shell=False, cwd=None):
+def log_call(command, stdin=None, env=None, shell=False, cwd=None, log_stdin=True):
     import subprocess
     import logging
     from multiprocessing.dummy import Pool as ThreadPool
@@ -28,7 +28,9 @@ def log_call(command, stdin=None, env=None, shell=False, cwd=None):
                           stderr=subprocess.PIPE,
                           universal_newlines=True) as process:
         if stdin is not None:
-            log.debug('  stdin: ' + stdin)
+            # Pass log_stdin=False when stdin holds secrets, such as passwords
+            if log_stdin:
+                log.debug('  stdin: ' + stdin)
             process.stdin.write(stdin + "\n")
             process.stdin.flush()
         process.stdin.close()

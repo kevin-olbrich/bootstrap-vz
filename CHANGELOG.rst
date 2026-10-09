@@ -84,6 +84,9 @@ Kevin Olbrich:
       ec2-run-user-data still runs only once. The expand_root plugin now replaces the common
       expand-root script, and the redundant ssh-generate-hostkeys init script is no longer
       installed
+    * Security: keep root_password and admin_user passwords and debconf answers out of the log,
+      and silence botocore, s3transfer and urllib3 debug logging on EC2 before credentials are
+      fetched, so temporary AWS credentials of role and SSO profiles are no longer logged
 
 2017-02-20
 ----------

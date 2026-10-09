@@ -12,7 +12,7 @@ class SetRootPassword(Task):
         password_crypted = info.manifest.plugins['root_password'].get('password-crypted', None)
         if password_crypted is not None:
             log_check_call(['chroot', info.root, '/usr/sbin/chpasswd', '--encrypted'],
-                           'root:' + password_crypted)
+                           'root:' + password_crypted, log_stdin=False)
         else:
             log_check_call(['chroot', info.root, '/usr/sbin/chpasswd'],
-                           'root:' + info.manifest.plugins['root_password']['password'])
+                           'root:' + info.manifest.plugins['root_password']['password'], log_stdin=False)

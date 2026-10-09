@@ -71,7 +71,9 @@ Profile
 ~~~~~~~
 A profile from the `boto3 shared credentials files <http://boto3.readthedocs.io/en/latest/guide/configuration.html#shared-credentials-file>`__
 can be declared rather than needing to enter credentials into the
-manifest.
+manifest. bootstrap-vz only logs messages of boto3 and botocore at the INFO
+level and above, so the temporary credentials of a role or SSO profile are not
+written to the log.
 
 -  ``profile``: AWS configuration profile.
 

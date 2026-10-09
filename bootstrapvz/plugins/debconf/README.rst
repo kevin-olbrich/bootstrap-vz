@@ -6,7 +6,8 @@ It enables you to preconfigure packages before their installation.
 
 This plugin lets you specify debconf answers directly in the manifest.
 You should only specify answers for packages that will be installed; the plugin
-does not check that this is the case.
+does not check that this is the case. The answers are not written to the log,
+because they can contain passwords.
 
 Settings
 ~~~~~~~~

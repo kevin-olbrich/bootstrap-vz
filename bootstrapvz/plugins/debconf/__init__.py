@@ -3,7 +3,7 @@ def validate_manifest(data, validator, error):
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
 
     log_check_call(['debconf-set-selections', '--checkonly'],
-                   stdin=data['plugins']['debconf'])
+                   stdin=data['plugins']['debconf'], log_stdin=False)
 
 
 def resolve_tasks(taskset, manifest):

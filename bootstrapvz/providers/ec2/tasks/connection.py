@@ -10,15 +10,17 @@ class SilenceBotoDebug(Task):
     @classmethod
     def run(cls, info):
         # Regardless of of loglevel, we don't want boto debug stuff, it's very noisy
+        # and botocore logs raw API responses, which hold the temporary credentials of STS and SSO
         import logging
-        logging.getLogger('boto').setLevel(logging.INFO)
-        logging.getLogger('boto3').setLevel(logging.INFO)
+        for name in ['boto3', 'botocore', 's3transfer', 'urllib3']:
+            logging.getLogger(name).setLevel(logging.INFO)
 
 
 class GetCredentials(Task):
     description = 'Getting AWS credentials'
     phase = phases.preparation
-    successors = [SilenceBotoDebug]
+    # Fetching credentials for a role or SSO profile already calls AWS
+    predecessors = [SilenceBotoDebug]
 
     @classmethod
     def run(cls, info):

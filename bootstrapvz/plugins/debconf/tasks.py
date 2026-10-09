@@ -12,4 +12,4 @@ class DebconfSetSelections(Task):
     @classmethod
     def run(cls, info):
         log_check_call(['chroot', info.root, 'debconf-set-selections'],
-                       stdin=info.manifest.plugins['debconf'])
+                       stdin=info.manifest.plugins['debconf'], log_stdin=False)

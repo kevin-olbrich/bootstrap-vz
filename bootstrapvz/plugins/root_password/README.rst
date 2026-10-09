@@ -2,7 +2,8 @@ root password
 -------------
 
 Sets the root password. This plugin removes the task that disables the
-SSH password authentication.
+SSH password authentication. Neither the password nor its hash is written
+to the log.
 
 Settings
 ~~~~~~~~
