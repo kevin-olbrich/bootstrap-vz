@@ -37,6 +37,8 @@ Kevin Olbrich:
     * Reject manifests whose provider has no kernel for the release and architecture (for
       example EC2 arm64 or GCE i386), arm64 with the grub or extlinux bootloader, and VirtualBox
       on arm64 during validation instead of failing during the build
+    * Apply the root partition's ``mountopts`` on unpartitioned volumes (partitions type none)
+      when mounting and in /etc/fstab instead of silently ignoring them
 
 2017-02-20
 ----------

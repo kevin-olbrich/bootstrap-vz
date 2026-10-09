@@ -17,7 +17,8 @@ class NoPartitions:
 
         # In the NoPartitions partitions map we only have a single 'partition'
         self.root = SinglePartition(Sectors(data['root']['size'], sector_size),
-                                    data['root']['filesystem'], data['root'].get('format_command', None), data['root'].get('mount_opts', None))
+                                    data['root']['filesystem'], data['root'].get('format_command', None),
+                                    data['root'].get('mountopts', None))
         self.partitions = [self.root]
 
     def is_blocking(self):
