@@ -160,13 +160,3 @@ class Sectors:
             self.bytes %= other.bytes
             return self
         raise UnitError('Cannot take modulus of sectors with different sector sizes')
-
-    def __getstate__(self):
-        return {'__class__': self.__module__ + '.' + self.__class__.__name__,
-                'sector_size': self.sector_size,
-                'bytes': self.bytes,
-                }
-
-    def __setstate__(self, state):
-        self.sector_size = state['sector_size']
-        self.bytes = state['bytes']

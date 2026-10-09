@@ -38,12 +38,3 @@ class Mount:
         else:
             log_check_call(['umount', self.mount_dir])
         del self.mount_dir
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state['__class__'] = self.__module__ + '.' + self.__class__.__name__
-        return state
-
-    def __setstate__(self, state):
-        for key in state:
-            self.__dict__[key] = state[key]

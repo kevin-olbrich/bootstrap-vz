@@ -137,10 +137,3 @@ class DictClass(dict):
             del self[name]
         except KeyError:
             raise AttributeError(name) from None
-
-    def __getstate__(self):
-        return self.__dict__
-
-    def __setstate__(self, state):
-        for key in state:
-            self[key] = state[key]

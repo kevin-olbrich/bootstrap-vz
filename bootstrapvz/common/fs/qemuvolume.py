@@ -102,7 +102,3 @@ class QEMUVolume(LoopbackVolume):
             time.sleep(0.1)
         raise VolumeError('The nbd device {device_path} did not become ready in time.'
                           .format(device_path=device_path))
-
-    def __setstate__(self, state):
-        for key in state:
-            self.__dict__[key] = state[key]

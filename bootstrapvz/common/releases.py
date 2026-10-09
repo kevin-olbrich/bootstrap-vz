@@ -19,15 +19,6 @@ class _Release:
     def __str__(self):
         return self.codename
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state['__class__'] = self.__module__ + '.' + self.__class__.__name__
-        return state
-
-    def __setstate__(self, state):
-        for key in state:
-            self.__dict__[key] = state[key]
-
 
 class _ReleaseAlias(_Release):
     def __init__(self, alias, release):

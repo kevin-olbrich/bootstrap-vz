@@ -66,22 +66,7 @@ def get_log_filename(manifest_path):
     return filename
 
 
-class SourceFormatter(logging.Formatter):
-    """Adds a [source] tag to the log message if it exists
-    The python docs suggest using a LoggingAdapter, but that would mean we'd
-    have to use it everywhere we log something (and only when called remotely),
-    which is not feasible.
-    """
-
-    def format(self, record):
-        extra = getattr(record, 'extra', {})
-        if 'source' in extra:
-            record.msg = '[{source}] {message}'.format(source=record.extra['source'],
-                                                       message=record.msg)
-        return super().format(record)
-
-
-class ColorFormatter(SourceFormatter):
+class ColorFormatter(logging.Formatter):
     """Colorizes log messages depending on the loglevel
     """
     level_colors = {logging.ERROR: 'red',
@@ -96,7 +81,7 @@ class ColorFormatter(SourceFormatter):
         return super().format(record)
 
 
-class FileFormatter(SourceFormatter):
+class FileFormatter(logging.Formatter):
     """Formats log statements for output to file
     Currently this is just a stub
     """
