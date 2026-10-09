@@ -99,6 +99,9 @@ Kevin Olbrich:
       updates
     * Add bookworm and trixie example manifests for kvm (cloud image, and virtio with separate
       partitions), VirtualBox (Vagrant box) and Docker
+    * Add bookworm and trixie example manifests for EC2 (EBS-backed HVM with cloud-init) and GCE
+      (with the current Google guest environment), and use the trixie EC2 example in the README
+      quick start
 
 2017-02-20
 ----------

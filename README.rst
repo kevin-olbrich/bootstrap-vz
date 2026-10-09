@@ -139,7 +139,7 @@ Amazon EC2 EBS backed AMI
     root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
     root@host:~# apt-get install debootstrap # Install dependencies from aptitude
     root@host:~# uv sync --project bootstrap-vz # Install python dependencies
-    root@host:~# uv run --project bootstrap-vz bootstrap-vz bootstrap-vz/manifests/official/ec2/ebs-jessie-amd64-hvm.yml
+    root@host:~# uv run --project bootstrap-vz bootstrap-vz bootstrap-vz/manifests/examples/ec2/ebs-trixie-amd64-hvm.yml
 
 To bootstrap S3 backed AMIs, bootstrap-vz will also need the
 ``euca2ools`` package. However, version 3.2.0 is required meaning you

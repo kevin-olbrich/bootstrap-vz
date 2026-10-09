@@ -1,0 +1,33 @@
+---
+name: debian-{system.release}-{system.architecture}-{provider.virtualization}-{%Y}-{%m}-{%d}-ebs
+provider:
+  name: ec2
+  virtualization: hvm
+  # credentials:
+  #   access-key: AFAKEACCESSKEYFORAWS
+  #   secret-key: thes3cr3tkeyf0ryourawsaccount/FS4d8Qdva
+  description: Debian {system.release} {system.architecture}
+bootstrapper:
+  workspace: /target
+system:
+  release: bookworm
+  architecture: amd64
+  bootloader: grub
+  charmap: UTF-8
+  locale: en_US
+  timezone: UTC
+volume:
+  backing: ebs
+  partitions:
+    type: gpt
+    root:
+      filesystem: ext4
+      size: 8GiB
+packages:
+  install:
+    # growpart for the cloud-init growpart module
+    - cloud-guest-utils
+plugins:
+  cloud_init:
+    metadata_sources: Ec2
+    username: admin

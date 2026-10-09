@@ -1,0 +1,42 @@
+---
+name: disk
+provider:
+  name: gce
+  description: Debian {system.release} {system.architecture}
+bootstrapper:
+  workspace: /target
+system:
+  release: trixie
+  architecture: amd64
+  bootloader: grub
+  charmap: UTF-8
+  locale: en_US
+  timezone: UTC
+volume:
+  backing: raw
+  partitions:
+    type: msdos
+    root:
+      filesystem: ext4
+      size: 10GiB
+packages:
+  sources:
+    google-cloud:
+      - deb http://packages.cloud.google.com/apt google-compute-engine-{system.release}-stable main
+  install:
+    # The guest environment. gce-configs-trixie adds the apt keyring and the sshd and rsyslog settings
+    # that the guest environment needs on trixie.
+    - gce-configs-trixie
+    - google-compute-engine
+    - google-osconfig-agent
+plugins:
+  expand_root:
+    filesystem_type: ext4
+    root_device: /dev/sda
+    root_partition: 1
+  # Installs the key of packages.cloud.google.com. Do not set enable_keyring_repo on trixie:
+  # gce-configs-trixie conflicts with the google-cloud-packages-archive-keyring package it installs.
+  google_cloud_repo: {}
+  ntp:
+    servers:
+      - metadata.google.internal
