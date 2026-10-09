@@ -26,7 +26,7 @@ These rules favor caution over speed. For trivial tasks, use judgment.
   Use `python3` in shebangs and invocations, never bare `python`.
 - Packaging: `setup.py` (setuptools). Version lives in `bootstrapvz/__init__.py`.
 - Main libraries: `fysom` (task state machine), `jsonschema` + `pyyaml` (manifest
-  validation), `boto3` (EC2), `pyro4` (remote bootstrapping).
+  validation), `boto3` (EC2).
 - All checks run through `tox`. CI (`.github/workflows/ci.yml`) runs each tox env
   on GitHub Actions.
 - Docs: Sphinx (`docs/`), published on Read the Docs.
@@ -65,8 +65,6 @@ deliberate project convention, and document why in `pylintrc`.
   an `__init__.py` with `validate_manifest(data, validator, error)` and
   `resolve_tasks(taskset, manifest)`, plus a `manifest-schema.yml`, a `README.rst`,
   tasks, and optional `assets/`.
-- `bootstrapvz/remote/`: build servers and a Pyro4 bridge for remote builds
-  (`bootstrap-vz-remote`, `bootstrap-vz-server`).
 - `manifests/official/` and `manifests/examples/`: every manifest here is dry-run by
   the integration tests, so a manifest must stay valid after a schema change.
 - `docs/`: Sphinx sources. `docs/conf.py` generates the provider and plugin pages
@@ -117,6 +115,8 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
 - Do not run real image builds, system tests or anything that calls cloud
   provider APIs unless the user explicitly asks. These need root and loop/nbd
   devices, and they can create billable resources.
+- Images are only built by running `bootstrap-vz` directly on the build host.
+  Remote bootstrapping was removed on purpose, so do not add it back.
 - AppArmor is disabled on purpose: `grub.DisableAppArmor` adds `apparmor=0` to
   every grub image. Keep it, and do not flag it as a security issue.
 - Tool-specific instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`,

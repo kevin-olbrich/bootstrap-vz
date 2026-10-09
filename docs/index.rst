@@ -8,7 +8,6 @@
    plugins/index
    supported_builds
    logging
-   remote_bootstrapping
    changelog
    developers/index
    api/index
