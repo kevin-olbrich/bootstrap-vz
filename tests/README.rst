@@ -12,7 +12,7 @@ To run one specific test suite simply append its file path to tox after ``--``:
 
 .. code-block:: sh
 
-    $ tox -e unit -- tests/unit/releases_tests.py
+    $ uv run tox -e unit -- tests/unit/releases_tests.py
 
 Specific tests can be selected by appending the function name with ``::``
 to the file path -- to run more than one tests, simply attach more arguments.
@@ -20,4 +20,4 @@ to the file path -- to run more than one tests, simply attach more arguments.
 
 .. code-block:: sh
 
-    $ tox -e unit -- tests/unit/releases_tests.py::test_lt tests/unit/releases_tests.py::test_eq
+    $ uv run tox -e unit -- tests/unit/releases_tests.py::test_lt tests/unit/releases_tests.py::test_eq

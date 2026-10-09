@@ -222,8 +222,7 @@ Dependencies
 ------------
 
 To communicate with the AWS API `boto3 <https://github.com/boto/boto3>`__
-is required you can install boto3 with
-``pip install boto3``. S3
+is required, it is installed together with bootstrap-vz. S3
 images are chopped up and uploaded using
 `euca2ools <https://github.com/eucalyptus/euca2ools>`__ (install with
 ``apt-get install euca2ools``).

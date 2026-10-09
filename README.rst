@@ -58,8 +58,9 @@ Installation
 
 bootstrap-vz has a master branch into which stable feature branches are merged.
 
-After checking out the branch of your choice you can install the
-python dependencies by running ``python3 setup.py install``. However,
+bootstrap-vz manages its python dependencies with `uv <https://docs.astral.sh/uv/>`__.
+After checking out the branch of your choice you can install them
+by running ``uv sync`` in the repository. However,
 depending on what kind of image you'd like to bootstrap, there are
 other debian package dependencies as well, at the very least you will
 need ``debootstrap``.
@@ -95,9 +96,9 @@ Docker
 
     user@host:~$ sudo -i # become root
     root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
-    root@host:~# apt-get install debootstrap python-pip docker.io # Install dependencies from aptitude
-    root@host:~# pip install termcolor jsonschema fysom docopt pyyaml pyrfc3339 # Install python dependencies
-    root@host:~# bootstrap-vz/bootstrap-vz bootstrap-vz/manifests/examples/docker/jessie-minimized.yml
+    root@host:~# apt-get install debootstrap docker.io # Install dependencies from aptitude
+    root@host:~# uv sync --project bootstrap-vz # Install python dependencies
+    root@host:~# uv run --project bootstrap-vz bootstrap-vz bootstrap-vz/manifests/examples/docker/jessie-minimized.yml
 
 The resulting image should be no larger than 82 MB (81.95 MB to be exact).
 The manifest ``jessie-minimized.yml`` uses the
@@ -113,10 +114,10 @@ VirtualBox Vagrant
 
     user@host:~$ sudo -i # become root
     root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
-    root@host:~# apt-get install qemu-utils debootstrap python-pip # Install dependencies from aptitude
-    root@host:~# pip install termcolor jsonschema fysom docopt pyyaml # Install python dependencies
+    root@host:~# apt-get install qemu-utils debootstrap # Install dependencies from aptitude
+    root@host:~# uv sync --project bootstrap-vz # Install python dependencies
     root@host:~# modprobe nbd max_part=16
-    root@host:~# bootstrap-vz/bootstrap-vz bootstrap-vz/manifests/examples/virtualbox/jessie-vagrant.yml
+    root@host:~# uv run --project bootstrap-vz bootstrap-vz bootstrap-vz/manifests/examples/virtualbox/jessie-vagrant.yml
 
 (The `modprobe nbd max_part=16` part enables the network block device driver to support up to 16 partitions
 on a device)
@@ -133,9 +134,9 @@ Amazon EC2 EBS backed AMI
 
     user@host:~$ sudo -i # become root
     root@host:~# git clone https://github.com/kevin-olbrich/bootstrap-vz.git # Clone the repo
-    root@host:~# apt-get install debootstrap python-pip # Install dependencies from aptitude
-    root@host:~# pip install termcolor jsonschema fysom docopt pyyaml boto3 json_minify # Install python dependencies
-    root@host:~# bootstrap-vz/bootstrap-vz bootstrap-vz/manifests/official/ec2/ebs-jessie-amd64-hvm.yml
+    root@host:~# apt-get install debootstrap # Install dependencies from aptitude
+    root@host:~# uv sync --project bootstrap-vz # Install python dependencies
+    root@host:~# uv run --project bootstrap-vz bootstrap-vz bootstrap-vz/manifests/official/ec2/ebs-jessie-amd64-hvm.yml
 
 To bootstrap S3 backed AMIs, bootstrap-vz will also need the
 ``euca2ools`` package. However, version 3.2.0 is required meaning you

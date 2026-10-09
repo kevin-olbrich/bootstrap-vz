@@ -9,7 +9,7 @@ Do you want to contribute to the bootstrap-vz project? Nice! Here is the basic w
 * Read the `development guidelines <#development-guidelines>`__
 * Fork this repository.
 * Make any changes you want/need.
-* Check the coding style of your changes using `tox <http://tox.readthedocs.org/>`__ by running `tox -e flake8`
+* Check the coding style of your changes using `tox <http://tox.readthedocs.org/>`__ by running ``uv run tox -e flake8``
   and fix any warnings that may appear.
   This check, together with the other tox environments, will be repeated by
   `GitHub Actions <.github/workflows/ci.yml>`__ once you send a pull request,
@@ -151,7 +151,7 @@ The codebase can be checked for any violations quite easily, since those rules a
 `tox <http://tox.readthedocs.org/>`__ configuration file.
 ::
 
-    tox -e flake8
+    uv run tox -e flake8
 
 
 Documentation
