@@ -117,6 +117,8 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
 - Do not run real image builds, system tests or anything that calls cloud
   provider APIs unless the user explicitly asks. These need root and loop/nbd
   devices, and they can create billable resources.
+- AppArmor is disabled on purpose: `grub.DisableAppArmor` adds `apparmor=0` to
+  every grub image. Keep it, and do not flag it as a security issue.
 - Tool-specific instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`,
   `.clinerules`, `.windsurfrules`, `.github/copilot-instructions.md`) are pointers
   only. Put project rules here in `AGENTS.md`.
