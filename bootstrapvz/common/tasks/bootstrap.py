@@ -27,13 +27,10 @@ def get_bootstrap_args(info):
         options.append('--keyring=' + info.manifest.bootstrapper['keyring'])
     if info.manifest.bootstrapper.get('no-check-gpg', False) is True:
         options.append('--no-check-gpg')
-    if info.manifest.bootstrapper.get('force-check-gpg', False) is True:
-        from bootstrapvz.common.releases import stretch
-        if info.manifest.release >= stretch:
-            options.append('--force-check-gpg')
-        else:
-            from bootstrapvz.common.exceptions import ManifestError
-            raise ManifestError('force-check-gpg is only support in Stretch and newer releases')
+    elif info.manifest.bootstrapper.get('force-check-gpg', True) is True:
+        # Without it, debootstrap only warns about a missing keyring and installs unverified packages
+        # (it falls back to an HTTPS mirror only when no mirror is given, but we always pass one)
+        options.append('--force-check-gpg')
     if info.include_packages:
         options.append('--include=' + ','.join(sorted(info.include_packages)))
     if info.exclude_packages:

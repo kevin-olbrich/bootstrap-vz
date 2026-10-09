@@ -107,19 +107,24 @@ This section concerns the bootstrapper itself and its behavior.
    is ``minbase`` and should only be used in conjunction with the
    Docker provider. Not specifying this option will result in a normal
    Debian variant being bootstrapped.
--  ``keyring``: path to keyring to check Release files against
+-  ``keyring``: path to keyring on the build host to check Release files against.
+   If not specified, debootstrap uses the Debian archive keyring of the
+   build host (from the ``debian-archive-keyring`` package).
    ``optional``
-   Default: ``false``
--  ``no-check-gpg``: avoid checking Release file signatures
-   ``optional``
-   Valid values: ``true, false``
-   Default: ``false``
--  ``force-check-gpg``: force checking Release file signatures
-   (also disables automatic fallback to HTTPS in case
-   of a missing keyring), aborting otherwise
+-  ``no-check-gpg``: avoid checking Release file signatures.
+   Cannot be combined with ``force-check-gpg: true``.
    ``optional``
    Valid values: ``true, false``
    Default: ``false``
+-  ``force-check-gpg``: abort when the Release file signatures cannot
+   be checked, for example because the build host has no keyring.
+   Set it to ``false`` to let debootstrap continue with a warning
+   and install unverified packages in that case.
+   debootstrap never falls back to HTTPS when the keyring is missing,
+   because bootstrap-vz always passes it a mirror.
+   ``optional``
+   Valid values: ``true, false``
+   Default: ``true`` (``false`` when ``no-check-gpg`` is ``true``)
 
 
 Example:

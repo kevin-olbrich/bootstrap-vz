@@ -32,6 +32,10 @@ def validate_manifest(data, validator, error):
     if data['system']['architecture'] == 'arm64' and data['system']['bootloader'] in ['grub', 'extlinux']:
         error('Grub and extlinux only support the i386 and amd64 architectures', ['system', 'bootloader'])
 
+    # debootstrap refuses --no-check-gpg together with --force-check-gpg
+    if data['bootstrapper'].get('no-check-gpg', False) and data['bootstrapper'].get('force-check-gpg', False):
+        error('no-check-gpg and force-check-gpg cannot both be enabled', ['bootstrapper', 'force-check-gpg'])
+
     # Check the bootloader/partitioning configuration.
     # Doing this via the schema is a pain and does not output a useful error message.
     if data['system']['bootloader'] == 'grub':
@@ -40,17 +44,7 @@ def validate_manifest(data, validator, error):
             error('Grub cannot boot from unpartitioned disks', ['system', 'bootloader'])
 
     # Check the volume configuration, which is not done via the schema for the same reason.
-    volume = data['volume']
-    for key in ['volumegroup', 'logicalvolume']:
-        if volume['backing'] == 'lvm' and key not in volume:
-            error('The lvm backing requires ' + key, ['volume'])
-        if volume['backing'] != 'lvm' and key in volume:
-            error(key + ' can only be used with the lvm backing', ['volume', key])
-
-    other_partitions = [key for key in volume['partitions'] if key not in ['type', 'root']]
-    if volume['partitions']['type'] == 'none' and other_partitions:
-        error('Unpartitioned volumes can only have a root partition',
-              ['volume', 'partitions', other_partitions[0]])
+    validate_volume(data['volume'], error)
 
     # Check the provided apt.conf(5) options
     if 'packages' in data:
@@ -62,3 +56,21 @@ def validate_manifest(data, validator, error):
 
             if status != 0:
                 error('apt.conf(5) syntax error', ['packages', 'apt.conf.d', name])
+
+
+def validate_volume(volume, error):
+    """Validates the volume settings that the schema cannot check with a useful error message
+
+    :param dict volume: The volume section of the manifest
+    :param function error: The function tha raises an error when the validation fails
+    """
+    for key in ['volumegroup', 'logicalvolume']:
+        if volume['backing'] == 'lvm' and key not in volume:
+            error('The lvm backing requires ' + key, ['volume'])
+        if volume['backing'] != 'lvm' and key in volume:
+            error(key + ' can only be used with the lvm backing', ['volume', key])
+
+    other_partitions = [key for key in volume['partitions'] if key not in ['type', 'root']]
+    if volume['partitions']['type'] == 'none' and other_partitions:
+        error('Unpartitioned volumes can only have a root partition',
+              ['volume', 'partitions', other_partitions[0]])

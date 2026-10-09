@@ -89,6 +89,10 @@ Kevin Olbrich:
       fetched, so temporary AWS credentials of role and SSO profiles are no longer logged
     * Security: gce images no longer ship the SSH host keys generated at build time; every
       instance creates its own keys on first boot
+    * Security: pass ``--force-check-gpg`` to debootstrap by default, so a build host without
+      the Debian archive keyring aborts instead of installing unverified packages (set
+      ``bootstrapper.force-check-gpg: false`` to opt out); ``force-check-gpg`` is also accepted
+      for releases older than stretch
 
 2017-02-20
 ----------

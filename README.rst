@@ -63,7 +63,10 @@ After checking out the branch of your choice you can install them
 by running ``uv sync`` in the repository. However,
 depending on what kind of image you'd like to bootstrap, there are
 other debian package dependencies as well, at the very least you will
-need ``debootstrap``.
+need ``debootstrap`` and the Debian archive keyring (``debian-archive-keyring``).
+bootstrap-vz makes debootstrap abort when it cannot check the Release
+file signatures, so on a build host without that package, such as Ubuntu,
+install it or set ``keyring`` in `the bootstrapper section of the manifest <manifests#bootstrapper>`__.
 `The documentation <http://bootstrap-vz.readthedocs.org/en/master>`__
 explains this in more detail.
 
