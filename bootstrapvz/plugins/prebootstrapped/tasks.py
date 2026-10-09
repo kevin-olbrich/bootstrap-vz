@@ -8,7 +8,6 @@ from bootstrapvz.common.fs import unmounted
 from bootstrapvz.common.tools import log_check_call
 from shutil import copyfile
 import os.path
-import time
 import logging
 log = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class Snapshot(Task):
         snapshot = None
         with unmounted(info.volume):
             snapshot = info.volume.snapshot()
-        msg = 'A snapshot of the bootstrapped volume was created. ID: ' + snapshot.id
+        msg = 'A snapshot of the bootstrapped volume was created. ID: ' + snapshot
         log.info(msg)
 
 
@@ -35,14 +34,8 @@ class CreateFromSnapshot(Task):
     @classmethod
     def run(cls, info):
         snapshot = info.manifest.plugins['prebootstrapped']['snapshot']
-        ebs_volume = info._ec2['connection'].create_volume(info.volume.size.bytes.get_qty_in('GiB'),
-                                                           info._ec2['host']['availabilityZone'],
-                                                           snapshot=snapshot)
-        while ebs_volume.volume_state() != 'available':
-            time.sleep(5)
-            ebs_volume.update()
-
-        info.volume.volume = ebs_volume
+        info.volume.create(info._ec2['connection'], info._ec2['host']['availabilityZone'],
+                           snapshot_id=snapshot)
         set_fs_states(info.volume)
 
 

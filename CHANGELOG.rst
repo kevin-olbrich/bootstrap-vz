@@ -67,6 +67,8 @@ Kevin Olbrich:
     * cloud_init: set the default user in /etc/cloud/cloud.cfg.d/02_bootstrapvz_user.cfg instead
       of editing cloud.cfg with regular expressions, which failed on every build of trixie and
       newer (cloud-init 23.3+); ``groups`` are added to the release's default groups
+    * prebootstrapped: create and restore EBS snapshots with boto3, which fixes crashes in both
+      EBS modes and logs the created snapshot ID again
 
 2017-02-20
 ----------
