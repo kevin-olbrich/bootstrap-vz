@@ -1,5 +1,5 @@
 from bootstrapvz.common import task_groups
-from bootstrapvz.common.tasks import apt, dpkg, folder, filesystem
+from bootstrapvz.common.tasks import apt, dpkg, folder
 from bootstrapvz.common.tools import rel_path
 from .tasks import commands, image, settings
 
@@ -13,10 +13,9 @@ def resolve_tasks(taskset, manifest):
     taskset.update(task_groups.get_base_group(manifest))
     taskset.update([dpkg.CreateDpkgCfg,
                     folder.Create,
-                    filesystem.CopyMountTable,
-                    filesystem.RemoveMountTable,
                     folder.Delete,
                     ])
+    taskset.update(task_groups.get_mount_table_group(manifest))
     taskset.update(task_groups.get_network_group(manifest))
     taskset.update(task_groups.get_apt_group(manifest))
     taskset.update(task_groups.get_locale_group(manifest))

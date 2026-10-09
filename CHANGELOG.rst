@@ -54,6 +54,8 @@ Kevin Olbrich:
       longer get recovery menu entries
     * apt_proxy: run debootstrap with ``http_proxy`` set to the configured proxy, so the base
       system is downloaded through the cache too
+    * Stop copying the build host's mount table to /etc/mtab for bookworm and newer on every
+      provider (ec2, gce, azure, oracle, virtualbox, docker), as was already done for kvm
 
 2017-02-20
 ----------

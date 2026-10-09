@@ -28,6 +28,7 @@ def get_standard_groups(manifest):
     if 'boot' in manifest.volume['partitions']:
         group.extend(boot_partition_group)
     group.extend(mounting_group)
+    group.extend(get_mount_table_group(manifest))
     group.extend(kernel_group)
     group.extend(get_fs_specific_group(manifest))
     group.extend(get_network_group(manifest))
@@ -77,11 +78,19 @@ mounting_group = [filesystem.CreateMountDir,
                   filesystem.MountAdditional,
                   filesystem.MountSpecials,
                   filesystem.ChmodMountDirs,
-                  filesystem.CopyMountTable,
-                  filesystem.RemoveMountTable,
                   filesystem.UnmountRoot,
                   filesystem.DeleteMountDir,
                   ]
+
+
+def get_mount_table_group(manifest):
+    from bootstrapvz.common.releases import bookworm
+    if manifest.release >= bookworm:
+        return []
+    return [filesystem.CopyMountTable,
+            filesystem.RemoveMountTable,
+            ]
+
 
 kernel_group = [kernel.DetermineKernelVersion,
                 kernel.UpdateInitramfs,
