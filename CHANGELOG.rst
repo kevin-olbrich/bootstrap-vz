@@ -87,6 +87,8 @@ Kevin Olbrich:
     * Security: keep root_password and admin_user passwords and debconf answers out of the log,
       and silence botocore, s3transfer and urllib3 debug logging on EC2 before credentials are
       fetched, so temporary AWS credentials of role and SSO profiles are no longer logged
+    * Security: gce images no longer ship the SSH host keys generated at build time; every
+      instance creates its own keys on first boot
 
 2017-02-20
 ----------

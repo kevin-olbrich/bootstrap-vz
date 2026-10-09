@@ -24,6 +24,7 @@ def resolve_tasks(taskset, manifest):
                     initd.InstallInitScripts,
                     bootstrapvz.common.tasks.boot.BlackListModules,
                     bootstrapvz.common.tasks.boot.UpdateInitramfs,
+                    ssh.ShredHostkeys,
                     ssh.AddSSHKeyGeneration,
                     ssh.DisableSSHPasswordAuthentication,
                     ssh.DisableRootLogin,
