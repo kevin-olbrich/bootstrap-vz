@@ -52,6 +52,8 @@ Kevin Olbrich:
     * grub: write boolean settings as lowercase true/false in /etc/default/grub, so
       ``GRUB_DISABLE_RECOVERY`` and ``GRUB_HIDDEN_TIMEOUT_QUIET`` take effect and images no
       longer get recovery menu entries
+    * apt_proxy: run debootstrap with ``http_proxy`` set to the configured proxy, so the base
+      system is downloaded through the cache too
 
 2017-02-20
 ----------

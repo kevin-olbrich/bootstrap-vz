@@ -65,7 +65,8 @@ class MakeTarball(Task):
             log.debug('Found matching tarball, skipping creation')
         else:
             from ..tools import log_call
-            status, out, err = log_call(executable + options + ['--make-tarball=' + tarball] + arguments)
+            status, out, err = log_call(executable + options + ['--make-tarball=' + tarball] + arguments,
+                                        env=dict(os.environ, **info.bootstrap_env))
             if status not in [0, 1]:  # variant=minbase exits with 0
                 msg = 'debootstrap exited with status {status}, it should exit with status 0 or 1'.format(status=status)
                 raise TaskError(msg)
@@ -92,7 +93,7 @@ class Bootstrap(Task):
 
         try:
             from ..tools import log_check_call
-            log_check_call(executable + options + arguments)
+            log_check_call(executable + options + arguments, env=dict(os.environ, **info.bootstrap_env))
         except KeyboardInterrupt:
             # Sometimes ../root/sys and ../root/proc are still mounted when
             # quitting debootstrap prematurely. This break the cleanup process,

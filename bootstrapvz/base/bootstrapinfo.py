@@ -63,6 +63,9 @@ class BootstrapInformation:
         # (will be used instead of e.g. /usr/share/debootstrap/scripts/jessie)
         self.bootstrap_script = None
 
+        # Environment variables that are added to the environment of the debootstrap invocation
+        self.bootstrap_env = {}
+
         # Lists of startup scripts that should be installed and disabled
         self.initd = {'install': {}, 'disable': []}
 

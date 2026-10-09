@@ -7,6 +7,11 @@ from the mirror every time. You could just install ``apt-cacher-ng`` on
 the host machine and then add ``"address": "127.0.0.1"`` and
 ``"port": 3142`` to the manifest file.
 
+The plugin also runs debootstrap with the proxy in its ``http_proxy``
+environment variable, so the base system is downloaded through the proxy
+as well. That variable only applies to ``http://`` mirrors, debootstrap
+does not send downloads from an ``https://`` mirror through the proxy.
+
 Settings
 ~~~~~~~~
 
