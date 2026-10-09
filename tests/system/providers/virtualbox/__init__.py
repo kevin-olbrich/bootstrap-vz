@@ -4,22 +4,8 @@ log = logging.getLogger(__name__)
 
 
 @contextmanager
-def boot_image(manifest, build_server, bootstrap_info):
-    from bootstrapvz.remote.build_servers.local import LocalBuildServer
-    if isinstance(build_server, LocalBuildServer):
-        image_path = bootstrap_info.volume.image_path
-    else:
-        import tempfile
-        handle, image_path = tempfile.mkstemp()
-        import os
-        os.close(handle)
-        try:
-            build_server.download(bootstrap_info.volume.image_path, image_path)
-        except (Exception, KeyboardInterrupt):
-            os.remove(image_path)
-            raise
-        finally:
-            build_server.delete(bootstrap_info.volume.image_path)
+def boot_image(manifest, settings, bootstrap_info):
+    image_path = bootstrap_info.volume.image_path
 
     from .image import VirtualBoxImage
     image = VirtualBoxImage(image_path)

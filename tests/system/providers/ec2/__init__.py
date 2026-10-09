@@ -5,10 +5,10 @@ log = logging.getLogger(__name__)
 
 
 @contextmanager
-def prepare_bootstrap(manifest, build_server):
+def prepare_bootstrap(manifest, settings):
     if manifest.volume['backing'] == 's3':
-        credentials = {'access-key': build_server.build_settings['ec2-credentials']['access-key'],
-                       'secret-key': build_server.build_settings['ec2-credentials']['secret-key']}
+        credentials = {'access-key': settings['build_settings']['ec2-credentials']['access-key'],
+                       'secret-key': settings['build_settings']['ec2-credentials']['secret-key']}
         import boto3
         s3 = boto3.resource('s3', region_name=manifest.image['region'],
                             aws_access_key_id=credentials['access-key'],
@@ -29,10 +29,10 @@ def prepare_bootstrap(manifest, build_server):
 
 
 @contextmanager
-def boot_image(manifest, build_server, bootstrap_info, instance_type=None):
+def boot_image(manifest, settings, bootstrap_info, instance_type=None):
 
-    credentials = {'access-key': build_server.run_settings['ec2-credentials']['access-key'],
-                   'secret-key': build_server.run_settings['ec2-credentials']['secret-key']}
+    credentials = {'access-key': settings['run_settings']['ec2-credentials']['access-key'],
+                   'secret-key': settings['run_settings']['ec2-credentials']['secret-key']}
     import boto3
     ec2 = boto3.resource('ec2', region_name=bootstrap_info._ec2['region'],
                          aws_access_key_id=credentials['access-key'],

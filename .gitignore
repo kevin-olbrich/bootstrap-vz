@@ -14,5 +14,5 @@
 /.tox/
 /.pytest_cache/
 /.venv
-/build-servers.yml
+/system-tests.yml
 /system.html

@@ -109,9 +109,9 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
 
 ## Boundaries
 - Never commit build or test output: `build/`, `dist/`, `*.egg-info/`, `.tox/`,
-  `docs/_build/`, `.coverage`, `build-servers.yml` or `system.html`.
-- `build-servers.yml` holds local credentials for remote builds. Never create it
-  with real values or read secrets out of it.
+  `docs/_build/`, `.coverage`, `system-tests.yml` or `system.html`.
+- `system-tests.yml` holds the build host's credentials for the system tests.
+  Never create it with real values or read secrets out of it.
 - Do not edit `LICENSE` or remove the original author's attribution. The fork
   keeps the upstream copyright under Apache 2.0.
 - Do not run real image builds, system tests or anything that calls cloud

@@ -1,21 +1,14 @@
 from contextlib import contextmanager
-from bootstrapvz.remote import register_deserialization_handlers
 import logging
 log = logging.getLogger(__name__)
-
-# Register deserialization handlers for objects
-# that will pass between server and client
-register_deserialization_handlers()
 
 
 @contextmanager
 def boot_manifest(manifest_data, boot_vars={}):
     from bootstrapvz.common.tools import load_data
-    build_servers = load_data('build-servers.yml')
-    from bootstrapvz.remote.build_servers import pick_build_server
-    build_server = pick_build_server(build_servers, manifest_data)
+    settings = load_data('system-tests.yml')
 
-    manifest_data = build_server.apply_build_settings(manifest_data)
+    manifest_data = apply_build_settings(manifest_data, settings.get('build_settings', {}))
     from bootstrapvz.base.manifest import Manifest
     manifest = Manifest(data=manifest_data)
 
@@ -23,16 +16,31 @@ def boot_manifest(manifest_data, boot_vars={}):
     provider_module = importlib.import_module('tests.system.providers.' + manifest.provider['name'])
 
     prepare_bootstrap = getattr(provider_module, 'prepare_bootstrap', noop)
-    with prepare_bootstrap(manifest, build_server):
-        bootstrap_info = None
-        log.info('Connecting to build server')
-        with build_server.connect() as connection:
-            log.info('Building manifest')
-            bootstrap_info = connection.run(manifest)
+    with prepare_bootstrap(manifest, settings):
+        log.info('Building manifest')
+        from bootstrapvz.base.main import run
+        bootstrap_info = run(manifest)
 
         log.info('Creating and booting instance')
-        with provider_module.boot_image(manifest, build_server, bootstrap_info, **boot_vars) as instance:
+        with provider_module.boot_image(manifest, settings, bootstrap_info, **boot_vars) as instance:
             yield instance
+
+
+def apply_build_settings(manifest_data, build_settings):
+    if manifest_data['provider']['name'] == 'virtualbox' and 'guest_additions' in manifest_data['provider']:
+        manifest_data['provider']['guest_additions'] = build_settings['guest_additions']
+    if 'apt_proxy' in build_settings:
+        manifest_data.get('plugins', {})['apt_proxy'] = build_settings['apt_proxy']
+    if 'ec2-credentials' in build_settings:
+        if 'credentials' not in manifest_data['provider']:
+            manifest_data['provider']['credentials'] = {}
+        for key in ['access-key', 'secret-key', 'certificate', 'private-key', 'user-id']:
+            if key in build_settings['ec2-credentials']:
+                manifest_data['provider']['credentials'][key] = build_settings['ec2-credentials'][key]
+    if 's3-region' in build_settings and manifest_data['volume']['backing'] == 's3':
+        if 'region' not in manifest_data['image']:
+            manifest_data['image']['region'] = build_settings['s3-region']
+    return manifest_data
 
 
 def waituntil(predicate, timeout=5, interval=0.05):

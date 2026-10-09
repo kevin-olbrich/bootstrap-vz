@@ -15,13 +15,51 @@ been developed that reduces each test to it's bare essentials:
 * Boot an instance from a manifest
 * Run tests on the booted instance
 
-In order for the system testing harness to be able to bootstrap it must
-know about your `build-servers <../../bootstrapvz/remote#build-servers-yml>`__.
-Depending on the manifest that is bootstrapped, the harness chooses
-a fitting build-server, connects to it and starts the bootstrapping process.
+The harness bootstraps every image on the machine that runs the tests, so run
+them as root on a build host that can build and boot the tested providers.
 
-When running system tests, the framework will look for ``build-servers.yml``
+
+system-tests.yml
+----------------
+When running system tests, the framework will look for ``system-tests.yml``
 at the root of the repo and raise an error if it is not found.
+The file holds the settings of your build host. Keep it out of version control,
+it contains credentials.
+
+.. code-block:: yaml
+
+    build_settings:
+      guest_additions: /root/images/VBoxGuestAdditions.iso
+      apt_proxy:
+        address: 127.0.0.1
+        port: 3142
+      ec2-credentials:
+        access-key: AFAKEACCESSKEYFORAWS
+        secret-key: thes3cr3tkeyf0ryourawsaccount/FS4d8Qdva
+        certificate: /root/manifests/cert.pem
+        private-key: /root/manifests/pk.pem
+        user-id: 1234-1234-1234
+      s3-region: eu-west-1
+    run_settings:
+      ec2-credentials:
+        access-key: AFAKEACCESSKEYFORAWS
+        secret-key: thes3cr3tkeyf0ryourawsaccount/FS4d8Qdva
+      docker:
+        machine: default
+
+The build settings override manifest properties before bootstrapping:
+
+* ``guest_additions`` specifies the path to the VirtualBox guest additions ISO.
+* ``apt_proxy`` sets the configuration for the `apt_proxy plugin <../../bootstrapvz/plugins/apt_proxy>`__.
+* ``ec2-credentials`` contains all the settings you know from EC2 manifests.
+* ``s3-region`` overrides the s3 bucket region when bootstrapping S3 backed images.
+
+The run settings hold information about how to start a bootstrapped image:
+
+* ``ec2-credentials`` contains the access key and secret key used to boot
+  an EC2 AMI.
+* ``docker.machine`` The docker machine on which an image built for docker
+  should run.
 
 
 Manifest combinations
