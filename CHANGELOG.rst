@@ -71,6 +71,9 @@ Kevin Olbrich:
       EBS modes and logs the created snapshot ID again
     * ec2_launch: port ``deregister_ami`` to boto3; it crashed on every build after launching
       the instance and left the AMI and its snapshot behind
+    * ntp: install ntpsec and edit /etc/ntpsec/ntp.conf on bookworm and newer, where ntp is only
+      a transitional package, and drop the default ``tos`` lines when ``servers`` are set so
+      ntpd also syncs with fewer than three servers
 
 2017-02-20
 ----------
