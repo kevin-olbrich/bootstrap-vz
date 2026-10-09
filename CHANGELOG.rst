@@ -49,6 +49,9 @@ Kevin Olbrich:
       ``system.locale`` ungenerated
     * pip3_install: validate the plugin settings against the ``pip3_install`` key instead of
       ``pip_install``, and require ``packages`` in both pip plugins
+    * grub: write boolean settings as lowercase true/false in /etc/default/grub, so
+      ``GRUB_DISABLE_RECOVERY`` and ``GRUB_HIDDEN_TIMEOUT_QUIET`` take effect and images no
+      longer get recovery menu entries
 
 2017-02-20
 ----------

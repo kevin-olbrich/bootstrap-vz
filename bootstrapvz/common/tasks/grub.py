@@ -206,10 +206,10 @@ class WriteGrubConfig(Task):
         for key, value in info.grub_config.items():
             if isinstance(value, str):
                 grub_config_contents += '{}="{}"\n'.format(key, value)
-            elif isinstance(value, int):
-                grub_config_contents += '{}={}\n'.format(key, value)
             elif isinstance(value, bool):
                 grub_config_contents += '{}="{}"\n'.format(key, str(value).lower())
+            elif isinstance(value, int):
+                grub_config_contents += '{}={}\n'.format(key, value)
             elif isinstance(value, list):
                 if value:
                     args_list = ' '.join(map(str, value))
