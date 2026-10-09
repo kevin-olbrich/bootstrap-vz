@@ -64,6 +64,9 @@ Kevin Olbrich:
       /etc/hostname, and ``system.hostname`` is no longer ignored for them; only the network
       interface configuration is still skipped for minbase without netbase. openvox applies its
       manifest after ``system.hostname`` is written
+    * cloud_init: set the default user in /etc/cloud/cloud.cfg.d/02_bootstrapvz_user.cfg instead
+      of editing cloud.cfg with regular expressions, which failed on every build of trixie and
+      newer (cloud-init 23.3+); ``groups`` are added to the release's default groups
 
 2017-02-20
 ----------

@@ -25,35 +25,38 @@ class AddCloudInitPackages(Task):
 
 
 class SetUsername(Task):
-    description = 'Setting username in cloud.cfg'
+    description = 'Setting username in cloud.cfg.d'
     phase = phases.system_modification
 
     @classmethod
     def run(cls, info):
-        from bootstrapvz.common.tools import sed_i
-        cloud_cfg = os.path.join(info.root, 'etc/cloud/cloud.cfg')
-        username = info.manifest.plugins['cloud_init']['username']
-        search = '^     name: debian$'
-        replace = ('     name: {username}\n'
-                   '     sudo: ALL=(ALL) NOPASSWD:ALL\n'
-                   '     shell: /bin/bash').format(username=username)
-        sed_i(cloud_cfg, search, replace)
+        import yaml
+        # cloud-init merges cloud.cfg.d over cloud.cfg, so the other default_user keys keep their values
+        user_cfg = os.path.join(info.root, 'etc/cloud/cloud.cfg.d/02_bootstrapvz_user.cfg')
+        default_user = {'name': info.manifest.plugins['cloud_init']['username'],
+                        'sudo': 'ALL=(ALL) NOPASSWD:ALL',
+                        'shell': '/bin/bash'}
+        with open(user_cfg, 'w', encoding='utf-8') as stream:
+            yaml.safe_dump({'system_info': {'default_user': default_user}}, stream, default_flow_style=False)
 
 
 class SetGroups(Task):
-    description = 'Setting groups in cloud.cfg'
+    description = 'Setting groups in cloud.cfg.d'
     phase = phases.system_modification
+    predecessors = [SetUsername]
 
     @classmethod
     def run(cls, info):
-        from bootstrapvz.common.tools import sed_i
-        cloud_cfg = os.path.join(info.root, 'etc/cloud/cloud.cfg')
-        groups = info.manifest.plugins['cloud_init']['groups']
-        search = (r'^     groups: \[adm, audio, cdrom, dialout, floppy, video,'
-                  r' plugdev, dip\]$')
-        replace = ('     groups: [adm, audio, cdrom, dialout, floppy, video,'
-                   ' plugdev, dip, {groups}]').format(groups=', '.join(groups))
-        sed_i(cloud_cfg, search, replace)
+        import yaml
+        from bootstrapvz.common.tools import load_yaml
+        cloud_cfg = load_yaml(os.path.join(info.root, 'etc/cloud/cloud.cfg'))
+        user_cfg_path = os.path.join(info.root, 'etc/cloud/cloud.cfg.d/02_bootstrapvz_user.cfg')
+        user_cfg = load_yaml(user_cfg_path)
+        # cloud-init replaces the groups list instead of merging it, so add the packaged groups here
+        groups = cloud_cfg['system_info']['default_user']['groups'] + info.manifest.plugins['cloud_init']['groups']
+        user_cfg['system_info']['default_user']['groups'] = groups
+        with open(user_cfg_path, 'w', encoding='utf-8') as stream:
+            yaml.safe_dump(user_cfg, stream, default_flow_style=False)
 
 
 class SetMetadataSource(Task):

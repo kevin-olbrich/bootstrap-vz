@@ -11,10 +11,14 @@ cloud-init is only compatible with Debian wheezy and upwards.
 Settings
 ~~~~~~~~
 
--  ``username``: The username of the account to create.
+-  ``username``: The username of the account to create. The plugin sets it as
+   the cloud-init default user in
+   ``/etc/cloud/cloud.cfg.d/02_bootstrapvz_user.cfg``, together with
+   passwordless sudo and ``/bin/bash`` as the login shell.
    ``required``
 -  ``groups``: A list of strings specifying which additional groups the account
-   should be added to.
+   should be added to, on top of the default groups in the
+   ``/etc/cloud/cloud.cfg`` of the cloud-init package.
    ``optional``
 -  ``disable_modules``: A list of strings specifying which cloud-init
    modules should be disabled.
