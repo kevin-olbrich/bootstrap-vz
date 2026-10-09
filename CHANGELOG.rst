@@ -44,6 +44,9 @@ Kevin Olbrich:
     * Start every partition on a 1MiB boundary: pass parted the last sector of each partition
       instead of padding with a one-sector gap, which left every partition after the first at an
       odd sector. Without grub, the first partition now starts at 1MiB
+    * minimize_size: drop the locales package and skip locale generation only when
+      ``dpkg.locales`` is an empty list; the check was inverted, so listing locales left
+      ``system.locale`` ungenerated
 
 2017-02-20
 ----------

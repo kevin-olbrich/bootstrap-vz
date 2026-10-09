@@ -77,7 +77,8 @@ Settings
    -  ``locales``: List of locales that should be kept.
       When this option is used, all locales (and the manpages in those locales)
       are excluded from installation excepting the ones in this list.
-      Specify an empty list to not install any locales at all.
+      Specify an empty list to not install any locales at all. The ``locales``
+      package is then left out and ``system.locale`` is not generated.
       ``optional``
    -  ``exclude_docs``: Exclude additional package documentation located in
       ``/usr/share/doc``

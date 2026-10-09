@@ -64,7 +64,7 @@ def resolve_tasks(taskset, manifest):
             taskset.update(filter_tasks)
             taskset.add(dpkg.FilterLocales)
             # If no locales are selected, we don't need the locale package
-            if msdpkg['locales']:
+            if not msdpkg['locales']:
                 taskset.discard(locale.LocaleBootstrapPackage)
                 taskset.discard(locale.GenerateLocale)
         if msdpkg.get('exclude_docs', False):
