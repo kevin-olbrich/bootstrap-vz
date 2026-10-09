@@ -216,8 +216,7 @@ def get_fs_specific_group(manifest):
 def get_cleanup_group(manifest):
     from bootstrapvz.common.releases import jessie
 
-    group = [cleanup.ClearMOTD,
-             cleanup.CleanTMP,
+    group = [cleanup.CleanTMP,
              ]
 
     if manifest.release >= jessie:

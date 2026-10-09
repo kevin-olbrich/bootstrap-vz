@@ -56,6 +56,10 @@ Kevin Olbrich:
       system is downloaded through the cache too
     * Stop copying the build host's mount table to /etc/mtab for bookworm and newer on every
       provider (ec2, gce, azure, oracle, virtualbox, docker), as was already done for kvm
+    * Stop touching the build host: kvm ``virtio`` lists its modules in the image's
+      /etc/initramfs-tools/modules (before the initramfs is rebuilt) instead of the host's,
+      SetLocalTimeCopy copies the image's zoneinfo instead of the host's, and the ClearMOTD
+      task, which truncated the host's /var/run/motd and never changed the image, is removed
 
 2017-02-20
 ----------

@@ -4,16 +4,6 @@ import os
 import shutil
 
 
-class ClearMOTD(Task):
-    description = 'Clearing the MOTD'
-    phase = phases.system_cleaning
-
-    @classmethod
-    def run(cls, info):
-        with open('/var/run/motd', 'w', encoding='utf-8'):
-            pass
-
-
 class CleanTMP(Task):
     description = 'Removing temporary files'
     phase = phases.system_cleaning

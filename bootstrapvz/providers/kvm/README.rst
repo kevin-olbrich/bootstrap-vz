@@ -16,7 +16,8 @@ Manifest settings
 Provider
 ~~~~~~~~
 
--  ``virtio``: Specifies which virtio kernel modules to install.
+-  ``virtio``: Specifies which virtio kernel modules to install. They are listed in
+   ``/etc/initramfs-tools/modules`` of the image, so that the initramfs loads them.
    ``optional``
 -  ``console``: Specifies which console should be used for stdout and stderr of init process
    to show startup messages and act as a console in single-user mode. Regardless of

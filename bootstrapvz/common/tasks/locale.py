@@ -69,6 +69,6 @@ class SetLocalTimeCopy(Task):
     def run(cls, info):
         from shutil import copy
         timezone = info.manifest.system['timezone']
-        zoneinfo_path = os.path.join(info.root, '/usr/share/zoneinfo', timezone)
+        zoneinfo_path = os.path.join(info.root, 'usr/share/zoneinfo', timezone)
         localtime_path = os.path.join(info.root, 'etc/localtime')
         copy(zoneinfo_path, localtime_path)
