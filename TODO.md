@@ -175,7 +175,7 @@ in `CHANGELOG.rst`.
     - `get_meta` uses `curl`, which the provider never installs, and sends IMDSv1 requests without a token.
     - `ec2net.hotplug:24` exits unless `runlevel` reports 5.
     - The `RTABLE=${INTERFACE#eth}` arithmetic and the eth1-eth7 stanzas assume `ethN` names, while ENA NICs on Nitro may get predictable names (unverified).
-  - The copy into `/etc/dhcp/dhclient-exit-hooks.d` raises `FileNotFoundError` if isc-dhcp-client is not installed. If trixie or later no longer installs it by default (unverified), this task aborts every EC2 build for that release, including cloud_init builds, so check this first.
+  - The copy into `/etc/dhcp/dhclient-exit-hooks.d` raises `FileNotFoundError` if isc-dhcp-client is not installed. trixie installs dhcpcd-base instead (Debian dhcpcd changelog 1:10.0.10-2), so this task aborts every EC2 trixie build, including cloud_init builds, unless the manifest installs isc-dhcp-client. `manifests/examples/ec2/ebs-trixie-amd64-hvm.yml` does that as a workaround. Running the task against an image root without the directory confirms the crash. Check this first.
   - The audit's statement that "only the iface stanzas have an effect" overlooks the udev-triggered `ifup`.
 
 - **Effort:** medium; **Severity:** low
@@ -945,8 +945,10 @@ Smaller problems found while the October 2026 fixes were made. They are not sche
 - Partition sizes that are not whole MiB (the schema allows for example `1536KiB`) still
   leave the following partitions unaligned. GPT volumes leave one sector unused at the
   end (`pad_end` could be 33 instead of 34).
-- The partition table schema accepts any partition name (for example `home`), but the
-  gpt and msdos maps only use boot, swap and root, so other names are silently ignored.
+- The partition table schema accepts additional partitions (for example `home`) for both
+  table types. GPT creates, mounts and lists them in fstab, but `MSDOSPartitionMap` raises
+  `PartitionError` for them when the volume is loaded, after validation passed. Reject
+  them for msdos during validation.
 - The EC2 S3 path (`S3FStab` in `bootstrapvz/providers/ec2/tasks/filesystem.py`) writes
   `defaults` for the root in fstab and ignores `mountopts`.
 
@@ -974,8 +976,11 @@ Smaller problems found while the October 2026 fixes were made. They are not sche
 
 ### Packages and plugins
 
-- The GCE provider still adds `ntp` unconditionally, which is only a transitional
-  package for ntpsec from bookworm on (`bootstrapvz/providers/gce/tasks/packages.py`).
+- The GCE provider still adds `ntp` and `isc-dhcp-client` unconditionally
+  (`bootstrapvz/providers/gce/tasks/packages.py:21,23`). ntpsec dropped its transitional
+  `ntp` package in 1.2.3+dfsg1-4, so GCE builds for forky and sid probably fail at package
+  installation; trixie still has the old transitional package. isc-dhcp-client is likely
+  gone after trixie too. Install `ntpsec` from bookworm on, as the ntp plugin does.
 - cloud_init: the user drop-in gets its mode from the host umask (the plugin's other
   drop-in is chmod 0644), `debian_cloud.cfg` still uses the deprecated
   `apt_preserve_sources_list`, and `SetCloudInitMountOptions` is misnamed (it copies
@@ -1018,3 +1023,125 @@ Smaller problems found while the October 2026 fixes were made. They are not sche
   boot path.
 - `tests/system/manifests/__init__.py` only globs `*.yml` and `*.json`, and its two glob
   variables have swapped names.
+
+## Bugs found by the new tests
+
+Found while the task body, plugin and release matrix tests and the bookworm and trixie
+examples were written in October 2026. The tests leave these cases out until they are
+fixed.
+
+### Validation and schemas
+
+- debconf: `bootstrapvz/plugins/debconf/manifest-schema.yml:1` declares
+  `$schema: http://json-schema.org/schema#`, so jsonschema warns that the metaschema is
+  unknown and will raise an error in a future version. Use draft-04 like the other schemas.
+- debconf: `validate_manifest` (`bootstrapvz/plugins/debconf/__init__.py:5-6`) runs
+  `debconf-set-selections --checkonly` through `log_check_call`, so malformed selections
+  raise `CalledProcessError` instead of a `ManifestError` at `plugins.debconf`, and even a
+  `--dry-run` needs debconf-set-selections on the host. Use `log_call` and `error()`.
+- file_copy: `mkdirs` has an `items` schema but no `type: array`
+  (`bootstrapvz/plugins/file_copy/manifest-schema.yml:8-9`), so `mkdirs: {dir: /srv}`
+  validates and `MkdirCommand` fails with `TypeError`.
+- salt: `minItems: 1` on the `grains` object has no effect
+  (`bootstrapvz/plugins/salt/manifest-schema.yml:16`), so `grains: {}` validates.
+- prebootstrapped: the `volume.backing` enum leaves out qcow2, vhd and lvm
+  (`bootstrapvz/plugins/prebootstrapped/manifest-schema.yml:9-16`), so for example
+  `manifests/examples/kvm/buster-cloudimg.yml` cannot use the plugin. qcow2 and vhd probably
+  work like vdi and vmdk (unverified).
+- Docker validation accepts arm64 on wheezy, although Debian's arm64 port starts with
+  jessie, so debootstrap would fail. The docker provider has no kernel table to reject it.
+
+### Common tasks
+
+- `GenerateLocale` (`bootstrapvz/common/tasks/locale.py:24-36`) only finds locale.gen
+  entries of the form `<locale>.<charmap> <charmap>`. For `locale: en_US` with
+  `charmap: ISO-8859-1` it searches for `# en_US.ISO-8859-1 ISO-8859-1` and fails with
+  `UnexpectedNumMatchesError` if locale.gen lists `# en_US ISO-8859-1` (the exact Debian
+  line is unverified), and it would set `LANG=en_US.ISO-8859-1`.
+- `apt.WriteConfiguration` (`bootstrapvz/common/tasks/apt.py:129`) sets `decription`
+  instead of `description`, so the build log shows its module path.
+- `CleanTMP` (`bootstrapvz/common/tasks/cleanup.py:13-17`) calls `shutil.rmtree` on every
+  entry of the image's /tmp that is not a regular file, which fails on a symlink, and it
+  fails when `var/log/bootstrap.log` or `dpkg.log` is missing.
+- `InstallPackages.install_local` (`bootstrapvz/common/tasks/packages.py:75-96`) copies
+  local packages to `/tmp/<basename>`, so two .debs with the same file name from
+  different directories overwrite each other.
+- `InstallTrustedKeys` keeps the key's file name, but apt only reads `*.gpg` and `*.asc`
+  in trusted.gpg.d (unverified), so a key with another extension is silently ignored.
+- `RemoveDNSInfo` and `RemoveHostname` (`bootstrapvz/common/tasks/network.py:10-25`)
+  decide with `os.path.isfile`, which follows symlinks from outside the chroot.
+- `DisableSSHDNSLookup` (`bootstrapvz/common/tasks/ssh.py:118`) appends `UseDNS no`
+  without a trailing newline.
+- `get_fs_specific_group` (`bootstrapvz/common/task_groups.py:201-213`) only looks at the
+  boot and root filesystems. An xfs `/var` gets `mkfs.xfs` on the host but no xfsprogs
+  in the image, although fstab checks it, and ext partitions get no `TuneVolumeFS` when
+  root is xfs.
+
+### Providers
+
+- EC2 pvgrub: `UpdateGrubConfig` declares `successors = [grub.WriteGrubConfig]`
+  (`bootstrapvz/providers/ec2/tasks/boot.py:22`), so update-grub runs before
+  /etc/default/grub is written and pv-grub's menu.lst lacks `console=hvc0`,
+  `consoleblank=0`, the timeout and the other settings. Make it a predecessor, and give
+  `ConfigurePVGrub` (line 66) `successors = [grub.WriteGrubConfig]`. Part of the PV path
+  repair.
+- EC2 pvgrub with a separate boot partition: `CreatePVGrubCustomRule` writes
+  `root (hd0,<root index - 1>)` while 40_custom makes kernel paths relative to /boot, so
+  the entry may point at the wrong partition (unverified, no manifest uses this layout).
+- Dead code: `AddBuildEssentialPackage` in `bootstrapvz/providers/ec2/tasks/network.py:31`
+  is not used anywhere.
+- The official GCE manifests install python-google-compute-engine and
+  python3-google-compute-engine, which the current google-guest-agent conflicts with
+  (unverified whether the old per-release suites still resolve this).
+
+### Plugins
+
+- vagrant: `write_ovf` (`bootstrapvz/plugins/vagrant/tasks.py:221-226`) sets namespaced
+  `ovf:uuid`, `ovf:name`, `ovf:lastStateChange` and `ovf:MACAddress` attributes, but
+  `assets/box.ovf` uses unprefixed attributes, so the box keeps the placeholders
+  `{[SYSTEM_UUID]}`, `[BOXNAME]`, `[LAST_CHANGED]` and `[MAC_ADDRESS]` and gains `ns0:*`
+  attributes. The machine `OSType` is always `Debian_64`, also for i386.
+- openvox: `ApplyManifest` removes its temporary hosts line with the unanchored pattern
+  `127.0.0.1\s*{hostname}\n?` (`bootstrapvz/plugins/openvox/tasks.py:92,102`). With the
+  hostname `localhost` it also matches netbase's `127.0.0.1 localhost` line, so `sed_i`
+  raises `UnexpectedNumMatchesError`.
+- minimize_size: with `dpkg: {exclude_docs: true}` and no `locales`, the include list is
+  empty and `assets/bootstrap-files-filter.sh:8` runs `grep --invert-match
+  --fixed-strings ''`, which drops every line, so debootstrap extracts /usr/share/doc
+  after all (`bootstrapvz/plugins/minimize_size/tasks/dpkg.py:48-50`).
+- minimize_size: `path-include=/usr/share/man/man[1-9]`
+  (`bootstrapvz/plugins/minimize_size/tasks/dpkg.py:96`) probably only matches the
+  directories, because dpkg matches with fnmatch, so English man pages of later packages
+  are dropped. `/usr/share/man/man[1-9]/*` likely fixes it (unverified with real dpkg).
+- expand_root on jessie: `InstallGrowpart` installs cloud-guest-utils from
+  jessie-backports, but `resolve_tasks` never adds `apt.AddBackports`, so kvm and
+  virtualbox jessie builds fail with `PackageError` (`bootstrapvz/plugins/expand_root`).
+  Add the backports source for jessie, as cloud_init does for wheezy.
+- apt_proxy: `CheckAptProxy` (`bootstrapvz/plugins/apt_proxy/tasks.py:31-45`) only catches
+  `URLError`. A proxy that accepts the connection but never answers raises
+  `TimeoutError`, so validation ends in a traceback instead of the warning. Catch
+  `OSError`.
+- salt: `BootstrapSaltMinion` leaves `/install_salt.sh` in the image.
+- chef: the `assets` path is used as given, so a relative path resolves against the
+  current directory, while ansible, admin_user and file_copy resolve paths against the
+  manifest.
+- file_copy: directory sources use `shutil.copytree`, which raises `FileExistsError` when
+  the destination already exists in the image (for example a directory copied to
+  /etc/ssh).
+- Long options and `$PATH` lookup (AGENTS.md) are not used by google_cloud_repo
+  (`wget -O`), minimize_size (`/usr/bin/vmware-vdiskmanager -k`) and prebootstrapped
+  (`cp -a`).
+
+### Docs
+
+- The README.rst quick starts for Docker and VirtualBox Vagrant still use jessie
+  examples, and the Docker provider README still claims an 82 MB image. Point them at the
+  new trixie examples.
+- The admin_user README says the plugin disables SSH root login, but it only does so
+  before jessie.
+- The debconf README example uses a folded scalar (`debconf: >-`), which joins the
+  selections into one line. Use `|`.
+- google_cloud_repo does not match Google's current setup: Google documents
+  `/etc/apt/keyrings/google-keyring.gpg` with `signed-by`, gce-configs-trixie replaces the
+  keyring package that `enable_keyring_repo` installs, and `cleanup_bootstrap_key` only
+  works together with `enable_keyring_repo`.
