@@ -1,14 +1,32 @@
+import io
 import os
+import subprocess
+import urllib.error
+import urllib.request
 from unittest import mock
-from bootstrapvz.base.bootstrapinfo import BootstrapInformation
+import pytest
+from bootstrapvz.base.bootstrapinfo import BootstrapInformation, DictClass
 from bootstrapvz.base.manifest import Manifest
 from bootstrapvz.base.tasklist import load_tasks
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import bootstrap
 from bootstrapvz.common.tools import load_data
+from bootstrapvz.plugins.apt_proxy import tasks
 
 example = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                        '../../manifests/examples/kvm/buster-cloudimg.yml')
+
+
+@pytest.fixture(autouse=True)
+def no_external_commands(monkeypatch):
+    """Fails the test when a command that the test does not mock would run on the host.
+    tools.log_call and tools.log_check_call start their commands through subprocess.Popen, so they fail too.
+    They are not replaced by name: a module that imports them while the test runs would keep the
+    replacement for the rest of the session.
+    """
+    def refuse(*args, **kwargs):
+        raise AssertionError('runs a command: {args}'.format(args=args or kwargs))
+    monkeypatch.setattr(subprocess, 'Popen', refuse)
 
 
 def debootstrap_environments(tmp_path, apt_proxy=None):
@@ -49,3 +67,51 @@ def test_debootstrap_without_apt_proxy(tmp_path, monkeypatch):
     monkeypatch.delenv('http_proxy', raising=False)
     for env in debootstrap_environments(tmp_path):
         assert 'http_proxy' not in env
+
+
+def proxy_info(tmp_path, settings):
+    root = tmp_path / 'root'
+    (root / 'etc/apt/apt.conf.d').mkdir(parents=True)
+    return DictClass(root=str(root), manifest=DictClass(plugins={'apt_proxy': settings}))
+
+
+@pytest.mark.parametrize('credentials, url', [({'username': 'user', 'password': 'secret'},
+                                               'http://user:secret@cache.example.org:3142'),
+                                              # The username is ignored without a password
+                                              ({'username': 'user'}, 'http://cache.example.org:3142')],
+                         ids=['credentials', 'username only'])
+def test_apt_uses_proxy_until_cleanup(tmp_path, credentials, url):
+    info = proxy_info(tmp_path, {'address': 'cache.example.org', 'port': 3142, **credentials})
+    tasks.SetAptProxy.run(info)
+    proxy_conf = tmp_path / 'root/etc/apt/apt.conf.d/02proxy'
+    assert proxy_conf.read_text(encoding='utf-8') == 'Acquire::http {{ Proxy "{url}"; }};\n'.format(url=url)
+    tasks.RemoveAptProxy.run(info)
+    assert not proxy_conf.exists()
+
+
+@pytest.mark.parametrize('settings, persistent', [({}, False),
+                                                  ({'persistent': False}, False),
+                                                  ({'persistent': True}, True)],
+                         ids=['default', 'not persistent', 'persistent'])
+def test_persistent_proxy_stays_in_image(settings, persistent):
+    data = load_data(example)
+    data['plugins']['apt_proxy'] = {'address': '127.0.0.1', 'port': 3142, **settings}
+    taskset = load_tasks('resolve_tasks', Manifest(path=example, data=data))
+    assert tasks.SetAptProxy in taskset
+    assert (tasks.RemoveAptProxy not in taskset) == persistent
+
+
+@pytest.mark.parametrize('error, warned', [
+    (None, False),
+    # apt-cacher-ng answers a request for its own address with a usage page
+    (urllib.error.HTTPError('http://127.0.0.1:3142', 406, 'Usage Information', {}, None), False),
+    (urllib.error.URLError(ConnectionRefusedError(111, 'Connection refused')), True),
+], ids=['reachable', 'apt-cacher-ng', 'refused'])
+def test_unreachable_proxy_warned(tmp_path, monkeypatch, caplog, error, warned):
+    def urlopen(url, timeout):
+        if error is not None:
+            raise error
+        return io.BytesIO(b'')
+    monkeypatch.setattr(urllib.request, 'urlopen', urlopen)
+    tasks.CheckAptProxy.run(proxy_info(tmp_path, {'address': '127.0.0.1', 'port': 3142}))
+    assert ('The APT proxy server couldn\'t be reached' in caplog.text) == warned
