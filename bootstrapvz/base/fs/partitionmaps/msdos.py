@@ -32,25 +32,13 @@ class MSDOSPartitionMap(AbstractPartitionMap):
                                        data['boot'].get('mountopts', None), 'boot', last_partition())
             self.partitions.append(self.boot)
 
-        # Offset all partitions by 1 sector.
-        # parted in jessie has changed and no longer allows
-        # partitions to be right next to each other.
-        partition_gap = Sectors(1, sector_size)
-
         if 'swap' in data:
             self.swap = MSDOSSwapPartition(Sectors(data['swap']['size'], sector_size), last_partition())
-            if self.swap.previous is not None:
-                # No need to pad if this is the first partition
-                self.swap.pad_start += partition_gap
-                self.swap.size -= partition_gap
             self.partitions.append(self.swap)
 
         self.root = MSDOSPartition(Sectors(data['root']['size'], sector_size),
                                    data['root']['filesystem'], data['root'].get('format_command', None),
                                    data['root'].get('mountopts', None), 'root', last_partition())
-        if self.root.previous is not None:
-            self.root.pad_start += partition_gap
-            self.root.size -= partition_gap
         self.partitions.append(self.root)
 
         # Raise exception while trying to create additional partitions
@@ -66,27 +54,22 @@ class MSDOSPartitionMap(AbstractPartitionMap):
         # If we are using the grub bootloader, we will need to add a 2 MB offset
         # at the beginning of the partitionmap and steal it from the first partition.
         # The MBR offset is included in the grub offset, so if we don't use grub
-        # we should reduce the size of the first partition and move it by only 512 bytes.
+        # we should reduce the size of the first partition and move it by only 1MiB,
+        # so that it is aligned.
         if bootloader == 'grub':
             mbr_offset = Sectors('2MiB', sector_size)
         else:
-            mbr_offset = Sectors('512B', sector_size)
+            mbr_offset = Sectors('1MiB', sector_size)
 
         self.partitions[0].pad_start += mbr_offset
         self.partitions[0].size -= mbr_offset
-
-        # Leave the last sector unformatted
-        # parted in jessie thinks that a partition 10 sectors in size
-        # goes from sector 0 to sector 9 (instead of 0 to 10)
-        self.partitions[-1].pad_end += 1
-        self.partitions[-1].size -= 1
 
         super().__init__(bootloader)
 
     def _before_create(self, event):
         volume = event.volume
-        # Disk alignment still plays a role in virtualized environment,
-        # but I honestly have no clue as to what best practice is here, so we choose 'none'
+        # parted must use the partition boundaries computed in __init__ as they are,
+        # they already take care of the alignment
         log_check_call(['parted', '--script', '--align', 'none', volume.device_path,
                         '--', 'mklabel', 'msdos'])
         # Create the partitions

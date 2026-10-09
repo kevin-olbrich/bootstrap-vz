@@ -101,6 +101,7 @@ class BasePartition(AbstractPartition):
         #   fs-type can be one of "fat16", "fat32", "ext2", "HFS", "linux-swap",
         #   "NTFS", "reiserfs", or "ufs".
         # - start and end are just Bytes objects coerced into strings
+        # - parted includes the end sector in the partition, so end is the last sector of it
         if self.filesystem == 'swap':
             fs_type = 'linux-swap'
         else:
@@ -108,7 +109,7 @@ class BasePartition(AbstractPartition):
         create_command = ('mkpart primary {fs_type} {start} {end}'
                           .format(fs_type=fs_type,
                                   start=str(self.get_start() + self.pad_start),
-                                  end=str(self.get_end() - self.pad_end)))
+                                  end=str(self.get_end() - self.pad_end - 1)))
         # Create the partition
         log_check_call(['parted', '--script', '--align', 'none', e.volume.device_path,
                         '--', create_command])

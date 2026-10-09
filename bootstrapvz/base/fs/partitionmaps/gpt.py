@@ -32,35 +32,20 @@ class GPTPartitionMap(AbstractPartitionMap):
             self.grub_boot = UnformattedPartition(Sectors('1MiB', sector_size), last_partition())
             self.partitions.append(self.grub_boot)
 
-        # Offset all partitions by 1 sector.
-        # parted in jessie has changed and no longer allows
-        # partitions to be right next to each other.
-        partition_gap = Sectors(1, sector_size)
-
         # The boot and swap partitions are optional
         if 'boot' in data:
             self.boot = GPTPartition(Sectors(data['boot']['size'], sector_size),
                                      data['boot']['filesystem'], data['boot'].get('format_command', None),
                                      data['boot'].get('mountopts', None), 'boot', last_partition())
-            if self.boot.previous is not None:
-                # No need to pad if this is the first partition
-                self.boot.pad_start += partition_gap
-                self.boot.size -= partition_gap
             self.partitions.append(self.boot)
 
         if 'swap' in data:
             self.swap = GPTSwapPartition(Sectors(data['swap']['size'], sector_size), last_partition())
-            if self.swap.previous is not None:
-                self.swap.pad_start += partition_gap
-                self.swap.size -= partition_gap
             self.partitions.append(self.swap)
 
         self.root = GPTPartition(Sectors(data['root']['size'], sector_size),
                                  data['root']['filesystem'], data['root'].get('format_command', None),
                                  data['root'].get('mountopts', None), 'root', last_partition())
-        if self.root.previous is not None:
-            self.root.pad_start += partition_gap
-            self.root.size -= partition_gap
         self.partitions.append(self.root)
 
         # Create all additional partitions
@@ -69,8 +54,6 @@ class GPTPartitionMap(AbstractPartitionMap):
                 part_tmp = GPTPartition(Sectors(data[partition]['size'], sector_size),
                                         data[partition]['filesystem'], data[partition].get('format_command', None),
                                         data[partition].get('mountopts', None), partition, last_partition())
-                part_tmp.pad_start += partition_gap
-                part_tmp.size -= partition_gap
                 setattr(self, partition, part_tmp)
                 self.partitions.append(part_tmp)
 
@@ -83,10 +66,15 @@ class GPTPartitionMap(AbstractPartitionMap):
             # Not using grub, mark the boot partition or root as bootable
             getattr(self, 'boot', self.root).flags.append('legacy_boot')
 
-        # The first and last 34 sectors are reserved for the primary/secondary GPT
-        primary_gpt_size = Sectors(34, sector_size)
-        self.partitions[0].pad_start += primary_gpt_size
-        self.partitions[0].size -= primary_gpt_size
+        # The first and last 34 sectors are reserved for the primary/secondary GPT.
+        # The grub partition fills the space between the primary GPT and 1MiB,
+        # without it the first partition starts at 1MiB, so that it is aligned.
+        if hasattr(self, 'grub_boot'):
+            gpt_offset = Sectors(34, sector_size)
+        else:
+            gpt_offset = Sectors('1MiB', sector_size)
+        self.partitions[0].pad_start += gpt_offset
+        self.partitions[0].size -= gpt_offset
 
         secondary_gpt_size = Sectors(34, sector_size)
         self.partitions[-1].pad_end += secondary_gpt_size
@@ -98,8 +86,8 @@ class GPTPartitionMap(AbstractPartitionMap):
         """Creates the partition map
         """
         volume = event.volume
-        # Disk alignment still plays a role in virtualized environment,
-        # but I honestly have no clue as to what best practice is here, so we choose 'none'
+        # parted must use the partition boundaries computed in __init__ as they are,
+        # they already take care of the alignment
         log_check_call(['parted', '--script', '--align', 'none', volume.device_path,
                         '--', 'mklabel', 'gpt'])
         # Create the partitions

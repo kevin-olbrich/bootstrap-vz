@@ -41,6 +41,9 @@ Kevin Olbrich:
       when mounting and in /etc/fstab instead of silently ignoring them
     * Run tasks without an ordering constraint in a fixed order (by module path and class name),
       so every build of the same manifest runs its tasks in the same order
+    * Start every partition on a 1MiB boundary: pass parted the last sector of each partition
+      instead of padding with a one-sector gap, which left every partition after the first at an
+      odd sector. Without grub, the first partition now starts at 1MiB
 
 2017-02-20
 ----------
