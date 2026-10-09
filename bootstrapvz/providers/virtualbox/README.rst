@@ -15,6 +15,10 @@ provided in the manifest.
 VirtualBox Additions iso can be installed from main Debian repo by running:
 `apt install virtualbox-guest-additions-iso`
 
+With the ``grub`` bootloader the boot messages also show on the virtual
+console (``console=tty0``). ``extlinux`` images only send them to the
+serial console (``console=ttyS0``).
+
 
 Manifest settings
 -----------------

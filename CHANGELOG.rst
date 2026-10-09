@@ -76,6 +76,9 @@ Kevin Olbrich:
       ntpd also syncs with fewer than three servers
     * docker_daemon: add ``cgroup_enable=memory`` to the kernel command line only for grub and
       pvgrub images, so builds with extlinux or no bootloader no longer crash
+    * virtualbox, kvm: add the grub console tasks only with the grub bootloader, so VirtualBox
+      extlinux builds and kvm ``console: virtual`` builds with extlinux or no bootloader no
+      longer crash
 
 2017-02-20
 ----------

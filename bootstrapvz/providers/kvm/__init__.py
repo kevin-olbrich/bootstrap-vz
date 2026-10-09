@@ -34,13 +34,12 @@ def resolve_tasks(taskset, manifest):
 
     if manifest.provider.get('console', False):
         if manifest.provider['console'] == 'virtual':
-            taskset.update([boot.SetGrubConsolOutputDeviceToVirtual])
+            if manifest.system['bootloader'] == 'grub':
+                taskset.update([boot.SetGrubConsolOutputDeviceToVirtual])
 
             from bootstrapvz.common.releases import jessie
             if manifest.release >= jessie:
-                taskset.update([boot.SetGrubConsolOutputDeviceToVirtual,
-                                boot.SetSystemdTTYVTDisallocate,
-                                ])
+                taskset.update([boot.SetSystemdTTYVTDisallocate])
 
 
 def resolve_rollback_tasks(taskset, manifest, completed, counter_task):

@@ -14,11 +14,13 @@ def resolve_tasks(taskset, manifest):
     taskset.update(task_groups.get_standard_groups(manifest))
 
     taskset.update([packages.DefaultPackages,
-                    boot.AddVirtualConsoleGrubOutputDevice,
                     loopback.AddRequiredCommands,
                     loopback.Create,
                     image.MoveImage,
                     ])
+
+    if manifest.system['bootloader'] == 'grub':
+        taskset.add(boot.AddVirtualConsoleGrubOutputDevice)
 
     if manifest.provider.get('guest_additions', False):
         from .tasks import guest_additions
