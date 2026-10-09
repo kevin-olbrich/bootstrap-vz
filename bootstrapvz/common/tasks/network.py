@@ -35,8 +35,10 @@ class SetHostname(Task):
             hostname_file.write(hostname)
 
         hosts_path = os.path.join(info.root, 'etc/hosts')
-        from bootstrapvz.common.tools import sed_i
-        sed_i(hosts_path, '^127.0.0.1\tlocalhost$', '127.0.0.1\tlocalhost\n127.0.1.1\t' + hostname)
+        # netbase creates /etc/hosts, so minbase has none unless netbase is installed
+        if os.path.isfile(hosts_path):
+            from bootstrapvz.common.tools import sed_i
+            sed_i(hosts_path, '^127.0.0.1\tlocalhost$', '127.0.0.1\tlocalhost\n127.0.1.1\t' + hostname)
 
 
 class ConfigureNetworkIF(Task):

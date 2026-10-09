@@ -50,6 +50,8 @@ Settings
    Default: ``openvox8``
    ``optional``
 -  ``manifest``: Path to the Puppet manifest that should be applied.
+   When ``system.hostname`` is set, the manifest is applied after the host
+   name has been written to ``/etc/hostname``.
    ``optional``
 -  ``assets``: Path to OpenVox assets. The contents will be copied into
    ``/etc/puppetlabs`` on the image. Any existing files will be overwritten.

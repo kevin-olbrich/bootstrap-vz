@@ -2,6 +2,7 @@ import os
 from bootstrapvz.base import Task
 from bootstrapvz.common import phases
 from bootstrapvz.common.tasks import apt
+from bootstrapvz.common.tasks import network
 from bootstrapvz.common.tools import sed_i, log_check_call, rel_path
 
 ASSETS_DIR = rel_path(__file__, 'assets')
@@ -79,7 +80,9 @@ class CopyAssets(Task):
 class ApplyManifest(Task):
     description = 'Applying the Puppet manifest with OpenVox.'
     phase = phases.system_modification
-    predecessors = [CopyAssets]
+    # Read the final hostname. On a tree without netbase, SetHostname also cannot
+    # edit the /etc/hosts this task leaves behind
+    predecessors = [CopyAssets, network.SetHostname]
 
     @classmethod
     def run(cls, info):

@@ -60,6 +60,10 @@ Kevin Olbrich:
       /etc/initramfs-tools/modules (before the initramfs is rebuilt) instead of the host's,
       SetLocalTimeCopy copies the image's zoneinfo instead of the host's, and the ClearMOTD
       task, which truncated the host's /var/run/motd and never changed the image, is removed
+    * minbase images (all Docker examples) no longer keep the build host's /etc/resolv.conf and
+      /etc/hostname, and ``system.hostname`` is no longer ignored for them; only the network
+      interface configuration is still skipped for minbase without netbase. openvox applies its
+      manifest after ``system.hostname`` is written
 
 2017-02-20
 ----------

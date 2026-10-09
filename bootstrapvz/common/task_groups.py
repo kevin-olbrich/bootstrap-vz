@@ -106,14 +106,13 @@ ssh_group = [ssh.AddOpenSSHPackage,
 
 
 def get_network_group(manifest):
+    group = [network.RemoveDNSInfo]
+    # minbase has no networking, but debootstrap still copies resolv.conf and hostname from the host
     if (
-       manifest.bootstrapper.get('variant', None) == 'minbase' and
-       'netbase' not in manifest.bootstrapper.get('include_packages', [])
+       manifest.bootstrapper.get('variant', None) != 'minbase' or
+       'netbase' in manifest.bootstrapper.get('include_packages', [])
        ):
-        # minbase has no networking
-        return []
-    group = [network.ConfigureNetworkIF,
-             network.RemoveDNSInfo]
+        group.append(network.ConfigureNetworkIF)
     if manifest.system.get('hostname', False):
         group.append(network.SetHostname)
     else:
