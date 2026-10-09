@@ -7,6 +7,8 @@ installation of `virtio kernel
 modules <http://www.linux-kvm.org/page/Virtio>`__ (paravirtualized
 drivers for IO operations).
 It also supports creating an image with LVM and qcow2 as a disk backend.
+``arm64`` images (jessie and later) need ``bootloader: none``, because
+the grub and extlinux bootloaders only support ``i386`` and ``amd64``.
 
 Manifest settings
 -----------------

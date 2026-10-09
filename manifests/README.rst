@@ -147,12 +147,16 @@ system and does not fit under any other section.
 
 -  ``architecture``: The architecture of the system.
    Valid values: ``i386, amd64, arm64``
-   (``i386`` only up to Debian bookworm, Debian dropped it in trixie)
+   (``i386`` only up to Debian bookworm, Debian dropped it in trixie).
+   Providers that install a kernel only accept an architecture they
+   have a kernel package for on the release. Only kvm has ``arm64``
+   kernels (from jessie on).
    ``required``
 -  ``bootloader``: The bootloader for the system. Depending on the
    bootmethod of the virtualization platform, the options may be
    restricted.
    Valid values: ``grub, extlinux, pv-grub``
+   (``grub`` and ``extlinux`` only on ``i386`` and ``amd64``)
    ``required``
 -  ``charmap``: The default charmap of the system.
    Valid values: Any valid charmap like ``UTF-8``, ``ISO-8859-`` or

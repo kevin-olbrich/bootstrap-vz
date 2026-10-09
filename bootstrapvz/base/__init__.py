@@ -28,6 +28,10 @@ def validate_manifest(data, validator, error):
     if release >= trixie and data['system']['architecture'] == 'i386':
         error('The i386 architecture is only supported up to Debian bookworm', ['system', 'architecture'])
 
+    # The grub and extlinux tasks install the x86 only grub-pc and extlinux packages
+    if data['system']['architecture'] == 'arm64' and data['system']['bootloader'] in ['grub', 'extlinux']:
+        error('Grub and extlinux only support the i386 and amd64 architectures', ['system', 'bootloader'])
+
     # Check the bootloader/partitioning configuration.
     # Doing this via the schema is a pain and does not output a useful error message.
     if data['system']['bootloader'] == 'grub':

@@ -8,6 +8,7 @@ interoperability (e.g.
 `OVF <http://en.wikipedia.org/wiki/Open_Virtualization_Format>`__ files
 *should* support vdi files, but since they have no identifier URL not
 even VirtualBox itself can import them).
+The provider supports the ``i386`` and ``amd64`` architectures.
 
 VirtualBox Guest Additions can be installed automatically if the ISO is
 provided in the manifest.

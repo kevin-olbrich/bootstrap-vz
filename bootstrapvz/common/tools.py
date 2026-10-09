@@ -107,9 +107,31 @@ def load_data(path):
 
 def config_get(path, config_path):
     config = load_data(path)
-    for key in config_path:
-        config = config.get(key)
+    for depth, key in enumerate(config_path, start=1):
+        if key not in config:
+            raise KeyError('{path} has no entry for {keys}'
+                           .format(path=path, keys='.'.join(config_path[:depth])))
+        config = config[key]
     return config
+
+
+def validate_kernel_architecture(data, kernel_packages_path, error):
+    """Rejects a manifest when the kernel table of its provider has no kernel package
+    for the release and architecture of the manifest
+
+    :param dict data: The data of the manifest
+    :param str kernel_packages_path: Path to the kernel table (packages-kernels.yml) of the provider
+    :param function error: The function that raises an error when the validation fails
+    """
+    from .releases import get_release
+    release = get_release(data['system']['release'])
+    architecture = data['system']['architecture']
+    try:
+        config_get(kernel_packages_path, [release.codename, architecture])
+    except KeyError:
+        error('The {provider} provider has no kernel for the {arch} architecture on Debian {release}'
+              .format(provider=data['provider']['name'], arch=architecture, release=release.codename),
+              ['system', 'architecture'])
 
 
 def copy_tree(from_path, to_path):

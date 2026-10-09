@@ -34,6 +34,9 @@ Kevin Olbrich:
       and partition mistakes on the right key, and name a misspelled ``system.release`` in the
       error. The volume schema is stricter: ``backing`` is required, and the lvm backing needs
       both ``volumegroup`` and ``logicalvolume``
+    * Reject manifests whose provider has no kernel for the release and architecture (for
+      example EC2 arm64 or GCE i386), arm64 with the grub or extlinux bootloader, and VirtualBox
+      on arm64 during validation instead of failing during the build
 
 2017-02-20
 ----------

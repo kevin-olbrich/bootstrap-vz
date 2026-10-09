@@ -4,8 +4,9 @@ from .tasks import packages, boot
 
 
 def validate_manifest(data, validator, error):
-    from bootstrapvz.common.tools import rel_path
+    from bootstrapvz.common.tools import rel_path, validate_kernel_architecture
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
+    validate_kernel_architecture(data, rel_path(__file__, 'tasks/packages-kernels.yml'), error)
 
 
 def resolve_tasks(taskset, manifest):

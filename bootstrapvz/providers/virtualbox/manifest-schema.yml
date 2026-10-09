@@ -12,6 +12,9 @@ properties:
   system:
     type: object
     properties:
+      architecture:
+        type: string
+        enum: [i386, amd64]
       bootloader:
         type: string
         enum:

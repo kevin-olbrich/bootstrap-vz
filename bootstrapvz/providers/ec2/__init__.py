@@ -5,11 +5,12 @@ import bootstrapvz.common.tasks.filesystem
 import bootstrapvz.common.tasks.grub
 import bootstrapvz.common.tasks.initd
 from bootstrapvz.common.tasks import apt, kernel, loopback, volume
-from bootstrapvz.common.tools import rel_path
+from bootstrapvz.common.tools import rel_path, validate_kernel_architecture
 
 
 def validate_manifest(data, validator, error):
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
+    validate_kernel_architecture(data, rel_path(__file__, 'tasks/packages-kernels.yml'), error)
 
     from bootstrapvz.common.bytes import Bytes
     if data['volume']['backing'] == 'ebs':
