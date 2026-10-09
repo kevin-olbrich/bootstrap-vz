@@ -22,6 +22,9 @@ class InstallInitScripts(Task):
             copy(src, dst)
             os.chmod(dst, rwxr_xr_x)
             if info.manifest.release > jessie:
+                # systemd v260 dropped support for SysV scripts, so each script
+                # comes with a native unit next to it that runs the script
+                copy(src + '.service', os.path.join(info.root, 'etc/systemd/system', name + '.service'))
                 log_check_call(['chroot', info.root, 'systemctl', 'enable', name])
             else:
                 log_check_call(['chroot', info.root, 'insserv', '--default', name])

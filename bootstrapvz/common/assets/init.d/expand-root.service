@@ -1,0 +1,16 @@
+# This file was created by bootstrap-vz.
+# See https://github.com/kevin-olbrich/bootstrap-vz/blob/master/LICENSE for
+# legal notices and disclaimers.
+
+[Unit]
+Description=Expand the filesystem of the mounted root volume/partition to its maximum possible size
+
+[Service]
+ExecStart=/etc/init.d/expand-root start
+Type=oneshot
+RemainAfterExit=yes
+# The units systemd generated for the SysV script did not ignore SIGPIPE either
+IgnoreSIGPIPE=no
+
+[Install]
+WantedBy=multi-user.target

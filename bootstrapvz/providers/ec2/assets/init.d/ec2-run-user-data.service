@@ -1,0 +1,20 @@
+# This file was created by bootstrap-vz.
+# See https://github.com/kevin-olbrich/bootstrap-vz/blob/master/LICENSE for
+# legal notices and disclaimers.
+
+[Unit]
+Description=Run instance user-data if it looks like a script
+After=ec2-get-credentials.service
+
+[Service]
+ExecStart=/etc/init.d/ec2-run-user-data start
+# The script ends with `insserv -r`, which only removes its SysV links. Disable the unit
+# when that succeeded, so user-data still runs only once.
+ExecStartPost=/bin/systemctl --no-reload disable ec2-run-user-data.service
+Type=oneshot
+RemainAfterExit=yes
+# The units systemd generated for the SysV script did not ignore SIGPIPE either
+IgnoreSIGPIPE=no
+
+[Install]
+WantedBy=multi-user.target

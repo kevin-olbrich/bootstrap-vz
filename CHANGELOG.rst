@@ -79,6 +79,11 @@ Kevin Olbrich:
     * virtualbox, kvm: add the grub console tasks only with the grub bootloader, so VirtualBox
       extlinux builds and kvm ``console: virtual`` builds with extlinux or no bootloader no
       longer crash
+    * Start expand-root, ec2-get-credentials and ec2-run-user-data from native systemd units on
+      stretch and newer, because systemd v260 removed support for SysV init scripts;
+      ec2-run-user-data still runs only once. The expand_root plugin now replaces the common
+      expand-root script, and the redundant ssh-generate-hostkeys init script is no longer
+      installed
 
 2017-02-20
 ----------

@@ -37,8 +37,6 @@ class AddSSHKeyGeneration(Task):
             elif info.manifest.release == jessie:
                 install['generate-ssh-hostkeys'] = os.path.join(init_scripts_dir, 'jessie/generate-ssh-hostkeys')
             else:
-                install['ssh-generate-hostkeys'] = os.path.join(init_scripts_dir, 'ssh-generate-hostkeys')
-
                 ssh_keygen_host_service = os.path.join(systemd_dir, 'ssh-generate-hostkeys.service')
                 ssh_keygen_host_service_dest = os.path.join(info.root, 'etc/systemd/system/ssh-generate-hostkeys.service')
 

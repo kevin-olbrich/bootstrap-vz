@@ -12,7 +12,10 @@ is used, special startup scripts will be installed that automatically fetch the
 configured authorized\_key from the instance metadata and save or run
 any userdata supplied (if the userdata begins with ``#!`` it will be
 run). Set the variable ``install_init_scripts`` to ``False`` in order
-to disable this behaviour.
+to disable this behaviour. On releases newer than jessie, these scripts
+and the script that expands the root volume are run by native systemd
+units of the same name, because systemd v260 removed support for SysV
+init scripts.
 
 Manifest settings
 -----------------

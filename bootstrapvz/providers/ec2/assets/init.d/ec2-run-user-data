@@ -16,8 +16,9 @@
 #
 # Only retrieves and runs the user-data script once per instance.  If
 # you want the user-data script to run again (e.g., on the next boot)
-# then readd this script with insserv:
+# then readd this script with insserv, or enable its unit on systemd releases:
 #   insserv -d ec2-run-user-data
+#   systemctl enable ec2-run-user-data.service
 #
 prog=$(basename $0)
 logger="logger -t $prog"

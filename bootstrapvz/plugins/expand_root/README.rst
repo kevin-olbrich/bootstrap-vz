@@ -1,7 +1,7 @@
 Expand Root
 -----------
 
-This plugin adds support to expand the root partition and filesystem dynamically on boot. It adds a shell script to call growpart and the proper filesystem expansion tool for a given device, partition, and filesystem. The growpart script is part of the cloud-guest-utils package in stretch and jessie-backports. The version of this script in jessie is broken in several ways and so this plugin installs the version from jessie-backports which works correctly. This plugin should not be used in conjunction with common.tasks.initd.AddExpandRoot and common.tasks.initd.AdjustExpandRootScript. It is meant to replace the existing internal common version of expand-root.
+This plugin adds support to expand the root partition and filesystem dynamically on boot. It adds a shell script to call growpart and the proper filesystem expansion tool for a given device, partition, and filesystem. The growpart script is part of the cloud-guest-utils package in stretch and jessie-backports. The version of this script in jessie is broken in several ways and so this plugin installs the version from jessie-backports which works correctly. It replaces the existing internal common version of expand-root (common.tasks.initd.AddExpandRoot and common.tasks.initd.AdjustExpandRootScript), which it removes from the task list.
 
 Settings
 ~~~~~~~~
