@@ -74,6 +74,8 @@ Kevin Olbrich:
     * ntp: install ntpsec and edit /etc/ntpsec/ntp.conf on bookworm and newer, where ntp is only
       a transitional package, and drop the default ``tos`` lines when ``servers`` are set so
       ntpd also syncs with fewer than three servers
+    * docker_daemon: add ``cgroup_enable=memory`` to the kernel command line only for grub and
+      pvgrub images, so builds with extlinux or no bootloader no longer crash
 
 2017-02-20
 ----------

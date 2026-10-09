@@ -12,6 +12,10 @@ Docker publishes packages for Debian ``buster``, ``bullseye``,
 ``bookworm`` and ``trixie`` on the ``amd64`` and ``arm64``
 architectures supported by this plugin.
 
+When the image boots with grub (bootloader ``grub`` or ``pvgrub``),
+the plugin adds ``cgroup_enable=memory`` to the kernel command line.
+With ``extlinux`` or ``none`` the kernel command line is left as is.
+
 Settings
 ~~~~~~~~
 

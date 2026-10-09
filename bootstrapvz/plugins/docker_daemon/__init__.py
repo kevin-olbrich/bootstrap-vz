@@ -22,7 +22,9 @@ def resolve_tasks(taskset, manifest):
     taskset.add(tasks.AddDockerAptSource)
     taskset.add(tasks.InstallDockerAptKey)
     taskset.add(tasks.AddDockerPackages)
-    taskset.add(tasks.EnableMemoryCgroup)
+    # Only these bootloaders create the grub configuration that EnableMemoryCgroup edits
+    if manifest.system['bootloader'] in ('grub', 'pvgrub'):
+        taskset.add(tasks.EnableMemoryCgroup)
     if 'version' in settings:
         taskset.add(tasks.PinDockerVersion)
         # Only added by default when the manifest has its own preferences
