@@ -75,6 +75,8 @@ deliberate project convention, and document why in `pylintrc`.
   the integration tests, so a manifest must stay valid after a schema change.
 - `docs/`: Sphinx sources. `docs/conf.py` generates the provider and plugin pages
   from their `README.rst`, and `docs/transform_github_links.py` rewrites links.
+- `TODO.md`: open findings from the October 2026 audit and decisions still to make.
+  Remove an entry when its fix lands.
 
 ## Conventions
 These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
