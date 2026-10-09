@@ -27,6 +27,9 @@ Kevin Olbrich:
     * Remove remote bootstrapping (``bootstrap-vz-remote``, ``bootstrap-vz-server`` and the
       Pyro4 dependency). Images are built by running ``bootstrap-vz`` on the build host. The
       system tests build locally and read their settings from ``system-tests.yml``
+    * Replace setup.py with pyproject.toml and manage dependencies with uv: ``uv sync`` installs
+      bootstrap-vz, ``uv.lock`` pins every dependency, and tox installs its envs from the lockfile
+      through tox-uv. The package no longer installs a top-level ``tests`` package
 
 2017-02-20
 ----------

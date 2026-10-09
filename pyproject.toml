@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools >= 77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bootstrap-vz"
+dynamic = ["version"]
+description = "Bootstrap Debian images for virtualized environments"
+readme = {content-type = "text/plain", text = """bootstrap-vz is a bootstrapping framework for Debian.
+It is is specifically targeted at bootstrapping systems for virtualized environments.
+bootstrap-vz runs without any user intervention and generates ready-to-boot images for
+a number of virtualization platforms.
+Its aim is to provide a reproducible bootstrapping process using manifests
+as well as supporting a high degree of customizability through plugins."""}
+requires-python = ">= 3.13"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{name = "Anders Ingemann", email = "anders@ingemann.de"}]
+maintainers = [{name = "Kevin Olbrich", email = "ko@sv01.de"}]
+dependencies = [
+    "termcolor >= 1.1.0",
+    "fysom >= 1.0.15",
+    "jsonschema >= 2.3.0",
+    "pyyaml >= 3.10",
+    "boto3 >= 1.4.2",
+    "docopt >= 0.6.1",
+    "pyrfc3339 >= 1.0",
+    "requests >= 2.4.3",
+    "JSON_minify >= 0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kevin-olbrich/bootstrap-vz"
+
+[project.scripts]
+bootstrap-vz = "bootstrapvz.base:main"
+
+# One group per tox env. tox installs them from uv.lock
+[dependency-groups]
+dev = ["tox >= 4.22", "tox-uv >= 1.20"]
+flake8 = ["flake8"]
+pylint = ["pylint", "pytest", "virtualbox"]
+yamllint = ["yamllint"]
+test = ["pytest"]
+system = ["pytest", "pytest-html", "virtualbox >= 2.0.0"]
+docs = ["sphinx != 1.5", "sphinx_rtd_theme"]
+
+[tool.setuptools.dynamic]
+version = {attr = "bootstrapvz.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["bootstrapvz*"]

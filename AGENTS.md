@@ -22,32 +22,38 @@ These rules favor caution over speed. For trivial tasks, use judgment.
   for which checks can currently run.
 
 ## Stack
-- Python 3.13 only (`python_requires='>=3.13'` in `setup.py`, `basepython` in `tox.ini`).
+- Python 3.13 only (`requires-python` in `pyproject.toml`, `basepython` in `tox.ini`).
   Use `python3` in shebangs and invocations, never bare `python`.
-- Packaging: `setup.py` (setuptools). Version lives in `bootstrapvz/__init__.py`.
+- Packaging: `pyproject.toml` (setuptools backend). Version lives in `bootstrapvz/__init__.py`.
+- Dependencies are managed with `uv`, never with pip. Runtime dependencies go in
+  `[project] dependencies`, tool dependencies in the `[dependency-groups]` group of
+  their tox env (`dev` holds tox and tox-uv). `uv.lock` pins all of them: after
+  changing dependencies run `uv lock` and commit `uv.lock`, because CI runs with
+  `--locked` and fails on a stale lockfile.
 - Main libraries: `fysom` (task state machine), `jsonschema` + `pyyaml` (manifest
   validation), `boto3` (EC2).
-- All checks run through `tox`. CI (`.github/workflows/ci.yml`) runs each tox env
-  on GitHub Actions.
+- All checks run through `tox`, and tox-uv installs each env from `uv.lock`. CI
+  (`.github/workflows/ci.yml`) runs each tox env on GitHub Actions.
 - Docs: Sphinx (`docs/`), published on Read the Docs.
 
 ## Commands
-Run these from the repository root. They need a `python3.13` interpreter and `tox`.
+Run these from the repository root. They need `uv` and a `python3.13` interpreter.
 
 ```sh
-python3.13 -m pip install tox                    # setup
-tox -e flake8                                    # style check (max line length 110)
-tox -e pylint                                    # static analysis (pylintrc)
-tox -e yamllint                                  # lint manifests/ (max line length 160)
-tox -e unit                                      # unit tests (tests/unit)
-tox -e unit -- tests/unit/releases_tests.py::test_lt  # a single test (pytest)
-tox -e integration                               # dry-run every manifest in manifests/
-tox -e docs                                      # Sphinx build with -W (warnings are errors)
-./bootstrap-vz --dry-run manifests/examples/kvm/buster-cloudimg.yml  # no root, no side effects
-sudo ./bootstrap-vz <manifest>                   # real build (root required)
+uv sync                                          # setup: .venv with bootstrap-vz, tox and tox-uv
+uv run tox -e flake8                             # style check (max line length 110)
+uv run tox -e pylint                             # static analysis (pylintrc)
+uv run tox -e yamllint                           # lint manifests/ (max line length 160)
+uv run tox -e unit                               # unit tests (tests/unit)
+uv run tox -e unit -- tests/unit/releases_tests.py::test_lt  # a single test (pytest)
+uv run tox -e integration                        # dry-run every manifest in manifests/
+uv run tox -e docs                               # Sphinx build with -W (warnings are errors)
+uv lock                                          # update uv.lock after changing pyproject.toml
+uv run bootstrap-vz --dry-run manifests/examples/kvm/buster-cloudimg.yml  # no root, no side effects
+sudo .venv/bin/bootstrap-vz <manifest>           # real build (root required)
 ```
 
-`tox -e system` runs the system tests. They build and boot real images, which
+`uv run tox -e system` runs the system tests. They build and boot real images, which
 costs cloud money, so run them only when the user explicitly asks.
 
 All default tox envs (flake8, pylint, yamllint, unit, integration, docs) pass,
@@ -106,7 +112,7 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
   "Co-Authored-By: Claude Fable 5") and no "generated with" lines.
 
 ## Boundaries
-- Never commit build or test output: `build/`, `dist/`, `*.egg-info/`, `.tox/`,
+- Never commit build or test output: `.venv/`, `build/`, `dist/`, `*.egg-info/`, `.tox/`,
   `docs/_build/`, `.coverage`, `system-tests.yml` or `system.html`.
 - `system-tests.yml` holds the build host's credentials for the system tests.
   Never create it with real values or read secrets out of it.
