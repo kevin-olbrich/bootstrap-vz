@@ -138,48 +138,20 @@ properties:
     additionalProperties: false
   volume:
     type: object
-    oneOf:
-        - $ref: '#/definitions/standardvolume'
-        - $ref: '#/definitions/logicalvolume'
-definitions:
-  standardvolume:
-    type: object
     properties:
       backing: {type: string}
-      partitions:
-        type: object
-        oneOf:
-          - $ref: '#/definitions/no_partitions'
-          - $ref: '#/definitions/partition_table'
-    required: [partitions]
-    additionalProperties: false
-  logicalvolume:
-    type: object
-    properties:
-      backing:
-        enum: [lvm]
-      volumegroup : {type: string}
+      volumegroup: {type: string}
       logicalvolume: {type: string}
-      partitions:
-        type: object
-        oneOf:
-          - $ref: '#/definitions/no_partitions'
-          - $ref: '#/definitions/partition_table'
-    required: [partitions]
+      partitions: {$ref: '#/definitions/partition_table'}
+    required: [backing, partitions]
     additionalProperties: false
+definitions:
   absolute_path:
     type: string
     pattern: ^/[^\0]+$
   bytes:
     pattern: ^\d+([KMGT]i?B|B)$
     type: string
-  no_partitions:
-    type: object
-    properties:
-      root: {$ref: '#/definitions/partition'}
-      type: {enum: [none]}
-    required: [type, root]
-    additionalProperties: false
   partition:
     type: object
     properties:
@@ -207,7 +179,7 @@ definitions:
         properties:
           size: {$ref: '#/definitions/bytes'}
         required: [size]
-      type: {enum: [msdos, gpt]}
+      type: {enum: [none, msdos, gpt]}
     required: [type, root]
     additionalProperties: false
   path:

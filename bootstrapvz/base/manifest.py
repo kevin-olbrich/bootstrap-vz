@@ -129,7 +129,7 @@ class Manifest:
             jsonschema.validate(schema, self.metaschema)
             jsonschema.validate(data, schema)
         except jsonschema.ValidationError as e:
-            self.validation_error(e.message, e.path)
+            self.validation_error(e.message, e.absolute_path)
 
     def validation_error(self, message, data_path=None):
         """This function is passed to all validation functions so that they may

@@ -30,6 +30,10 @@ Kevin Olbrich:
     * Replace setup.py with pyproject.toml and manage dependencies with uv: ``uv sync`` installs
       bootstrap-vz, ``uv.lock`` pins every dependency, and tox installs its envs from the lockfile
       through tox-uv. The package no longer installs a top-level ``tests`` package
+    * Report manifest validation errors at the full path of the offending setting, report volume
+      and partition mistakes on the right key, and name a misspelled ``system.release`` in the
+      error. The volume schema is stricter: ``backing`` is required, and the lvm backing needs
+      both ``volumegroup`` and ``logicalvolume``
 
 2017-02-20
 ----------

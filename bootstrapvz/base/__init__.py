@@ -15,8 +15,11 @@ def validate_manifest(data, validator, error):
     from bootstrapvz.common.tools import rel_path
     validator(data, rel_path(__file__, 'manifest-schema.yml'))
 
-    from bootstrapvz.common.releases import get_release, wheezy, trixie
-    release = get_release(data['system']['release'])
+    from bootstrapvz.common.releases import get_release, wheezy, trixie, UnknownReleaseException
+    try:
+        release = get_release(data['system']['release'])
+    except UnknownReleaseException as e:
+        error(str(e), ['system', 'release'])
 
     if release < wheezy:
         error('Only Debian wheezy and later is supported', ['system', 'release'])
@@ -31,6 +34,19 @@ def validate_manifest(data, validator, error):
 
         if data['volume']['partitions']['type'] == 'none':
             error('Grub cannot boot from unpartitioned disks', ['system', 'bootloader'])
+
+    # Check the volume configuration, which is not done via the schema for the same reason.
+    volume = data['volume']
+    for key in ['volumegroup', 'logicalvolume']:
+        if volume['backing'] == 'lvm' and key not in volume:
+            error('The lvm backing requires ' + key, ['volume'])
+        if volume['backing'] != 'lvm' and key in volume:
+            error(key + ' can only be used with the lvm backing', ['volume', key])
+
+    other_partitions = [key for key in volume['partitions'] if key not in ['type', 'root']]
+    if volume['partitions']['type'] == 'none' and other_partitions:
+        error('Unpartitioned volumes can only have a root partition',
+              ['volume', 'partitions', other_partitions[0]])
 
     # Check the provided apt.conf(5) options
     if 'packages' in data:

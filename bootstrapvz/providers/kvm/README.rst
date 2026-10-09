@@ -23,7 +23,7 @@ Provider
    ``optional``
 -  ``logicalvolume``: Specifies the logical volume where the disk image will be built.
 -  ``volumegroup``: Specifies the volume group where the logical volume will be stored.
-   These options should only be used if ``lvm`` was given as a disk backend.
+   Both options are required if ``lvm`` was given as a disk backend, and can only be used with it.
 
 
 Example:

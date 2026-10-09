@@ -51,5 +51,5 @@ def test_sid_is_newest():
 
 
 def test_bogus_releasename():
-    with pytest.raises(releases.UnknownReleaseException):
+    with pytest.raises(releases.UnknownReleaseException, match='nemo'):
         releases.get_release('nemo')

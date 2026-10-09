@@ -65,7 +65,7 @@ def get_release(release_name):
     from . import releases  # pylint: disable=import-self
     release = getattr(releases, release_name, None)
     if release is None or not isinstance(release, _Release):
-        raise UnknownReleaseException('The release `{name}\' is unknown'.format(name=release))
+        raise UnknownReleaseException('The release `{name}\' is unknown'.format(name=release_name))
     return release
 
 
