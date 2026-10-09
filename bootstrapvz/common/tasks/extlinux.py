@@ -3,6 +3,7 @@ from .. import phases
 from ..tools import log_check_call
 from . import filesystem
 from . import kernel
+from . import packages
 from bootstrapvz.base.fs import partitionmaps
 import os
 
@@ -53,6 +54,21 @@ class InstallExtlinux(Task):
                         'extlinux-update'])
 
 
+class LinkKernelInBoot(Task):
+    description = 'Keeping the default kernel symlinks in /boot'
+    phase = phases.package_installation
+    successors = [packages.InstallPackages]
+
+    @classmethod
+    def run(cls, info):
+        # With link_in_boot, kernel installations and removals keep /boot/vmlinuz and
+        # /boot/initrd.img pointed at the default (most recently installed) kernel.
+        # extlinux boots these symlinks, so it follows kernel updates, and in /boot they
+        # are readable by extlinux even when /boot is a separate partition.
+        with open(os.path.join(info.root, 'etc/kernel-img.conf'), 'w', encoding='utf-8') as kernel_img_conf:
+            kernel_img_conf.write('link_in_boot = yes\n')
+
+
 class ConfigureExtlinuxJessie(Task):
     description = 'Configuring extlinux'
     phase = phases.system_modification
@@ -66,8 +82,7 @@ class ConfigureExtlinuxJessie(Task):
         with open(os.path.join(assets, 'extlinux/extlinux.conf'), encoding='utf-8') as template:
             extlinux_config_tpl = template.read()
 
-        config_vars = {'root_uuid': info.volume.partition_map.root.get_uuid(),
-                       'kernel_version': info.kernel_version}
+        config_vars = {'root_uuid': info.volume.partition_map.root.get_uuid()}
         # Check if / and /boot are on the same partition
         # If not, /boot will actually be / when booting
         if hasattr(info.volume.partition_map, 'boot'):

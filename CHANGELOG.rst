@@ -93,6 +93,10 @@ Kevin Olbrich:
       the Debian archive keyring aborts instead of installing unverified packages (set
       ``bootstrapper.force-check-gpg: false`` to opt out); ``force-check-gpg`` is also accepted
       for releases older than stretch
+    * Security: extlinux images on jessie and newer boot the /boot/vmlinuz and /boot/initrd.img
+      symlinks that the kernel packages maintain (``link_in_boot = yes`` in
+      /etc/kernel-img.conf), so they no longer keep booting the build-time kernel after kernel
+      updates
 
 2017-02-20
 ----------

@@ -192,7 +192,8 @@ def get_bootloader_group(manifest):
             group.extend([extlinux.ConfigureExtlinux,
                           extlinux.InstallExtlinux])
         else:
-            group.extend([extlinux.ConfigureExtlinuxJessie,
+            group.extend([extlinux.LinkKernelInBoot,
+                          extlinux.ConfigureExtlinuxJessie,
                           extlinux.InstallExtlinuxJessie])
     return group
 
