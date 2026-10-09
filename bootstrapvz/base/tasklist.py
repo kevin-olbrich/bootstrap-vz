@@ -104,7 +104,7 @@ def create_list(taskset, all_tasks):
         # Node of 1 is also a strongly connected component but hardly a cycle, so we filter them out
         if len(component) > 1:
             cycles_found += 1
-            log.debug('Cycle: {list}\n' + (', '.join(map(repr, component))))
+            log.debug('Cycle: {list}'.format(list=', '.join(map(repr, component))))
     if cycles_found > 0:
         msg = ('{num} cycles were found in the tasklist, '
                'consult the logfile for more information.'.format(num=cycles_found))
@@ -290,7 +290,10 @@ def topological_sort(graph):
 
     result = []
     while ready:
-        node = ready.pop(-1)
+        # Of the tasks that are ready, pick the one with the lowest name,
+        # so that every run of the same manifest results in the same order
+        node = min(ready, key=str)
+        ready.remove(node)
         result.append(node)
 
         for successor in graph[node]:

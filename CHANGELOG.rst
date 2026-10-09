@@ -39,6 +39,8 @@ Kevin Olbrich:
       on arm64 during validation instead of failing during the build
     * Apply the root partition's ``mountopts`` on unpartitioned volumes (partitions type none)
       when mounting and in /etc/fstab instead of silently ignoring them
+    * Run tasks without an ordering constraint in a fixed order (by module path and class name),
+      so every build of the same manifest runs its tasks in the same order
 
 2017-02-20
 ----------

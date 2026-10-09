@@ -36,6 +36,10 @@ successors.
 The final task list that will be executed is computed by enumerating
 all tasks in the package, placing them in the graph and
 `sorting them topologically <http://en.wikipedia.org/wiki/Topological_sort>`_.
+When several tasks are ready to run, the one with the lowest full name
+(module path and class name) runs first, so the same manifest always
+results in the same task list. Do not rely on this order; declare
+predecessors and successors for every ordering a task needs.
 Subsequently the list returned is filtered to contain only the tasks the
 provider and the plugins added to the taskset.
 
