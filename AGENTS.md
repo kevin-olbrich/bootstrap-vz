@@ -123,6 +123,8 @@ These rules come from `CONTRIBUTING.rst`, which has the full reasoning.
   devices, and they can create billable resources.
 - Images are only built by running `bootstrap-vz` directly on the build host.
   Remote bootstrapping was removed on purpose, so do not add it back.
+- Old Debian releases stay supported. Never remove a release, a release-specific
+  code path or an example manifest; add new example manifests and tests instead.
 - AppArmor is disabled on purpose: `grub.DisableAppArmor` adds `apparmor=0` to
   every grub image. Keep it, and do not flag it as a security issue.
 - Tool-specific instruction files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`,
