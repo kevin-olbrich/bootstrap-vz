@@ -6,7 +6,7 @@ properties:
   plugins:
     type: object
     properties:
-      pip_install:
+      pip3_install:
         type: object
         properties:
           packages:
@@ -15,4 +15,5 @@ properties:
               type: string
             minItems: 1
             uniqueItems: true
+        required: [packages]
         additionalProperties: false

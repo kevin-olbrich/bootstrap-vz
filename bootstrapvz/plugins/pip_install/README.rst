@@ -18,3 +18,4 @@ Settings
 -  ``packages``: Python packages to install, a list of strings. The list
    can contain anything that ``pip install`` would accept as an
    argument, for example ``awscli==1.3.13``.
+   ``required``

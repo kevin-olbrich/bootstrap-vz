@@ -47,6 +47,8 @@ Kevin Olbrich:
     * minimize_size: drop the locales package and skip locale generation only when
       ``dpkg.locales`` is an empty list; the check was inverted, so listing locales left
       ``system.locale`` ungenerated
+    * pip3_install: validate the plugin settings against the ``pip3_install`` key instead of
+      ``pip_install``, and require ``packages`` in both pip plugins
 
 2017-02-20
 ----------
