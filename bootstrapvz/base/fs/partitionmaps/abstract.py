@@ -113,6 +113,9 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
             if partition.fsm.cannot('unmap'):
                 msg = 'The partition {partition} prevents the unmap procedure'.format(partition=partition)
                 raise PartitionError(msg)
+        # A tool that closes a partition it opened for writing (e.g. zerofree) makes udev probe
+        # the partition again. kpartx fails while that probe still holds the mapping open.
+        log_check_call(['udevadm', 'settle'])
         # Actually unmap the partitions
         log_check_call(['kpartx', '-ds', volume.device_path])
         # Call unmap on all partitions

@@ -16,6 +16,7 @@ class AddRequiredCommands(Task):
         if not isinstance(info.volume.partition_map, NoPartitions):
             info.host_dependencies['parted'] = 'parted'
             info.host_dependencies['kpartx'] = 'kpartx'
+            info.host_dependencies['udevadm'] = 'udev'
 
 
 class PartitionVolume(Task):
