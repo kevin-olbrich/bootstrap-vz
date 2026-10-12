@@ -73,9 +73,10 @@ class BasePartition(AbstractPartition):
         self.fsm.map(device_path=device_path)
 
     def link_uuid(self):
-        # /lib/udev/rules.d/60-kpartx.rules does not create symlinks in /dev/disk/by-{uuid,label}
-        # This patch would fix that: http://www.redhat.com/archives/dm-devel/2013-July/msg00080.html
-        # For now we just do the uuid part ourselves.
+        # Older hosts do not create symlinks in /dev/disk/by-{uuid,label} for kpartx mappings
+        # (/lib/udev/rules.d/60-kpartx.rules), so we create the uuid link ourselves. Newer hosts
+        # (e.g. Debian 13, 60-persistent-storage-dm.rules) create it themselves, possibly while
+        # this method runs.
         # This is mainly to fix a problem in update-grub where /etc/grub.d/10_linux
         # checks if the $GRUB_DEVICE_UUID exists in /dev/disk/by-uuid and falls
         # back to $GRUB_DEVICE if it doesn't.
@@ -85,7 +86,11 @@ class BasePartition(AbstractPartition):
         self.disk_by_uuid_path = os.path.join('/dev/disk/by-uuid', self.get_uuid())
         if not os.path.exists(self.disk_by_uuid_path):
             os.makedirs(os.path.dirname(self.disk_by_uuid_path), exist_ok=True)
-            os.symlink(self.device_path, self.disk_by_uuid_path)
+            try:
+                os.symlink(self.device_path, self.disk_by_uuid_path)
+            except FileExistsError:
+                # udev was faster: its link points to the same device-mapper device
+                pass
 
     def unlink_uuid(self):
         if os.path.isfile(self.disk_by_uuid_path):
