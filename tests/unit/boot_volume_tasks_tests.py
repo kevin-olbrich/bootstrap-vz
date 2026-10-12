@@ -186,9 +186,10 @@ def test_workspace_with_files_is_kept(tmp_path):
 
 
 @pytest.mark.parametrize('layout,backing,dependencies', [
-    ('msdos', 'raw', {'losetup': 'mount', 'truncate': 'coreutils', 'parted': 'parted', 'kpartx': 'kpartx'}),
+    ('msdos', 'raw', {'losetup': 'mount', 'truncate': 'coreutils', 'parted': 'parted', 'kpartx': 'kpartx',
+                      'udevadm': 'udev'}),
     ('gpt', 'qcow2', {'losetup': 'mount', 'truncate': 'coreutils', 'qemu-img': 'qemu-utils',
-                      'parted': 'parted', 'kpartx': 'kpartx', 'mkfs.xfs': 'xfsprogs'}),
+                      'parted': 'parted', 'kpartx': 'kpartx', 'udevadm': 'udev', 'mkfs.xfs': 'xfsprogs'}),
     ('none', 'vmdk', {'losetup': 'mount', 'truncate': 'coreutils', 'qemu-img': 'qemu-utils'}),
 ])
 def test_host_dependencies(tmp_path, host, layout, backing, dependencies):
@@ -355,7 +356,18 @@ def test_mapped_partitions_keep_the_volume_attached(tmp_path, host):
     host.commands.clear()
     partitioning.UnmapPartitions.run(info)
     volume.Detach.run(info)
-    assert host.commands == [['kpartx', '-ds', LOOP_DEVICE], ['losetup', '--detach', LOOP_DEVICE]]
+    assert host.commands == [['udevadm', 'settle'], ['kpartx', '-ds', LOOP_DEVICE],
+                             ['losetup', '--detach', LOOP_DEVICE]]
+
+
+def test_udev_settles_before_the_partitions_are_unmapped(tmp_path, host):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    host.commands.clear()
+    partitioning.UnmapPartitions.run(info)
+    # zerofree and other writers make udev probe the partitions again when they close them,
+    # kpartx fails to remove a mapping that the probe still holds open
+    assert host.commands.index(['udevadm', 'settle']) < host.commands.index(['kpartx', '-ds', LOOP_DEVICE])
 
 
 @pytest.mark.parametrize('layout,commands', [
