@@ -20,6 +20,8 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
         """
         :param str bootloader: Name of the bootloader we will use for bootstrapping
         """
+        # Failed mapping may leave devices behind before the FSM reaches 'mapped'.
+        self._mappings_pending = False
         # Create the configuration for the state machine
         cfg = {'initial': 'nonexistent', 'events': self.events, 'callbacks': {}}
         super().__init__(cfg)
@@ -29,7 +31,7 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
 
         :rtype: bool
         """
-        return self.fsm.current == 'mapped'
+        return self.fsm.current == 'mapped' or self._mappings_pending
 
     def get_total_size(self):
         """Returns the total size the partitions occupy
@@ -63,14 +65,15 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
         :raises PartitionError: In case a partition could not be mapped.
         """
         volume = event.volume
+        # Ask kpartx how the partitions will be mapped before actually attaching them.
+        mappings = log_check_call(['kpartx', '-l', volume.device_path])
+        import re
+        regexp = re.compile(r'^(?P<name>.+[^\d](?P<p_idx>\d+)) : '
+                            r'(?P<start_blk>\d) (?P<num_blks>\d+) '
+                            r'{device_path} (?P<blk_offset>\d+)$'
+                            .format(device_path=volume.device_path))
         try:
-            # Ask kpartx how the partitions will be mapped before actually attaching them.
-            mappings = log_check_call(['kpartx', '-l', volume.device_path])
-            import re
-            regexp = re.compile(r'^(?P<name>.+[^\d](?P<p_idx>\d+)) : '
-                                r'(?P<start_blk>\d) (?P<num_blks>\d+) '
-                                r'{device_path} (?P<blk_offset>\d+)$'
-                                .format(device_path=volume.device_path))
+            self._mappings_pending = True
             log_check_call(['kpartx', '-as', volume.device_path])
 
             import os.path
@@ -88,12 +91,18 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
                 if partition.fsm.current not in ['mapped', 'formatted']:
                     raise PartitionError('kpartx did not map partition #' + str(partition.get_index()))
 
-        except PartitionError:
+        except (Exception, KeyboardInterrupt):
             # Revert any mapping and reraise the error
+            log_check_call(['udevadm', 'settle'])
+            log_check_call(['kpartx', '-ds', volume.device_path])
             for partition in self.partitions:
                 if partition.fsm.can('unmap'):
                     partition.unmap()
-            log_check_call(['kpartx', '-ds', volume.device_path])
+                elif partition.device_path is not None:
+                    # Child setup can fail before its FSM transitions.
+                    partition.unlink_uuid()
+                    partition.device_path = None
+            self._mappings_pending = False
             raise
 
     def unmap(self, volume):
@@ -121,3 +130,4 @@ class AbstractPartitionMap(FSMProxy, metaclass=ABCMeta):
         # Call unmap on all partitions
         for partition in self.partitions:
             partition.unmap()
+        self._mappings_pending = False

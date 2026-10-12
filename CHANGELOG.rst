@@ -17,6 +17,8 @@ Kevin Olbrich:
       other devices while preserving aliases to the current partition.
     * Remove UUID links created during the build when unmapping partitions,
       preserving existing udev links and links replaced before cleanup.
+    * Clean up partial partition mappings after command failures or interrupted
+      UUID setup, and prevent volume detach if mapping cleanup fails.
 
 2026-09-24
 ----------

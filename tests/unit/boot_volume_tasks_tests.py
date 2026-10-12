@@ -348,6 +348,98 @@ def test_partial_mapping_is_reverted(tmp_path, host):
     assert [partition.device_path for partition in info.volume.partition_map.partitions] == [None] * 3
 
 
+@pytest.mark.parametrize('operation', ['-l', '-as'])
+def test_mapping_command_failure_cleanup(tmp_path, monkeypatch, host, operation):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    info.volume.device_path = LOOP_DEVICE
+    partitioning.PartitionVolume.run(info)
+    host.commands.clear()
+    failure = subprocess.CalledProcessError(1, ['kpartx', operation, LOOP_DEVICE])
+
+    def command_with_failure(command):
+        result = host(command)
+        if command[:2] == ['kpartx', operation]:
+            raise failure
+        return result
+    monkeypatch.setattr('bootstrapvz.base.fs.partitionmaps.abstract.log_check_call', command_with_failure)
+    with pytest.raises(subprocess.CalledProcessError) as raised:
+        partitioning.MapPartitions.run(info)
+    assert raised.value is failure
+    expected = [['kpartx', '-l', LOOP_DEVICE]]
+    if operation == '-as':
+        # Adding mappings can fail after some of them have already been created.
+        expected += [['kpartx', '-as', LOOP_DEVICE], ['udevadm', 'settle'], ['kpartx', '-ds', LOOP_DEVICE]]
+    assert host.commands == expected
+    assert not info.volume.partition_map.is_blocking()
+    assert all(partition.device_path is None for partition in info.volume.partition_map.partitions)
+
+
+@pytest.mark.parametrize('error_type', [OSError, KeyboardInterrupt])
+def test_mapping_child_failure_cleanup(tmp_path, monkeypatch, host, error_type):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    partitioning.UnmapPartitions.run(info)
+    p_map = info.volume.partition_map
+    original_states = [partition.fsm.current for partition in p_map.partitions]
+    failure = error_type('UUID setup failed')
+    cleanup_paths = []
+
+    def fail_link():
+        # A callback can be interrupted after creating its link but before the FSM transitions.
+        p_map.root.disk_by_uuid_path = str(tmp_path / 'uuid-link')
+        raise failure
+
+    def unlink():
+        cleanup_paths.append(p_map.root.device_path)
+        p_map.root.disk_by_uuid_path = None
+    monkeypatch.setattr(p_map.root, 'link_uuid', fail_link)
+    monkeypatch.setattr(p_map.root, 'unlink_uuid', unlink)
+    host.commands.clear()
+    with pytest.raises(error_type) as raised:
+        partitioning.MapPartitions.run(info)
+    assert raised.value is failure
+    assert host.commands == [['kpartx', '-l', LOOP_DEVICE], ['kpartx', '-as', LOOP_DEVICE],
+                             ['udevadm', 'settle'], ['kpartx', '-ds', LOOP_DEVICE]]
+    assert [partition.fsm.current for partition in p_map.partitions] == original_states
+    assert all(partition.device_path is None for partition in p_map.partitions)
+    assert cleanup_paths == [mapper(3)]
+    assert p_map.root.disk_by_uuid_path is None
+    assert not p_map.is_blocking()
+
+
+@pytest.mark.parametrize('failed_command', [['udevadm', 'settle'], ['kpartx', '-ds', LOOP_DEVICE]])
+def test_mapping_cleanup_failure_blocks_detach(tmp_path, monkeypatch, host, failed_command):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    partitioning.UnmapPartitions.run(info)
+    p_map = info.volume.partition_map
+    failure = OSError('UUID setup failed')
+    cleanup_failure = subprocess.CalledProcessError(1, failed_command)
+
+    def fail_link():
+        raise failure
+
+    def command_with_failure(command):
+        result = host(command)
+        if command == failed_command:
+            raise cleanup_failure
+        return result
+    monkeypatch.setattr(p_map.root, 'link_uuid', fail_link)
+    monkeypatch.setattr('bootstrapvz.base.fs.partitionmaps.abstract.log_check_call', command_with_failure)
+    host.commands.clear()
+    with pytest.raises(subprocess.CalledProcessError) as raised:
+        partitioning.MapPartitions.run(info)
+    assert raised.value is cleanup_failure
+    assert raised.value.__context__ is failure
+    assert [partition.fsm.current for partition in p_map.partitions] \
+        == ['formatted', 'formatted', 'unmapped_fmt']
+    assert [partition.device_path for partition in p_map.partitions] == [mapper(index) for index in (1, 2, 3)]
+    assert p_map.is_blocking()
+    with pytest.raises(VolumeError, match='prevents the detach procedure'):
+        volume.Detach.run(info)
+    assert not any(command[0] == 'losetup' for command in host.commands)
+
+
 def test_mapped_partitions_keep_the_volume_attached(tmp_path, host):
     info = build(tmp_path, host, LAYOUTS['msdos'])
     prepare_volume(info)
