@@ -370,6 +370,35 @@ def test_udev_settles_before_the_partitions_are_unmapped(tmp_path, host):
     assert host.commands.index(['udevadm', 'settle']) < host.commands.index(['kpartx', '-ds', LOOP_DEVICE])
 
 
+def uuid_link_partition(monkeypatch, symlink):
+    """The root partition with a UUID, and /dev/disk/by-uuid of the build host left alone:
+    the link does not exist yet, symlink stands in for os.symlink"""
+    partition = load_volume({'backing': 'raw', 'partitions': LAYOUTS['msdos']}, 'grub').partition_map.root
+    partition.device_path = mapper(3)
+    monkeypatch.setattr(partition, 'get_uuid', lambda: uuid_of(mapper(3)))
+    monkeypatch.setattr(os.path, 'exists', lambda path: False)
+    monkeypatch.setattr(os, 'makedirs', lambda path, exist_ok=False: None)
+    monkeypatch.setattr(os, 'symlink', symlink)
+    return partition
+
+
+def test_uuid_link_points_to_the_partition(monkeypatch):
+    links = []
+    partition = uuid_link_partition(monkeypatch, lambda src, dst: links.append((src, dst)))
+    partition.link_uuid()
+    assert links == [(mapper(3), '/dev/disk/by-uuid/' + uuid_of(mapper(3)))]
+
+
+def test_uuid_link_created_by_udev_meanwhile_is_kept(monkeypatch):
+    # Newer udev links device-mapper partitions in /dev/disk/by-uuid itself
+    # (60-persistent-storage-dm.rules) - here between the check and os.symlink
+    def symlink(src, dst):
+        raise FileExistsError(17, 'File exists', dst)
+    partition = uuid_link_partition(monkeypatch, symlink)
+    partition.link_uuid()
+    assert partition.disk_by_uuid_path == '/dev/disk/by-uuid/' + uuid_of(mapper(3))
+
+
 @pytest.mark.parametrize('layout,commands', [
     ('msdos', [['mkfs.ext2', mapper(1)], ['mkswap', mapper(2)], ['mkfs.ext4', mapper(3)]]),
     # The bios_grub partition stays unformatted
