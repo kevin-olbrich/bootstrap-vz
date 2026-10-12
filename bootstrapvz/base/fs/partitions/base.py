@@ -34,6 +34,7 @@ class BasePartition(AbstractPartition):
         self.flags = []
         # Path to symlink in /dev/disk/by-uuid (manually maintained by this class)
         self.disk_by_uuid_path = None
+        self.disk_by_uuid_identity = None
         super().__init__(size, filesystem, format_command, mountopts)
 
     def create(self, volume):
@@ -95,11 +96,22 @@ class BasePartition(AbstractPartition):
                 # Accept udev's competing link only if it resolves to this partition.
                 if not os.path.samefile(self.device_path, self.disk_by_uuid_path):
                     raise
+            else:
+                # Remember only links we created, so cleanup preserves udev's replacements.
+                link_stat = os.lstat(self.disk_by_uuid_path)
+                self.disk_by_uuid_identity = (link_stat.st_dev, link_stat.st_ino, link_stat.st_ctime_ns)
 
     def unlink_uuid(self):
-        if os.path.isfile(self.disk_by_uuid_path):
-            os.remove(self.disk_by_uuid_path)
+        if self.disk_by_uuid_identity is not None:
+            try:
+                link_stat = os.lstat(self.disk_by_uuid_path)
+                identity = (link_stat.st_dev, link_stat.st_ino, link_stat.st_ctime_ns)
+                if identity == self.disk_by_uuid_identity:
+                    os.remove(self.disk_by_uuid_path)
+            except FileNotFoundError:
+                pass
         self.disk_by_uuid_path = None
+        self.disk_by_uuid_identity = None
 
     def _before_create(self, e):
         """Creates the partition

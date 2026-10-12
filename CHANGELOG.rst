@@ -15,6 +15,8 @@ Kevin Olbrich:
       allowing GRUB to fall back to a build-host device path.
     * Validate UUID links that already exist before creation, rejecting links to
       other devices while preserving aliases to the current partition.
+    * Remove UUID links created during the build when unmapping partitions,
+      preserving existing udev links and links replaced before cleanup.
 
 2026-09-24
 ----------

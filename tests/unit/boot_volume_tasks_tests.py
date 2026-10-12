@@ -395,6 +395,57 @@ def test_uuid_link_points_to_the_partition(tmp_path, monkeypatch):
     assert os.path.samefile(link, partition.device_path)
 
 
+@pytest.mark.parametrize('device_exists', [True, False])
+def test_owned_uuid_link_is_removed_on_unmap(tmp_path, monkeypatch, device_exists):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    partition.link_uuid()
+    partition.fsm.current = 'formatted'
+    if not device_exists:
+        # kpartx removes the device before the partition is told to unmap.
+        (tmp_path / 'device').unlink()
+    partition.unmap()
+    assert partition.device_path is None
+    assert partition.fsm.current == 'unmapped_fmt'
+    assert not os.path.lexists(link)
+    partition.unlink_uuid()
+
+
+def test_uuid_link_cleanup_before_creation_is_harmless(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    partition.unlink_uuid()
+    assert not os.path.lexists(link)
+
+
+@pytest.mark.parametrize('removed_during_cleanup', [False, True])
+def test_missing_owned_uuid_link_cleanup_is_harmless(tmp_path, monkeypatch, removed_during_cleanup):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    partition.link_uuid()
+    if removed_during_cleanup:
+        original_remove = os.remove
+
+        def remove(path):
+            original_remove(path)
+            original_remove(path)
+        monkeypatch.setattr(os, 'remove', remove)
+    else:
+        link.unlink()
+    partition.unlink_uuid()
+    assert not os.path.lexists(link)
+    partition.unlink_uuid()
+
+
+@pytest.mark.parametrize('target', ['device', 'other-device'])
+def test_replaced_uuid_link_is_kept(tmp_path, monkeypatch, target):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    (tmp_path / 'other-device').write_bytes(b'')
+    partition.link_uuid()
+    # Keep the old inode alive so the replacement cannot reuse it.
+    link.rename(tmp_path / 'original-link')
+    link.symlink_to(tmp_path / target)
+    partition.unlink_uuid()
+    assert os.path.samefile(link, tmp_path / target)
+
+
 def test_uuid_link_created_by_udev_meanwhile_is_kept(tmp_path, monkeypatch):
     # Newer udev links device-mapper partitions in /dev/disk/by-uuid itself
     # (60-persistent-storage-dm.rules) - here between the check and os.symlink
@@ -408,6 +459,7 @@ def test_uuid_link_created_by_udev_meanwhile_is_kept(tmp_path, monkeypatch):
     monkeypatch.setattr(os, 'symlink', symlink)
     partition.link_uuid()
     assert partition.disk_by_uuid_path == str(link)
+    partition.unlink_uuid()
     assert os.readlink(link) == '../alias'
     assert os.path.samefile(link, partition.device_path)
 
@@ -418,6 +470,7 @@ def test_dangling_uuid_link_is_rejected(tmp_path, monkeypatch):
     link.symlink_to('../missing')
     with pytest.raises(OSError):
         partition.link_uuid()
+    partition.unlink_uuid()
     assert os.readlink(link) == '../missing'
 
 
@@ -427,6 +480,7 @@ def test_existing_uuid_link_to_the_partition_is_kept(tmp_path, monkeypatch):
     link.parent.mkdir()
     link.symlink_to('../alias')
     partition.link_uuid()
+    partition.unlink_uuid()
     assert os.readlink(link) == '../alias'
     assert os.path.samefile(link, partition.device_path)
 
@@ -438,6 +492,7 @@ def test_existing_uuid_link_to_another_device_is_rejected(tmp_path, monkeypatch)
     link.symlink_to('../other-device')
     with pytest.raises(FileExistsError):
         partition.link_uuid()
+    partition.unlink_uuid()
     assert os.readlink(link) == '../other-device'
 
 
@@ -452,6 +507,7 @@ def test_racing_uuid_link_to_another_device_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setattr(os, 'symlink', symlink)
     with pytest.raises(FileExistsError):
         partition.link_uuid()
+    partition.unlink_uuid()
     assert os.readlink(link) == '../other-device'
 
 

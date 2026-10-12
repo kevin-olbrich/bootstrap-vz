@@ -663,18 +663,6 @@ Confirmed by the audit, not scheduled yet.
 
 - **Effort:** small; **Severity:** low
 
-### Remove the `/dev/disk/by-uuid` symlinks that `link_uuid` creates on the host
-
-- **Where:** `bootstrapvz/base/fs/partitions/base.py:75-93`, `bootstrapvz/base/fs/partitions/base.py:121-137`, `bootstrapvz/base/fs/partitionmaps/abstract.py:106-120`
-
-- **Problem:** `link_uuid` creates `/dev/disk/by-uuid/<uuid>` on the build host, pointing at `/dev/mapper/<loop>pN`, so that `update-grub` uses the UUID. `unlink_uuid` removes the link only `if os.path.isfile(...)`. That check follows the symlink and is always False, because the target is a block device. The target is gone by then anyway, since `AbstractPartitionMap._before_unmap` runs `kpartx -ds` before `partition.unmap()`. So every build leaves its links in the host's `/dev/disk/by-uuid` until reboot. `link_uuid` checks with `os.path.exists`, which is False for a dangling link, so `os.symlink` raises `FileExistsError` when the same UUID later appears under a different device name. That happens with a `format_command` that pins the UUID, or when `prebootstrapped` reuses an image while the earlier loop device is still busy.
-
-- **Fix:** In `link_uuid`, use `os.path.lexists()` and replace a dangling link instead of failing. In `unlink_uuid`, use `os.path.islink()` and remove the link only if this object created it, either by tracking a flag or by checking `os.readlink(path) == self.device_path`, so that a link created by the host's own udev rules is left alone.
-
-- **Notes:** Within one build, the unmount/unmap/remap cycle in `bootstrapvz/common/fs/__init__.py` (`unmounted()`) does not hit the error: the mapper name stays the same, so the old link resolves again. Checked locally: `os.path.isfile` is False both for a symlink to a device node and for a dangling symlink, and `os.symlink` onto a dangling link raises `FileExistsError`.
-
-- **Effort:** small; **Severity:** low
-
 ### Make `--color=always` colorize output when stdout is not a TTY
 
 - **Where:** `bootstrapvz/base/log.py:69-81`, `bootstrapvz/base/main.py:74-82`, `pyproject.toml:21`
