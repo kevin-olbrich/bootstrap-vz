@@ -1,7 +1,7 @@
 import bootstrapvz.common.tasks.apt
 import bootstrapvz.common.tasks.boot
 import bootstrapvz.common.tasks.image
-from bootstrapvz.common.tasks import loopback, initd, ssh, volume, grub
+from bootstrapvz.common.tasks import loopback, initd, ssh, volume
 from bootstrapvz.common import task_groups
 from .tasks import apt, boot, configuration, image, packages
 
@@ -33,7 +33,6 @@ def resolve_tasks(taskset, manifest):
                     image.CreateTarball,
                     volume.Delete,
                     ])
-    taskset.discard(grub.SetGrubConsolOutputDeviceToSerial)
 
     if 'gcs_destination' in manifest.provider:
         taskset.add(image.UploadImage)

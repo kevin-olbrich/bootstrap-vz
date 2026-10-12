@@ -108,7 +108,6 @@ def resolve_tasks(taskset, manifest):
         taskset.update([bootstrapvz.common.tasks.grub.AddGrubPackage,
                         bootstrapvz.common.tasks.grub.InitGrubConfig,
                         bootstrapvz.common.tasks.grub.SetGrubTerminalToConsole,
-                        bootstrapvz.common.tasks.grub.SetGrubConsolOutputDeviceToSerial,
                         bootstrapvz.common.tasks.grub.RemoveGrubTimeout,
                         bootstrapvz.common.tasks.grub.DisableGrubRecovery,
                         boot.CreatePVGrubCustomRule,

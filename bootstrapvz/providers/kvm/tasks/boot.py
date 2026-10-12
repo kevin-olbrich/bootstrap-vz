@@ -9,7 +9,6 @@ assets = rel_path(__file__, '../assets')
 class SetGrubConsolOutputDeviceToVirtual(Task):
     description = 'Setting the init process terminal output device to `tty0\''
     phase = phases.system_modification
-    predecessors = [grub.SetGrubConsolOutputDeviceToSerial]
     successors = [grub.WriteGrubConfig]
 
     @classmethod

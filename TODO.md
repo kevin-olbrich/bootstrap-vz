@@ -693,7 +693,7 @@ Confirmed by the audit, not scheduled yet.
 
 - **Problem:** For every release from stretch on, `ConfigureNetworkIF` writes only `auto eth0` / `iface eth0 inet dhcp`. Grub images work only because `grub.DisablePNIN` adds `net.ifnames=0 biosdevname=0`, and `get_bootloader_group` adds that task only in the grub branch. The `append` lines in the extlinux template have no such parameters, and nothing else in the code base (no udev rule, no `.link` file) restores the old names. With `bootloader: extlinux` on stretch+, a PCI NIC comes up as `ens3`/`ens4` (KVM virtio, GCE), `enp0s3` (VirtualBox) or `ens5` (EC2 Nitro). `eth0` never exists, so the image boots without network unless cloud-init happens to configure it.
 
-- **Fix:** Add `net.ifnames=0 biosdevname=0` to both `append` lines in `extlinux.conf`. The only other release that uses this template is jessie (wheezy uses `ConfigureExtlinux`), where the parameters are harmless, so they can be added unconditionally. The alternative is to build the extlinux kernel command line from the parameter list the grub tasks fill. That would also pull in `apparmor=0`, `consoleblank=0` and the other grub parameters, which changes extlinux images beyond this bug and needs a deliberate decision.
+- **Fix:** Add `net.ifnames=0 biosdevname=0` to both `append` lines in `extlinux.conf`. The only other release that uses this template is jessie (wheezy uses the package-generated configuration), where the parameters are harmless, so they can be added unconditionally. The alternative is to build the extlinux kernel command line from the parameter list the grub tasks fill. That would also pull in `apparmor=0`, `consoleblank=0` and the other grub parameters, which changes extlinux images beyond this bug and needs a deliberate decision.
 
 - **Notes:** extlinux is allowed by the base schema and by the ec2, kvm, virtualbox, gce and azure provider schemas. Even so, no manifest in `manifests/` uses it on stretch+ (only the wheezy EC2 official manifests do), and `tests/system/ec2_ebs_hvm_tests.py` builds extlinux images without checking networking. Azure (`hv_netvsc`) and Xen netfront instances probably keep `eth0`, but newer systemd names Xen NICs `enX0` (unverified). Related separate entries: VirtualBox with extlinux, and KVM `console: virtual` with a non-grub bootloader, crash earlier on the missing `info.grub_config`; the same template also pins the build-time kernel version.
 
@@ -923,10 +923,7 @@ Smaller problems found while the October 2026 fixes were made. They are not sche
   such builds crash after the bootstrap (`bootstrapvz/providers/gce/__init__.py`,
   `bootstrapvz/providers/azure/__init__.py`). VirtualBox, KVM and docker_daemon got the
   same fix already.
-- VirtualBox extlinux images only get `console=ttyS0`, so boot messages and the
-  recovery entry are not visible in a VM without a serial port. The KVM README sentence
-  about kernel messages going to both consoles is inaccurate, and
-  `docs/supported_builds.rst` still lists KVM as TODO.
+- `docs/supported_builds.rst` still lists KVM as TODO.
 - extlinux images get no `cgroup_enable=memory` from docker_daemon, because the
   extlinux template has no hook for extra kernel parameters.
 - extlinux kernel symlinks: a kernel installed through `bootstrapper.include_packages`,

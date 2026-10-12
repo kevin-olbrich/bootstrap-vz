@@ -12,6 +12,10 @@ Note that to register an image, it must first be uploaded to GCS, so you must
 specify ``gcs_destination`` (upload to GCS) to use ``gce_project`` (register
 with GCE)
 
+On Debian jessie and newer, ``serial-getty@ttyS0.service`` is enabled for serial
+logins. The boot configuration no longer adds ``console=ttyS0`` or
+``earlyprintk=ttyS0`` kernel arguments, including baud-rate variants.
+
 Manifest settings
 -----------------
 

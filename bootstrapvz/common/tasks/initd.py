@@ -5,6 +5,15 @@ from . import assets
 import os.path
 
 
+class EnableSerialGetty(Task):
+    description = 'Enabling serial-getty@ttyS0.service'
+    phase = phases.system_modification
+
+    @classmethod
+    def run(cls, info):
+        log_check_call(['chroot', info.root, 'systemctl', 'enable', 'serial-getty@ttyS0.service'])
+
+
 class InstallInitScripts(Task):
     description = 'Installing startup scripts'
     phase = phases.system_modification

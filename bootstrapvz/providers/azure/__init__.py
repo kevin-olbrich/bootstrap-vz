@@ -4,7 +4,6 @@ from bootstrapvz.common.tasks import loopback
 from bootstrapvz.common.tasks import initd
 from bootstrapvz.common.tasks import ssh
 from bootstrapvz.common.tasks import apt
-from bootstrapvz.common.tasks import grub
 from .tasks import packages, boot
 
 
@@ -29,7 +28,6 @@ def resolve_tasks(taskset, manifest):
                     boot.ConfigureGrub,
                     boot.PatchUdev,
                     ])
-    taskset.discard(grub.SetGrubConsolOutputDeviceToSerial)
 
 
 def resolve_rollback_tasks(taskset, manifest, completed, counter_task):

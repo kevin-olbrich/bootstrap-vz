@@ -24,6 +24,8 @@ def test_extlinux_boots_the_default_kernel_symlinks(tmp_path, separate_boot, boo
     (tmp_path / 'boot').mkdir()
     extlinux.ConfigureExtlinuxJessie.run(info)
     config = (tmp_path / 'boot/extlinux/extlinux.conf').read_text(encoding='utf-8')
+    assert 'console=ttyS0' not in config
+    assert 'earlyprintk=ttyS0' not in config
     # Kernel updates must not leave the image booting the kernel it was built with
     assert BUILD_KERNEL_VERSION not in config
     # Both entries boot the symlinks that the kernel packages point at the default kernel

@@ -21,7 +21,7 @@ class PatchUdev(Task):
 
 
 class ConfigureGrub(Task):
-    description = 'Change grub configuration to allow for ttyS0 output'
+    description = 'Configuring grub for Azure'
     phase = phases.system_modification
     successors = [grub.WriteGrubConfig]
 
@@ -29,7 +29,5 @@ class ConfigureGrub(Task):
     def run(cls, info):
         info.grub_config['GRUB_CMDLINE_LINUX'].extend([
             'console=tty0',
-            'console=ttyS0,115200n8',
-            'earlyprintk=ttyS0,115200',
             'rootdelay=300',
         ])

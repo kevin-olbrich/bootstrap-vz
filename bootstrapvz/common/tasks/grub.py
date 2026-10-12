@@ -275,18 +275,6 @@ class SetGrubTerminalToConsole(Task):
         info.grub_config['GRUB_TERMINAL'] = 'console'
 
 
-class SetGrubConsolOutputDeviceToSerial(Task):
-    description = 'Setting the grub terminal output device to `ttyS0\''
-    phase = phases.system_modification
-    successors = [WriteGrubConfig]
-
-    @classmethod
-    def run(cls, info):
-        # See issue #245 for more details
-        info.grub_config['GRUB_CMDLINE_LINUX'].append('console=ttyS0')
-        info.grub_config['GRUB_CMDLINE_LINUX'].append('earlyprintk=ttyS0')
-
-
 class RemoveGrubTimeout(Task):
     description = 'Setting grub menu timeout to 0'
     phase = phases.system_modification

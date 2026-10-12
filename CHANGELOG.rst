@@ -1,6 +1,16 @@
 Changelog
 =========
 
+2026-10-12
+----------
+Kevin Olbrich:
+    * Replace ttyS0 console and early-printk kernel arguments in GRUB, PVGRUB and
+      extlinux configurations with ``serial-getty@ttyS0.service`` for serial
+      logins on Debian jessie and newer VM images. This also removes the GCE and
+      Azure baud-rate variants. KVM's legacy ``console: serial`` setting remains
+      accepted but no longer selects the kernel console. Older releases do not
+      enable the systemd service.
+
 2026-09-24
 ----------
 Kevin Olbrich:

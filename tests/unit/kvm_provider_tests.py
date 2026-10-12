@@ -52,9 +52,8 @@ def grub_defaults(info):
 def test_virtual_console_is_the_kernel_console(tmp_path):
     parameters = grub_defaults(bootstrap_info('buster-console.yml', tmp_path))['GRUB_CMDLINE_LINUX'].split()
     consoles = [parameter for parameter in parameters if parameter.startswith('console=')]
-    # The last console= parameter becomes /dev/console, the serial console still gets the kernel messages
-    assert consoles[-1] == 'console=tty0'
-    assert 'console=ttyS0' in consoles
+    assert consoles == ['console=tty0']
+    assert not any(parameter.startswith('earlyprintk=ttyS0') for parameter in parameters)
 
 
 def test_boot_messages_stay_on_tty1(tmp_path):

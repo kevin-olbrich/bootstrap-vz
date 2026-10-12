@@ -71,12 +71,13 @@ def kernel_parameters(info):
 
 
 @pytest.mark.parametrize('release, multiqueue', [('jessie', False), ('stretch', True), ('buster', True)])
-def test_kernel_logs_to_the_serial_port(tmp_path, release, multiqueue):
+def test_kernel_parameters_without_serial_console(tmp_path, release, multiqueue):
     data = manifest_data(tmp_path, os.path.join(manifests, release + '.yml'))
     parameters = kernel_parameters(bootstrap_info(tmp_path, data))
     consoles = [parameter for parameter in parameters if parameter.startswith('console=')]
-    # GCE shows the serial port output at 38400 baud, the generic serial console is left out
-    assert consoles == ['console=ttyS0,38400n8']
+    assert not consoles
+    assert not any(parameter.startswith('earlyprintk=ttyS0') for parameter in parameters)
+    assert 'elevator=noop' in parameters
     assert ('scsi_mod.use_blk_mq=Y' in parameters) == multiqueue
 
 

@@ -58,10 +58,9 @@ def grub_defaults(info):
 
 def test_default_boot_entry_shows_messages_in_the_vm_window(tmp_path):
     settings = grub_defaults(bootstrap_info(tmp_path))
-    # grub puts GRUB_CMDLINE_LINUX_DEFAULT after GRUB_CMDLINE_LINUX, so the virtual console
-    # is the last console= parameter and becomes /dev/console
     assert settings['GRUB_CMDLINE_LINUX_DEFAULT'].split()[-1] == 'console=tty0'
-    assert 'console=ttyS0' in settings['GRUB_CMDLINE_LINUX'].split()
+    assert not any(parameter.startswith(('console=ttyS0', 'earlyprintk=ttyS0'))
+                   for parameter in settings['GRUB_CMDLINE_LINUX'].split())
 
 
 def test_guest_additions_image_is_found_relative_to_the_manifest(tmp_path):

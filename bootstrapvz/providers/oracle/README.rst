@@ -7,6 +7,10 @@ the web interface of the Oracle Compute Cloud Service dashboard or configured
 to be automatically sent by our Oracle Storage Cloud Service API embedded
 client.
 
+On Debian jessie and newer, ``serial-getty@ttyS0.service`` is enabled for serial
+logins. The boot configuration no longer adds ``console=ttyS0`` or
+``earlyprintk=ttyS0`` kernel arguments.
+
 Manifest settings
 -----------------
 

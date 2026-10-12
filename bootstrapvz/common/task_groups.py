@@ -20,6 +20,7 @@ from .tasks import folder
 
 
 def get_standard_groups(manifest):
+    from bootstrapvz.common.releases import jessie
     group = []
     group.extend(get_base_group(manifest))
     group.extend(volume_group)
@@ -36,6 +37,8 @@ def get_standard_groups(manifest):
     group.extend(security_group)
     group.extend(get_locale_group(manifest))
     group.extend(get_bootloader_group(manifest))
+    if manifest.release >= jessie:
+        group.append(initd.EnableSerialGetty)
     group.extend(get_cleanup_group(manifest))
     return group
 
@@ -176,7 +179,6 @@ def get_bootloader_group(manifest):
                       grub.DisableConsoleBlanking,
                       grub.DisableAppArmor,
                       grub.SetIoScheduler,
-                      grub.SetGrubConsolOutputDeviceToSerial,
                       grub.RemoveGrubTimeout,
                       grub.DisableGrubRecovery,
                       grub.WriteGrubConfig])
@@ -189,8 +191,7 @@ def get_bootloader_group(manifest):
     if manifest.system['bootloader'] == 'extlinux':
         group.append(extlinux.AddExtlinuxPackage)
         if manifest.release < jessie:
-            group.extend([extlinux.ConfigureExtlinux,
-                          extlinux.InstallExtlinux])
+            group.append(extlinux.InstallExtlinux)
         else:
             group.extend([extlinux.LinkKernelInBoot,
                           extlinux.ConfigureExtlinuxJessie,

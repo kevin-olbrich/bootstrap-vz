@@ -17,6 +17,10 @@ and the script that expands the root volume are run by native systemd
 units of the same name, because systemd v260 removed support for SysV
 init scripts.
 
+On Debian jessie and newer, ``serial-getty@ttyS0.service`` is enabled for serial
+logins. GRUB and PVGRUB retain ``console=hvc0`` but no longer add ``console=ttyS0`` or
+``earlyprintk=ttyS0`` kernel arguments. Extlinux no longer adds ``console=ttyS0``.
+
 Manifest settings
 -----------------
 

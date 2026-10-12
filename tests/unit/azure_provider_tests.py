@@ -48,12 +48,12 @@ def kernel_parameters(info):
     return []
 
 
-def test_kernel_logs_to_the_serial_console(tmp_path):
+def test_kernel_parameters_keep_the_virtual_console(tmp_path):
     parameters = kernel_parameters(bootstrap_info(tmp_path))
     consoles = [parameter for parameter in parameters if parameter.startswith('console=')]
-    # The last console= parameter becomes /dev/console, Azure shows ttyS0 in the boot diagnostics
-    assert consoles == ['console=tty0', 'console=ttyS0,115200n8']
-    assert {'earlyprintk=ttyS0,115200', 'rootdelay=300'} <= set(parameters)
+    assert consoles == ['console=tty0']
+    assert not any(parameter.startswith('earlyprintk=ttyS0') for parameter in parameters)
+    assert 'rootdelay=300' in parameters
 
 
 @pytest.mark.parametrize('release', ['jessie', 'bookworm'])

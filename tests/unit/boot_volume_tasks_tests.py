@@ -490,13 +490,13 @@ def test_volume_tasks_are_resolved_for_the_layout(layout):
     ('grub', 'wheezy', {grub.InstallGrub_1_99}),
     ('grub', 'jessie', {grub.InstallGrub_2}),
     ('grub', 'trixie', {grub.InstallGrub_2}),
-    ('extlinux', 'wheezy', {extlinux.ConfigureExtlinux, extlinux.InstallExtlinux}),
+    ('extlinux', 'wheezy', {extlinux.InstallExtlinux}),
     ('extlinux', 'jessie', {extlinux.ConfigureExtlinuxJessie, extlinux.InstallExtlinuxJessie}),
     ('extlinux', 'trixie', {extlinux.ConfigureExtlinuxJessie, extlinux.InstallExtlinuxJessie}),
 ])
 def test_bootloader_installation_is_resolved_for_the_release(bootloader, release, expected):
     installation = {grub.InstallGrub_1_99, grub.InstallGrub_2,
-                    extlinux.ConfigureExtlinux, extlinux.InstallExtlinux,
+                    extlinux.InstallExtlinux,
                     extlinux.ConfigureExtlinuxJessie, extlinux.InstallExtlinuxJessie}
     assert resolve_tasks(LAYOUTS['msdos'], bootloader, release) & installation == expected
 
@@ -570,16 +570,6 @@ def test_grub_1_99_is_installed_through_a_device_mapper_node(tmp_path, monkeypat
         == [mapper(idx) for idx in range(1, len(partitions) + 1)]
     remounts = host.commands[host.commands.index(['kpartx', '-as', LOOP_DEVICE]) + 1:]
     assert sorted(remounts) == sorted(mounts)
-
-
-def test_extlinux_gets_a_serial_console_on_wheezy(tmp_path):
-    (tmp_path / 'etc/default').mkdir(parents=True)
-    defaults = tmp_path / 'etc/default/extlinux'
-    defaults.write_text('EXTLINUX_UPDATE="true"\nEXTLINUX_PARAMETERS="ro quiet"\nEXTLINUX_TIMEOUT="50"\n',
-                        encoding='utf-8')
-    extlinux.ConfigureExtlinux.run(DictClass(root=str(tmp_path)))
-    assert defaults.read_text(encoding='utf-8') \
-        == 'EXTLINUX_UPDATE="true"\nEXTLINUX_PARAMETERS="ro quiet console=ttyS0"\nEXTLINUX_TIMEOUT="50"\n'
 
 
 @pytest.mark.parametrize('task,partition_type,mbr,update', [

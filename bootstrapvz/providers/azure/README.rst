@@ -4,6 +4,11 @@ Azure
 This provider generates raw images for Microsoft Azure computing
 platform.
 
+On Debian jessie and newer, ``serial-getty@ttyS0.service`` is enabled for serial
+logins. The boot configuration retains ``console=tty0`` but no longer adds
+``console=ttyS0`` or ``earlyprintk=ttyS0`` kernel arguments, including baud-rate
+variants.
+
 
 Manifest settings
 -----------------
