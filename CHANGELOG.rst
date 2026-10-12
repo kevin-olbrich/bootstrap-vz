@@ -21,6 +21,8 @@ Kevin Olbrich:
       UUID setup, and prevent volume detach if mapping cleanup fails.
     * Retry incomplete mount cleanup without unmounting completed children again,
       and allow rollback when the root partition is already unmounted.
+    * Disconnect NBD devices when attachment readiness fails or is interrupted,
+      and preserve the backing image if disconnect cleanup also fails.
 
 2026-09-24
 ----------

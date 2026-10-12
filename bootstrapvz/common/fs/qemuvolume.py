@@ -45,9 +45,20 @@ class QEMUVolume(LoopbackVolume):
 
     def _before_attach(self, e):
         self._check_nbd_module()
-        self.loop_device_path = self._find_free_nbd_device()
-        log_check_call(['qemu-nbd', '--connect', self.loop_device_path, self.image_path])
-        self._wait_for_nbd_device(self.loop_device_path)
+        device_path = self._find_free_nbd_device()
+        log_check_call(['qemu-nbd', '--connect', device_path, self.image_path])
+        self.loop_device_path = device_path
+        try:
+            self._wait_for_nbd_device(self.loop_device_path)
+        except (Exception, KeyboardInterrupt):
+            try:
+                self._before_detach(e)
+            except (Exception, KeyboardInterrupt):
+                # Keep the owned attachment tracked and prevent deletion of its backing image.
+                self.device_path = self.loop_device_path
+                self.fsm.current = 'attached'
+                raise
+            raise
         self.device_path = self.loop_device_path
 
     def _before_detach(self, e):
