@@ -10,6 +10,9 @@ Kevin Olbrich:
       Azure baud-rate variants. KVM's legacy ``console: serial`` setting remains
       accepted but no longer selects the kernel console. Older releases do not
       enable the systemd service.
+    * Accept a UUID symlink creation race only when the existing link resolves to
+      the current partition. Abort on dangling or conflicting links instead of
+      allowing GRUB to fall back to a build-host device path.
 
 2026-09-24
 ----------

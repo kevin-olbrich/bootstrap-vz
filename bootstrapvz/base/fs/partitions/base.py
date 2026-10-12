@@ -89,8 +89,9 @@ class BasePartition(AbstractPartition):
             try:
                 os.symlink(self.device_path, self.disk_by_uuid_path)
             except FileExistsError:
-                # udev was faster: its link points to the same device-mapper device
-                pass
+                # Accept udev's competing link only if it resolves to this partition.
+                if not os.path.samefile(self.device_path, self.disk_by_uuid_path):
+                    raise
 
     def unlink_uuid(self):
         if os.path.isfile(self.disk_by_uuid_path):

@@ -370,33 +370,69 @@ def test_udev_settles_before_the_partitions_are_unmapped(tmp_path, host):
     assert host.commands.index(['udevadm', 'settle']) < host.commands.index(['kpartx', '-ds', LOOP_DEVICE])
 
 
-def uuid_link_partition(monkeypatch, symlink):
-    """The root partition with a UUID, and /dev/disk/by-uuid of the build host left alone:
-    the link does not exist yet, symlink stands in for os.symlink"""
+def uuid_link_partition(tmp_path, monkeypatch):
+    """A partition backed by a temporary file, with UUID links redirected away from /dev"""
     partition = load_volume({'backing': 'raw', 'partitions': LAYOUTS['msdos']}, 'grub').partition_map.root
-    partition.device_path = mapper(3)
+    device = tmp_path / 'device'
+    device.write_bytes(b'')
+    partition.device_path = str(device)
     monkeypatch.setattr(partition, 'get_uuid', lambda: uuid_of(mapper(3)))
-    monkeypatch.setattr(os.path, 'exists', lambda path: False)
-    monkeypatch.setattr(os, 'makedirs', lambda path, exist_ok=False: None)
-    monkeypatch.setattr(os, 'symlink', symlink)
-    return partition
+    join = os.path.join
+
+    def local_join(directory, *paths):
+        if directory == '/dev/disk/by-uuid':
+            directory = str(tmp_path / 'by-uuid')
+        return join(directory, *paths)
+    monkeypatch.setattr(os.path, 'join', local_join)
+    return partition, tmp_path / 'by-uuid' / partition.get_uuid()
 
 
-def test_uuid_link_points_to_the_partition(monkeypatch):
-    links = []
-    partition = uuid_link_partition(monkeypatch, lambda src, dst: links.append((src, dst)))
+def test_uuid_link_points_to_the_partition(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
     partition.link_uuid()
-    assert links == [(mapper(3), '/dev/disk/by-uuid/' + uuid_of(mapper(3)))]
+    assert link.is_symlink()
+    assert os.readlink(link) == partition.device_path
+    assert os.path.samefile(link, partition.device_path)
 
 
-def test_uuid_link_created_by_udev_meanwhile_is_kept(monkeypatch):
+def test_uuid_link_created_by_udev_meanwhile_is_kept(tmp_path, monkeypatch):
     # Newer udev links device-mapper partitions in /dev/disk/by-uuid itself
     # (60-persistent-storage-dm.rules) - here between the check and os.symlink
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    (tmp_path / 'alias').symlink_to('device')
+    original_symlink = os.symlink
+
     def symlink(src, dst):
-        raise FileExistsError(17, 'File exists', dst)
-    partition = uuid_link_partition(monkeypatch, symlink)
+        original_symlink('../alias', dst)
+        original_symlink(src, dst)
+    monkeypatch.setattr(os, 'symlink', symlink)
     partition.link_uuid()
-    assert partition.disk_by_uuid_path == '/dev/disk/by-uuid/' + uuid_of(mapper(3))
+    assert partition.disk_by_uuid_path == str(link)
+    assert os.readlink(link) == '../alias'
+    assert os.path.samefile(link, partition.device_path)
+
+
+def test_dangling_uuid_link_is_rejected(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    link.parent.mkdir()
+    link.symlink_to('../missing')
+    with pytest.raises(OSError):
+        partition.link_uuid()
+    assert os.readlink(link) == '../missing'
+
+
+def test_racing_uuid_link_to_another_device_is_rejected(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    (tmp_path / 'other-device').write_bytes(b'')
+    original_symlink = os.symlink
+
+    def symlink(src, dst):
+        original_symlink('../other-device', dst)
+        original_symlink(src, dst)
+    monkeypatch.setattr(os, 'symlink', symlink)
+    with pytest.raises(FileExistsError):
+        partition.link_uuid()
+    assert os.readlink(link) == '../other-device'
 
 
 @pytest.mark.parametrize('layout,commands', [
