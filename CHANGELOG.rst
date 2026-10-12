@@ -23,6 +23,8 @@ Kevin Olbrich:
       and allow rollback when the root partition is already unmounted.
     * Disconnect NBD devices when attachment readiness fails or is interrupted,
       and preserve the backing image if disconnect cleanup also fails.
+    * Restore temporarily unmounted filesystems when image-copy, snapshot or
+      bootloader operations fail or are interrupted.
 
 2026-09-24
 ----------

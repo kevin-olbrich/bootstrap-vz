@@ -24,10 +24,12 @@ def unmounted(volume):
     p_map = volume.partition_map
     root_dir = p_map.root.mount_dir
     p_map.root.unmount()
-    if not isinstance(p_map, NoPartitions):
+    partitioned = not isinstance(p_map, NoPartitions)
+    if partitioned:
         p_map.unmap(volume)
+    try:
         yield
-        p_map.map(volume)
-    else:
-        yield
-    p_map.root.mount(destination=root_dir)
+    finally:
+        if partitioned:
+            p_map.map(volume)
+        p_map.root.mount(destination=root_dir)
