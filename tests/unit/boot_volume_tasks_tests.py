@@ -11,6 +11,7 @@ from bootstrapvz.base.bootstrapinfo import DictClass
 from bootstrapvz.base.fs import load_volume
 from bootstrapvz.base.fs.exceptions import PartitionError, VolumeError
 from bootstrapvz.base.fs.partitions.base import BasePartition
+from bootstrapvz.base.fs.partitions.mount import Mount
 from bootstrapvz.base.manifest import Manifest
 from bootstrapvz.base.tasklist import load_tasks
 from bootstrapvz.common import releases, tools
@@ -689,6 +690,117 @@ def test_volume_is_unmounted(tmp_path, host, layout):
     for index, path in enumerate(unmounted):
         assert not any(nested.startswith(path + '/') for nested in unmounted[index + 1:])
     assert all(partition.fsm.current != 'mounted' for partition in info.volume.partition_map.partitions)
+
+
+@pytest.mark.parametrize('layout', ['msdos', 'gpt', 'none'])
+@pytest.mark.parametrize('busy_mount', ['dev', ''])
+def test_unmount_retry_finishes_remaining_mounts(tmp_path, host, monkeypatch, layout, busy_mount):
+    info = build(tmp_path, host, LAYOUTS[layout])
+    prepare_volume(info)
+    mount_volume(info)
+    mounted = [command[-1] for command in host.commands if command[0] == 'mount']
+    busy_path = os.path.normpath(os.path.join(info.root, busy_mount))
+    busy_command = ['umount', busy_path]
+    error = subprocess.CalledProcessError(32, busy_command, 'target is busy')
+    host.commands.clear()
+
+    def unmount(command):
+        host(command)
+        if command == busy_command and host.commands.count(command) == 1:
+            raise error
+
+    monkeypatch.setattr('bootstrapvz.base.fs.partitions.abstract.log_check_call', unmount)
+    monkeypatch.setattr('bootstrapvz.base.fs.partitions.mount.log_check_call', unmount)
+    with pytest.raises(subprocess.CalledProcessError) as caught:
+        filesystem.UnmountRoot.run(info)
+    assert caught.value is error
+    assert info.volume.partition_map.root.fsm.current == 'mounted'
+    filesystem.UnmountRoot.run(info)
+    assert sorted(command[1] for command in host.commands) == sorted(mounted + [busy_path])
+    assert all(partition.fsm.current != 'mounted' for partition in info.volume.partition_map.partitions)
+
+
+def test_unmount_retry_preserves_busy_error(tmp_path, host, monkeypatch):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    mount_volume(info)
+    busy_command = ['umount', os.path.join(info.root, 'dev')]
+    error = subprocess.CalledProcessError(32, busy_command, 'target is busy')
+
+    def unmount(command):
+        host(command)
+        if command == busy_command:
+            raise error
+
+    monkeypatch.setattr('bootstrapvz.base.fs.partitions.mount.log_check_call', unmount)
+    for _ in range(2):
+        with pytest.raises(subprocess.CalledProcessError) as caught:
+            filesystem.UnmountRoot.run(info)
+        assert caught.value is error
+    root = info.volume.partition_map.root
+    assert root.fsm.current == 'mounted'
+    assert root.mounts['dev'].mount_dir == busy_command[1]
+
+
+def test_unmount_task_skips_already_unmounted_root(tmp_path, host):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    mount_volume(info)
+    filesystem.UnmountRoot.run(info)
+    host.commands.clear()
+    filesystem.UnmountRoot.run(info)
+    assert host.commands == []
+
+
+@pytest.mark.parametrize('partition_source', [False, True])
+def test_mount_teardown_skips_never_mounted_children(tmp_path, host, partition_source):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    source = info.volume.partition_map.boot if partition_source else '/dev'
+    mount = Mount(source, 'child', [])
+    host.commands.clear()
+    mount.unmount()
+    assert host.commands == []
+
+
+def test_mount_teardown_skips_already_unmounted_partition(tmp_path, host):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    mount_volume(info)
+    info.volume.partition_map.boot.unmount()
+    mount = info.volume.partition_map.root.mounts['boot']
+    host.commands.clear()
+    mount.unmount()
+    assert host.commands == []
+    assert not hasattr(mount, 'mount_dir')
+
+
+def test_mount_teardown_recovers_partial_partition_mount(tmp_path, host, monkeypatch):
+    info = build(tmp_path, host, LAYOUTS['msdos'])
+    prepare_volume(info)
+    boot_partition = info.volume.partition_map.boot
+    boot_partition.add_mount('none', 'proc', ['--types', 'proc'])
+    boot_partition.add_mount('none', 'sys', ['--types', 'sysfs'])
+    mount = Mount(boot_partition, 'boot', [])
+    boot_dir = os.path.join(info.workspace, 'boot')
+    failed_command = ['mount', '--types', 'proc', 'none', os.path.join(boot_dir, 'proc')]
+    error = subprocess.CalledProcessError(32, failed_command)
+
+    def mount_child(command):
+        host(command)
+        if command == failed_command:
+            raise error
+
+    monkeypatch.setattr('bootstrapvz.base.fs.partitions.mount.log_check_call', mount_child)
+    with pytest.raises(subprocess.CalledProcessError) as caught:
+        mount.mount(info.workspace)
+    assert caught.value is error
+    assert not hasattr(mount, 'mount_dir')
+    assert boot_partition.fsm.current == 'mounted'
+    host.commands.clear()
+    mount.unmount()
+    assert host.commands == [['umount', os.path.join(boot_dir, 'sys')], ['umount', boot_dir]]
+    assert boot_partition.fsm.current == 'formatted'
 
 
 def test_mount_dir_is_deleted(tmp_path, host):

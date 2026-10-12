@@ -864,18 +864,6 @@ Confirmed by the audit, not scheduled yet.
 
 - **Effort:** small; **Severity:** low
 
-### Make UnmountRoot safe to retry during rollback
-
-- **Where:** `bootstrapvz/base/fs/partitions/abstract.py:99-107`, `bootstrapvz/base/fs/partitions/mount.py:32-40`, `bootstrapvz/common/task_groups.py:220-227`, `bootstrapvz/base/main.py:136-142`, `bootstrapvz/base/tasklist.py:34-46`
-
-- **Problem:** `_before_unmount` unmounts each child mount first, and each `Mount.unmount()` ends with `del self.mount_dir`. Only then does it unmount the root. If any `umount` fails with "target is busy", fysom keeps the partition in `mounted` and `UnmountRoot` is not recorded as completed. The rollback map (`MountRoot: UnmountRoot`) then runs it again. The retry raises `AttributeError: 'Mount' object has no attribute 'mount_dir'` on the first child that was already unmounted, even after the busy condition has cleared. I reproduced this with the real classes and a stubbed `log_check_call`: `dev` was busy on the first attempt and nothing was busy on the retry. `TaskList.run` has no per-task error handling, so `UnmapPartitions`, `volume.Detach`, `volume.Delete` and `DeleteWorkspace` never run. The loop/nbd device, the kpartx mappings and the mounts stay on the host. Realistic triggers are a chroot process that is still exiting, or a user who frees the busy mount at the `--pause-on-error` prompt.
-
-- **Fix:** Make unmounting idempotent. `Mount.unmount` should skip a mount that has no `mount_dir`, and, for a partition source, one whose fsm is not `mounted`. `_before_unmount` should only `umount` the root while `mount_dir` is still set. A retried `UnmountRoot` then finishes the remaining mounts.
-
-- **Notes:** If the mount is still busy when rollback runs, an idempotent retry fails too, just with the real `umount` error instead of `AttributeError`. Do not adopt the broader options of continuing the rollback after a failing task or falling back to `umount --lazy`. They would run `kpartx -d` and `losetup -d`, and delete the image, while the volume is still mounted. A busy `dev/pts` alone already retries fine, because it is unmounted first. `DeleteWorkspace` uses `os.rmdir`, which fails safely on a non-empty workspace.
-
-- **Effort:** small; **Severity:** low
-
 ### Keep `/usr/share/doc/*/copyright` when minimize_size excludes docs
 
 - **Where:** `bootstrapvz/plugins/minimize_size/tasks/dpkg.py:111-125`, `bootstrapvz/plugins/minimize_size/tasks/dpkg.py:46-50`, `bootstrapvz/plugins/minimize_size/assets/bootstrap-files-filter.sh:8`, `bootstrapvz/plugins/minimize_size/README.rst:82-86`, `manifests/examples/docker/stretch-minimized.yml:12,47`, `manifests/examples/docker/jessie-minimized.yml:13,46`

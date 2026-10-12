@@ -19,6 +19,8 @@ Kevin Olbrich:
       preserving existing udev links and links replaced before cleanup.
     * Clean up partial partition mappings after command failures or interrupted
       UUID setup, and prevent volume detach if mapping cleanup fails.
+    * Retry incomplete mount cleanup without unmounting completed children again,
+      and allow rollback when the root partition is already unmounted.
 
 2026-09-24
 ----------

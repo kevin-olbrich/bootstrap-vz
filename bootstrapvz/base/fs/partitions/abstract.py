@@ -128,7 +128,6 @@ class AbstractPartition(FSMProxy, metaclass=ABCMeta):
         :param str destination: The mountpoint path of the mount that should be removed
         """
         # Unmount the mount if the partition is mounted and delete it from the mounts dict
-        # If the mount is already unmounted and the source is a partition, this will raise an exception
         if self.fsm.current == 'mounted':
             self.mounts[destination].unmount()
         del self.mounts[destination]

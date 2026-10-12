@@ -186,7 +186,9 @@ class UnmountRoot(Task):
 
     @classmethod
     def run(cls, info):
-        info.volume.partition_map.root.unmount()
+        root = info.volume.partition_map.root
+        if root.fsm.can('unmount'):
+            root.unmount()
 
 
 class RemoveMountTable(Task):

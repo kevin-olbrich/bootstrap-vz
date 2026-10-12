@@ -34,7 +34,10 @@ class Mount:
         """
         # If its a partition, it can unmount itself
         if isinstance(self.source, AbstractPartition):
-            self.source.unmount()
-        else:
+            # A child mount can fail after its partition has already become mounted.
+            if self.source.fsm.can('unmount'):
+                self.source.unmount()
+        elif hasattr(self, 'mount_dir'):
             log_check_call(['umount', self.mount_dir])
-        del self.mount_dir
+        if hasattr(self, 'mount_dir'):
+            del self.mount_dir
