@@ -84,7 +84,10 @@ class BasePartition(AbstractPartition):
         # Creating the symlink ensures that grub consistently uses
         # $GRUB_DEVICE_UUID when creating /boot/grub/grub.cfg
         self.disk_by_uuid_path = os.path.join('/dev/disk/by-uuid', self.get_uuid())
-        if not os.path.exists(self.disk_by_uuid_path):
+        if os.path.exists(self.disk_by_uuid_path):
+            if not os.path.samefile(self.device_path, self.disk_by_uuid_path):
+                raise FileExistsError('UUID link points to a different device: ' + self.disk_by_uuid_path)
+        else:
             os.makedirs(os.path.dirname(self.disk_by_uuid_path), exist_ok=True)
             try:
                 os.symlink(self.device_path, self.disk_by_uuid_path)

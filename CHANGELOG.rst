@@ -13,6 +13,8 @@ Kevin Olbrich:
     * Accept a UUID symlink creation race only when the existing link resolves to
       the current partition. Abort on dangling or conflicting links instead of
       allowing GRUB to fall back to a build-host device path.
+    * Validate UUID links that already exist before creation, rejecting links to
+      other devices while preserving aliases to the current partition.
 
 2026-09-24
 ----------

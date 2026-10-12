@@ -421,6 +421,26 @@ def test_dangling_uuid_link_is_rejected(tmp_path, monkeypatch):
     assert os.readlink(link) == '../missing'
 
 
+def test_existing_uuid_link_to_the_partition_is_kept(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    (tmp_path / 'alias').symlink_to('device')
+    link.parent.mkdir()
+    link.symlink_to('../alias')
+    partition.link_uuid()
+    assert os.readlink(link) == '../alias'
+    assert os.path.samefile(link, partition.device_path)
+
+
+def test_existing_uuid_link_to_another_device_is_rejected(tmp_path, monkeypatch):
+    partition, link = uuid_link_partition(tmp_path, monkeypatch)
+    (tmp_path / 'other-device').write_bytes(b'')
+    link.parent.mkdir()
+    link.symlink_to('../other-device')
+    with pytest.raises(FileExistsError):
+        partition.link_uuid()
+    assert os.readlink(link) == '../other-device'
+
+
 def test_racing_uuid_link_to_another_device_is_rejected(tmp_path, monkeypatch):
     partition, link = uuid_link_partition(tmp_path, monkeypatch)
     (tmp_path / 'other-device').write_bytes(b'')
