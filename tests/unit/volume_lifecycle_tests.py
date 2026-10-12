@@ -8,7 +8,7 @@ from bootstrapvz.base.fs.exceptions import VolumeError
 from bootstrapvz.common.fs import qemuvolume, unmounted
 from bootstrapvz.common.tasks import filesystem, loopback, partitioning, volume, workspace
 from .boot_volume_tasks_tests import (LAYOUTS, LOOP_DEVICE, NBD_LOADED, build, mount_volume,
-                                     nbd_host, prepare_volume)
+                                      nbd_host, prepare_volume)
 from .boot_volume_tasks_tests import fixture_host, no_host_commands
 
 # Re-export the shared fixtures so pytest registers them for this module.
